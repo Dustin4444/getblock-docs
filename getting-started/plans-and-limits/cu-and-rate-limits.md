@@ -24,7 +24,7 @@ GetBlock’s shared node service is subject to several usage limits. These are t
 * **RPS (Requests Per Second)**: Each plan enforces a maximum number of requests you can send every second. While you’re not billed per request, staying within this limit is critical to maintaining optimal service quality.
 * [**Access Tokens**](../authentication-with-access-tokens.md)**:** Access tokens are unique identifiers used to authenticate your connection to GetBlock’s node infrastructure, generated when you create an endpoint. The limitation on your plan determines how many of these access tokens (and therefore endpoints) you can create.
 
-<table><thead><tr><th>Plan</th><th width="129.24566650390625">Price (monthly)</th><th width="120.96441650390625">CU Allocation</th><th width="116.09033203125">RPS Limit</th><th width="99.59716796875">Access Tokens</th><th width="102.822021484375" data-type="checkbox">CU Top-ups</th></tr></thead><tbody><tr><td>Free</td><td>$0</td><td>50,000 / day</td><td>20 RPS</td><td>2</td><td>false</td></tr><tr><td>Starter</td><td>$49</td><td>50M / mo</td><td>100 RPS</td><td>10</td><td>true</td></tr><tr><td>Growth</td><td>$99</td><td>105M / mo</td><td>150 RPS</td><td>15</td><td>true</td></tr><tr><td>Advanced</td><td>$199</td><td>220M / mo</td><td>300 RPS</td><td>25</td><td>true</td></tr><tr><td>Scale</td><td>$349</td><td>400M / mo</td><td>400 RPS</td><td>35</td><td>true</td></tr><tr><td>Pro</td><td>$499</td><td>600M / mo</td><td>500 RPS</td><td>50</td><td>true</td></tr><tr><td>Premium</td><td>$699</td><td>900M / mo</td><td>700 RPS</td><td>75</td><td>true</td></tr><tr><td>Enterprise</td><td>from $999</td><td>Custom</td><td>Custom</td><td>Custom</td><td>true</td></tr></tbody></table>
+<table data-search="false"><thead><tr><th>Plan</th><th width="129.24566650390625">Price (monthly)</th><th width="120.96441650390625">CU Allocation</th><th width="116.09033203125">RPS Limit</th><th width="99.59716796875">Access Tokens</th><th width="102.822021484375" data-type="checkbox">CU Top-ups</th></tr></thead><tbody><tr><td>Free</td><td>$0</td><td>50,000 / day</td><td>20 RPS</td><td>2</td><td>false</td></tr><tr><td>Starter</td><td>$49</td><td>90M / mo</td><td>100 RPS</td><td>10</td><td>true</td></tr><tr><td>Growth</td><td>$99</td><td>185M / mo</td><td>150 RPS</td><td>15</td><td>true</td></tr><tr><td>Advanced</td><td>$199</td><td>385M / mo</td><td>300 RPS</td><td>25</td><td>true</td></tr><tr><td>Scale</td><td>$349</td><td>700M / mo</td><td>400 RPS</td><td>35</td><td>true</td></tr><tr><td>Pro</td><td>$499</td><td>1B / mo</td><td>500 RPS</td><td>50</td><td>true</td></tr><tr><td>Premium</td><td>$699</td><td>1.6B / mo</td><td>700 RPS</td><td>75</td><td>true</td></tr><tr><td>Enterprise</td><td>from $999</td><td>Custom</td><td>Custom</td><td>Custom</td><td>true</td></tr></tbody></table>
 
 Check [https://getblock.io/pricing/](https://getblock.io/pricing/) for current pricing and annual discounts across all tiers.
 
@@ -54,7 +54,7 @@ For use cases that are growing beyond the free tier — a first production app o
 
 <figure><img src="../../.gitbook/assets/Starter_widget_upd.svg" alt="Starter plan limits for Shared RPC nodes by GetBlock"><figcaption></figcaption></figure>
 
-* **CU**: 50M per month (\~1.6M/day)
+* **CU**: 90M per month (\~3M/day)
 * **Throughput**: 100 requests per second (RPS)
 * **Access Tokens**: 10
 * Additional CU packages can be purchased as needed.
@@ -65,7 +65,7 @@ For apps with a growing user base: higher daily call volumes and room for severa
 
 <figure><img src="../../.gitbook/assets/Growth_widget.png" alt=""><figcaption></figcaption></figure>
 
-* **CU**: 105M per month (\~3.5M/day)
+* **CU**: 185M per month (\~6.2M/day)
 * **Throughput**: 150 requests per second (RPS)
 * **Access Tokens**: 15
 * Additional CU packages can be purchased as needed.
@@ -76,7 +76,7 @@ For apps with a growing user base: higher daily call volumes and room for severa
 
 <figure><img src="../../.gitbook/assets/Advanced_widget_upd.svg" alt=""><figcaption></figcaption></figure>
 
-* **CU**: 220M per month (\~7.2M/day)
+* **CU**: 385M per month (\~12.8M/day)
 * **Throughput**: 300 requests per second (RPS)
 * **Access Tokens**: 25
 * Add extra compute units (CU) to your account balance when needed without switching plans
@@ -87,7 +87,7 @@ For larger apps and teams. More CU headroom and endpoints to run many services o
 
 <figure><img src="../../.gitbook/assets/Scale-widget.png" alt=""><figcaption></figcaption></figure>
 
-* **CU**: 400M per month (\~13.3M/day)
+* **CU**: 700M per month (\~23.3M/day)
 * **Throughput**: 400 requests per second (RPS)
 * **Access** **Tokens**: 35
 * Extra CU packages also available
@@ -98,7 +98,7 @@ For applications that need significantly **higher throughput** and **increased r
 
 <figure><img src="../../.gitbook/assets/Pro_widget_upd.svg" alt="RPC node with higher-limit access"><figcaption></figcaption></figure>
 
-* **CU**: 600M per month (\~20M/day)
+* **CU**: 1B per month (\~33.3M/day)
 * **Throughput**: 500 requests per second (RPS)
 * **Access Tokens**: 50
 * Purchase additional CU packages when required
@@ -109,7 +109,7 @@ For applications that need significantly **higher throughput** and **increased r
 
 <figure><img src="../../.gitbook/assets/Premium-widget.png" alt=""><figcaption></figcaption></figure>
 
-* **CU**: 900M per month (\~30M/day)
+* **CU**: 1.6B per month (\~53.3M/day)
 * **Throughput**: 700 requests per second (RPS)
 * **Access Tokens**: 75
 * CU top-ups available

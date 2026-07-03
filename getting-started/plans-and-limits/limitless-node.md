@@ -1,7 +1,7 @@
 ---
 description: >-
   A dedicated RPC endpoint with guaranteed RPS and no request limits, at a flat
-  monthly price. For Ethereum, Solana, Bitcoin and other tier-1 blockchains.
+  monthly price. For Ethereum, Solana, Bitcoin and other Tier-1 blockchains.
 ---
 
 # Limitless Node
@@ -85,6 +85,8 @@ To get started:
 4. Receive your RPC endpoint, generate [access token(s)](https://docs.getblock.io/getting-started/authentication-with-access-tokens). Connect your application and start sending requests.
 
 Our team can also recommend the right tier based on your workload. <a href="https://getblock.io/contact/" class="button primary">Get a free consultation.</a>&#x20;
+
+***
 
 #### Next steps
 
