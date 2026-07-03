@@ -11,7 +11,7 @@ This Subscribes to contract event logs emitted by preconfirmed transactions — 
 This is the fastest way to react to on-chain events, up to \~1.8 seconds ahead of the standard `logs` subscription.
 
 {% hint style="warning" %}
-**WebSocket-only method.** This method requires the WebSocket transport at `wss://go.getblock.io/<ACCESS-TOKEN>/`. It will not work via HTTP POST. Preconfirmed events arrive at the Flashblock cadence — approximately every 200ms on Base, 250ms on Optimism.
+**WebSocket-only method.** This method requires the WebSocket transport at `wss://go.getblock.io/<ACCESS-TOKEN>/`. It will not work via HTTP POST. Preconfirmed events arrive at the Flashblocks cadence — approximately every 200ms on Base, 250ms on Optimism.
 {% endhint %}
 
 ## Parameters

@@ -6,7 +6,7 @@ description: >-
 
 # eth\_simulateV1 - Flashblocks
 
-This simulates a bundle of transactions against the latest Flashblock — including state overrides, transfer tracing, and full validation. This is critical for MEV searchers, liquidation bots, and any application that needs to know "what would happen if I submitted this bundle right now, given the preconfirmed state?" The simulation reflects every transaction already committed to the in-progress block.
+This simulates a bundle of transactions against the latest Flashblocks — including state overrides, transfer tracing, and full validation. This is critical for MEV searchers, liquidation bots, and any application that needs to know "what would happen if I submitted this bundle right now, given the preconfirmed state?" The simulation reflects every transaction already committed to the in-progress block.
 
 ## Parameters
 

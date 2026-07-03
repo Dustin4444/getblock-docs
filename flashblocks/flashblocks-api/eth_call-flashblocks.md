@@ -6,7 +6,7 @@ description: >-
 
 # eth\_call - Flashblocks
 
-This executes a read-only contract call without creating a transaction. When the block reference is `"pending"`, the call executes against state including every transaction preconfirmed into the latest Flashblock. This lets applications compute derived values (token balances, oracle prices, pool reserves) reflecting the freshest possible state.
+This executes a read-only contract call without creating a transaction. When the block reference is `"pending"`, the call executes against state including every transaction preconfirmed into the latest Flashblocks. This lets applications compute derived values (token balances, oracle prices, pool reserves) reflecting the freshest possible state.
 
 ## Parameters
 

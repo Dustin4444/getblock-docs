@@ -6,10 +6,10 @@ description: >-
 
 # newFlashblocks - Flashblocks
 
-This subscribes to the full Flashblock payload stream as each preconfirmed sub-block is built. Each notification delivers a Flashblock Object containing `payload_id`, `index` (0-9 on Base, 0-7 on Optimism), `diff` (the delta since the previous Flashblock), and — on the first Flashblock of a new block (`index: 0`) — a `base` field with the block's initial state. This is the lowest-latency Flashblocks subscription and the canonical way to build sub-block indexers.
+This subscribes to the full Flashblocks payload stream as each preconfirmed sub-block is built. Each notification delivers a Flashblocks Object containing `payload_id`, `index` (0-9 on Base, 0-7 on Optimism), `diff` (the delta since the previous Flashblocks), and — on the first Flashblocks of a new block (`index: 0`) — a `base` field with the block's initial state. This is the lowest-latency Flashblocks subscription and the canonical way to build sub-block indexers.
 
 {% hint style="warning" %}
-**WebSocket-only method.** This method requires the WebSocket transport at `wss://go.getblock.io/<ACCESS-TOKEN>/`. It will not work via HTTP POST. Preconfirmed events arrive at the Flashblock cadence — approximately every 200ms on Base, 250ms on Optimism.
+**WebSocket-only method.** This method requires the WebSocket transport at `wss://go.getblock.io/<ACCESS-TOKEN>/`. It will not work via HTTP POST. Preconfirmed events arrive at the Flashblocks cadence — approximately every 200ms on Base, 250ms on Optimism.
 {% endhint %}
 
 ## Parameters
@@ -136,9 +136,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ## Response Parameters
 
-| Field  | Type   | Description                                                                                                                                                                  |
-| ------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| result | string | Hex-encoded subscription ID. Each subsequent `eth_subscription` notification carries a Flashblock Object payload with `payload_id`, `index`, `diff`, and (on index 0) `base` |
+| Field  | Type   | Description                                                                                                                                                                   |
+| ------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| result | string | Hex-encoded subscription ID. Each subsequent `eth_subscription` notification carries a Flashblocks Object payload with `payload_id`, `index`, `diff`, and (on index 0) `base` |
 
 ## Use Cases
 

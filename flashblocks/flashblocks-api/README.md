@@ -1,10 +1,13 @@
 ---
-description: This contain all the methods for flashblock on Base network
+description: >-
+  let's make description: Flashblocks API on the Base network: fetch the latest
+  in-progress block with every preconfirmed transaction. Quickstart examples in
+  JavaScript and Python
 ---
 
 # Flashblocks API
 
-This section contains all the flashblock methods available on the Base network
+This section contains all the Flashblocks methods available on the Base network
 
 ### Quickstart
 

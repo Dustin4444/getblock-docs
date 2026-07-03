@@ -7,7 +7,7 @@ description: >-
 
 # base\_transactionStatus - Flashblocks
 
-This Checks whether a specific transaction is currently present in the node's mempool. This confirms that a submitted transaction has been received by the sequencer _before_ it appears in a Flashblock — closing the gap between submission and first preconfirmation. Base-specific: this method exists on Base's Flashblocks endpoints but has no equivalent on Optimism.
+This Checks whether a specific transaction is currently present in the node's mempool. This confirms that a submitted transaction has been received by the sequencer _before_ it appears in a Flashblocks — closing the gap between submission and first preconfirmation. Base-specific: this method exists on Base's Flashblocks endpoints but has no equivalent on Optimism.
 
 {% hint style="warning" %}
 **Base-only method.** This method is exposed by Base's Flashblocks infrastructure but has no equivalent on Optimism. Calling it against an Optimism endpoint will return `-32601 Method not found`.
