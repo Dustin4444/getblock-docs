@@ -200,7 +200,6 @@ const result = await provider.send('eth_getBlockReceipts', ["pending"]);
 console.log(result);
 
 // Many standard methods have typed wrappers on ethers Provider that accept 'pending':
-// provider.getBalance(addr, 'pending'), provider.getTransactionCount(addr, 'pending'), etc.
 ```
 {% endcode %}
 {% endtab %}

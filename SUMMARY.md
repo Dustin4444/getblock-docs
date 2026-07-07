@@ -43,6 +43,7 @@
 
 * [Overview](flashblocks/overview.md)
 * [Base Flashblocks](flashblocks/base-flashblocks.md)
+* [Optimism Flashblocks](flashblocks/optimism-flashblocks.md)
 * [Flashblocks API](flashblocks/flashblocks-api/README.md)
   * [eth\_getTransactionCount - Flashblocks](flashblocks/flashblocks-api/eth_gettransactioncount-flashblocks.md)
   * [eth\_getStorageAt - Flashblocks](flashblocks/flashblocks-api/eth_getstorageat-flashblocks.md)
@@ -54,12 +55,12 @@
   * [eth\_call - Flashblocks](flashblocks/flashblocks-api/eth_call-flashblocks.md)
   * [eth\_simulateV1 - Flashblocks](flashblocks/flashblocks-api/eth_simulatev1-flashblocks.md)
   * [eth\_getLogs - Flashblocks](flashblocks/flashblocks-api/eth_getlogs-flashblocks.md)
+  * [eth\_getCode - Flashblocks](flashblocks/flashblocks-api/eth_getcode-flashblocks.md)
   * [newFlashblocks - Flashblocks](flashblocks/flashblocks-api/newflashblocks-flashblocks.md)
   * [pendingLogs - Flashblocks](flashblocks/flashblocks-api/pendinglogs-flashblocks.md)
   * [newFlashblockTransactions - Flashblocks](flashblocks/flashblocks-api/newflashblocktransactions-flashblocks.md)
   * [eth\_unsubscribe - Flashblocks](flashblocks/flashblocks-api/eth_unsubscribe-flashblocks.md)
   * [base\_transactionStatus - Flashblocks](flashblocks/flashblocks-api/base_transactionstatus-flashblocks.md)
-* [Optimism Flashblocks](flashblocks/optimism-flashblocks.md)
 
 ## Solana Advanced Data Tools
 

@@ -31,7 +31,7 @@ This is the fastest way to react to on-chain events, up to \~1.8 seconds ahead o
 wscat -c 'wss://go.getblock.io/<ACCESS-TOKEN>/'
 
 # Then send:
-{"jsonrpc": "2.0", "method": "pendingLogs", "params": ["pendingLogs", {"address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", "topics": ["0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"]}], "id": "getblock.io"}
+{"jsonrpc": "2.0", "method": "eth_subscribe", "params": ["pendingLogs", {"address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", "topics": ["0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"]}], "id": "getblock.io"}
 ```
 {% endcode %}
 {% endtab %}
@@ -45,7 +45,7 @@ const ws = new WebSocket('wss://go.getblock.io/<ACCESS-TOKEN>/');
 ws.on('open', () => {
     ws.send(JSON.stringify({
     "jsonrpc": "2.0",
-    "method": "pendingLogs",
+    "method": "eth_subscribe",
     "params": [
         "pendingLogs",
         {
@@ -82,7 +82,7 @@ async def main():
     async with websockets.connect('wss://go.getblock.io/<ACCESS-TOKEN>/') as ws:
         await ws.send(json.dumps({
     "jsonrpc": "2.0",
-    "method": "pendingLogs",
+    "method": "eth_subscribe",
     "params": [
         "pendingLogs",
         {
@@ -120,7 +120,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let payload = json!({
         "jsonrpc": "2.0",
-        "method": "pendingLogs",
+        "method": "eth_subscribe",
         "params": [
                 "pendingLogs",
                 {

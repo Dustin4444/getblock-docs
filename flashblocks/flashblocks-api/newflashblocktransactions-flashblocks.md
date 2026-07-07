@@ -30,7 +30,7 @@ This subscribes to individual preconfirmed transactions as they land in Flashblo
 wscat -c 'wss://go.getblock.io/<ACCESS-TOKEN>/'
 
 # Then send:
-{"jsonrpc": "2.0", "method": "newFlashblockTransactions", "params": ["newFlashblockTransactions", true], "id": "getblock.io"}
+{"jsonrpc": "2.0", "method": "eth_subscribe", "params": ["newFlashblockTransactions", true], "id": "getblock.io"}
 ```
 {% endcode %}
 {% endtab %}
@@ -44,7 +44,7 @@ const ws = new WebSocket('wss://go.getblock.io/<ACCESS-TOKEN>/');
 ws.on('open', () => {
     ws.send(JSON.stringify({
     "jsonrpc": "2.0",
-    "method": "newFlashblockTransactions",
+    "method": "eth_subscribe",
     "params": [
         "newFlashblockTransactions",
         true
@@ -76,7 +76,7 @@ async def main():
     async with websockets.connect('wss://go.getblock.io/<ACCESS-TOKEN>/') as ws:
         await ws.send(json.dumps({
     "jsonrpc": "2.0",
-    "method": "newFlashblockTransactions",
+    "method": "eth_subscribe",
     "params": [
         "newFlashblockTransactions",
         true
@@ -109,7 +109,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let payload = json!({
         "jsonrpc": "2.0",
-        "method": "newFlashblockTransactions",
+        "method": "eth_subscribe",
         "params": [
                 "newFlashblockTransactions",
                 true

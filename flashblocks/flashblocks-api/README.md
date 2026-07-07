@@ -1,13 +1,19 @@
 ---
 description: >-
-  let's make description: Flashblocks API on the Base network: fetch the latest
-  in-progress block with every preconfirmed transaction. Quickstart examples in
-  JavaScript and Python
+  Flashblocks API on the Base network: fetch the latest in-progress block,
+  including all preconfirmed transactions. Quickstart examples in JavaScript and
+  Python
 ---
 
 # Flashblocks API
 
-This section contains all the Flashblocks methods available on the Base network
+This section contains all the Flashblock methods available on the Base network
+
+{% hint style="info" %}
+### To make use of Flashblocks:
+
+Flashblocks are simply a class of RPC API methods that are now active on GetBlock endpoints for Base and Optimism. If you already run either chain with GetBlock, the new methods are available on your existing endpoint; if you are new, set up a Base or Optimism endpoint from the [GetBlock dashboard](https://account.getblock.io/) and the methods are there.
+{% endhint %}
 
 ### Quickstart
 
@@ -54,7 +60,7 @@ Set the ES module `"type": "module"` in your `package.json`.
 {% step %}
 ### Add code
 
-{% code title="index.js" %}
+{% code title="index.js" overflow="wrap" %}
 ```javascript
 import axios from 'axios';
 
@@ -196,7 +202,7 @@ print(response.text)
 ```
 {% endcode %}
 
-Replace `<ACCESS-TOKEN>` with your actual access token from GetBlock.
+Replace `<ACCESS-TOKEN>` with your actual GetBlock access token.
 {% endstep %}
 
 {% step %}
