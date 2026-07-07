@@ -33,7 +33,7 @@ Always check available configurations in your dashboard
 
 #### _Reference High vs Standard tier comparison_&#x20;
 
-<table><thead><tr><th width="208.7109375">Feature</th><th>High Performance</th><th>Standard Performance</th></tr></thead><tbody><tr><td><strong>Resource allocation</strong></td><td>Maximum hardware and bandwidth</td><td>Balanced hardware profile</td></tr><tr><td><strong>Throughput</strong></td><td>Highest supported</td><td>High</td></tr><tr><td><strong>SLA</strong></td><td>99.9% uptime</td><td>99.5% uptime</td></tr><tr><td><strong>Recommended for</strong></td><td>Applications with high transaction volumes &#x26; large user bases, mission-critical systems, and any workflow where latency and throughput are the top priority</td><td>Most production dApps, wallets, and enterprise tools or projects that need guaranteed resources but do not require the maximum performance tier</td></tr></tbody></table>
+<table><thead><tr><th width="208.7109375">Feature</th><th>High Performance</th><th>Standard Performance</th></tr></thead><tbody><tr><td><strong>Resource allocation</strong></td><td>Maximum hardware and bandwidth</td><td>Balanced hardware profile</td></tr><tr><td><strong>Throughput</strong></td><td>Highest supported</td><td>High</td></tr><tr><td><strong>Uptime SLA</strong></td><td>99.95%</td><td>99.9%</td></tr><tr><td><strong>Recommended for</strong></td><td>Applications with high transaction volumes &#x26; large user bases, mission-critical systems, and any workflow where latency and throughput are the top priority</td><td>Most production dApps, wallets, and enterprise tools or projects that need guaranteed resources but do not require the maximum performance tier</td></tr></tbody></table>
 
 ***
 

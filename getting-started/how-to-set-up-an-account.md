@@ -15,7 +15,7 @@ icon: file-lines
 
 Visit the [homepage](https://getblock.io/) and click on the 'Dashboard' button in the upper-right corner, or use [this direct link](https://account.getblock.io/sign-up).
 
-<figure><img src="../.gitbook/assets/Signup_page_2025.svg" alt="How to create an account on GetBlock"><figcaption><p>GetBlock's Sign-Up page, where users can register to access blockchain services</p></figcaption></figure>
+<figure><img src="../.gitbook/assets/getblock-signup-page.webp" alt="How to create an account on GetBlock"><figcaption><p>GetBlock's Sign-Up page, where users can register to access blockchain services</p></figcaption></figure>
 {% endstep %}
 
 {% step %}
@@ -30,6 +30,8 @@ Visit the [homepage](https://getblock.io/) and click on the 'Dashboard' button i
 *   **Connect with MetaMask**
 
     Use a MetaMask wallet browser extension to sign up – no email or password required. If you don’t have a wallet extension installed, you’ll be prompted to add one.
+* **WalletConnect** \
+  Sign in with MetaMask Mobile, Trust Wallet, Rabby, Ledger Live, or another WalletConnect-compatible wallet.
 *   **Sign up with GitHub**
 
     Use your GitHub credentials to set up an account.

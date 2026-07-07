@@ -52,7 +52,7 @@ To increase usage limits, choose between the higher-tier options.
 {% tab title="Starter" %}
 For use cases that are growing beyond the free tier — a first production app or side project. Offers a **significant increase in CU** and **RPS** compared to the Free plan.&#x20;
 
-<figure><img src="../../.gitbook/assets/Starter_widget_upd.svg" alt="Starter plan limits for Shared RPC nodes by GetBlock"><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Starter_widget_upd (1).svg" alt="Starter plan limits for Shared RPC nodes by GetBlock"><figcaption></figcaption></figure>
 
 * **CU**: 90M per month (\~3M/day)
 * **Throughput**: 100 requests per second (RPS)
@@ -63,7 +63,7 @@ For use cases that are growing beyond the free tier — a first production app o
 {% tab title="Growth" %}
 For apps with a growing user base: higher daily call volumes and room for several services or environments at once.
 
-<figure><img src="../../.gitbook/assets/Growth_widget.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Growth_widget_upd.svg" alt="GetBlock &#x22;Growth&#x22; RPC plan limits"><figcaption></figcaption></figure>
 
 * **CU**: 185M per month (\~6.2M/day)
 * **Throughput**: 150 requests per second (RPS)
@@ -74,7 +74,7 @@ For apps with a growing user base: higher daily call volumes and room for severa
 {% tab title="Advanced" %}
 **Mid-to-upper tier, production-ready** plan, suitable for moderate-to-high traffic applications.
 
-<figure><img src="../../.gitbook/assets/Advanced_widget_upd.svg" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Advanced_widget_upd (1).svg" alt="GetBlock Advanced plan CU limits and RPS limits"><figcaption></figcaption></figure>
 
 * **CU**: 385M per month (\~12.8M/day)
 * **Throughput**: 300 requests per second (RPS)
@@ -85,7 +85,7 @@ For apps with a growing user base: higher daily call volumes and room for severa
 {% tab title="Scale" %}
 For larger apps and teams. More CU headroom and endpoints to run many services or environments from one account.
 
-<figure><img src="../../.gitbook/assets/Scale-widget.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Scale-widget-upd.svg" alt="GetBlock&#x27;s &#x22;Scale&#x22; RPC node plan limits - Compute Units (CUs) and requests-per-second"><figcaption></figcaption></figure>
 
 * **CU**: 700M per month (\~23.3M/day)
 * **Throughput**: 400 requests per second (RPS)
@@ -96,7 +96,7 @@ For larger apps and teams. More CU headroom and endpoints to run many services o
 {% tab title="Pro" %}
 For applications that need significantly **higher throughput** and **increased resource availability** compared to lower tier plans.
 
-<figure><img src="../../.gitbook/assets/Pro_widget_upd.svg" alt="RPC node with higher-limit access"><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Pro_widget (1).svg" alt="GetBlock&#x27;s &#x22;Pro&#x22; subscription plan CU allowance and rate limits"><figcaption></figcaption></figure>
 
 * **CU**: 1B per month (\~33.3M/day)
 * **Throughput**: 500 requests per second (RPS)
@@ -107,7 +107,7 @@ For applications that need significantly **higher throughput** and **increased r
 {% tab title="Premium" %}
 **Highest** standard tier before custom Enterprise terms. Built for sustained high-volume production traffic.
 
-<figure><img src="../../.gitbook/assets/Premium-widget.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Premium-widget (1).svg" alt="GetBlock&#x27;s RPC plan with highest request and RPS limits - &#x22;Premium&#x22;"><figcaption></figcaption></figure>
 
 * **CU**: 1.6B per month (\~53.3M/day)
 * **Throughput**: 700 requests per second (RPS)
@@ -118,7 +118,7 @@ For applications that need significantly **higher throughput** and **increased r
 {% tab title="Enterprise" %}
 **Fully customizable** with tailored CU allocations, rate limits, and access tokens to meet exceptionally high call volumes and performance requirements.
 
-<figure><img src="../../.gitbook/assets/Enterprise_widget.svg" alt="GetBlock&#x27;s Enterprise plan with custom usage limit settings"><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Enterprise_widget_upd.svg" alt="GetBlock&#x27;s Enterprise plan with custom usage limit settings"><figcaption></figcaption></figure>
 
 * **CU**: Custom monthly allocation based on your demands
 * **Throughput**: Custom

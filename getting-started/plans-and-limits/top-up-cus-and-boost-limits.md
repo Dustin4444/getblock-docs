@@ -6,7 +6,7 @@ description: >-
 
 # Top up CUs and boost limits
 
-The current **CU balance** **for Shared Node** users is displayed on the **Dashboard**. This shows how many Compute Units (CUs) are left before running out.&#x20;
+The current **CU balance** **for Shared Node** users is displayed on the **Dashboard**. This shows how many Compute Units (CUs) are left before running out.
 
 With the "**Top Up**" feature, users can add more **Compute Units** to their account or upgrade to higher monthly limits.
 
@@ -14,7 +14,7 @@ With the "**Top Up**" feature, users can add more **Compute Units** to their acc
 
 ### Add Compute Units: Paid plan users
 
-<figure><img src="../../.gitbook/assets/Starter_with_top_up_button.png" alt="managing GetBlock CU balance"><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/TopUp_Starter-new.png" alt="topping up GetBlock CU balance"><figcaption></figcaption></figure>
 
 **Starter, Pro & Enterprise** users can refill their CU balance or switch to another plan for increased limits:
 
