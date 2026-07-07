@@ -43,7 +43,7 @@
 
 * [Overview](flashblocks/overview.md)
 * [Base Flashblocks](flashblocks/base-flashblocks.md)
-* [Optimism Flashblocks](flashblocks/optimism-flashblocks.md)
+* [Optimism Flashblocks.](flashblocks/optimism-flashblocks..md)
 * [Flashblocks API](flashblocks/flashblocks-api/README.md)
   * [eth\_getTransactionCount - Flashblocks](flashblocks/flashblocks-api/eth_gettransactioncount-flashblocks.md)
   * [eth\_getStorageAt - Flashblocks](flashblocks/flashblocks-api/eth_getstorageat-flashblocks.md)

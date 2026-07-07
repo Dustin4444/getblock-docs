@@ -884,6 +884,6 @@ You've built a real-time Base Flashblocks listener in Go that:
 
 * [Base Flashblocks Documentation](https://docs.base.org/chain/flashblocks)
 * [Base Blog: Flashblocks Deep Dive](https://blog.base.dev/flashblocks-deep-dive)
-* [Base Flashblocks Listener Repo](https://github.com/GetBlock-io/guides/tree/main/base-flashblocks-listener)
+* [Base Flashblocks Listener Repo](https://github.com/GetBlock-io/guides/tree/main/flashblocks-listener/base)
 * [Flashbots Documentation](https://docs.flashbots.net/)
 * [GetBlock Dashboard](https://account.getblock.io/)

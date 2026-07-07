@@ -91,5 +91,5 @@ Example response:
 The result field shows the account balance in wei (1 ether = 10¹⁸ wei).
 
 {% hint style="info" %}
-For a list of supported RPC methods with examples, navigate to [API Reference](../../guides/testing-rpc-connection/broken-reference/).
+For a list of supported RPC methods with examples, navigate to [API Reference](https://github.com/GetBlock-io/getblock-docs/blob/main/guides/testing-rpc-connection/broken-reference/README.md).
 {% endhint %}
