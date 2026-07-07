@@ -27,37 +27,8 @@ There are two access patterns:
 * **WebSocket streaming (subscriptions)**: Open a WebSocket connection and subscribe to a Flashblocks topic to receive each Flashblock as it is produced — five times per second. This is intended for latency-sensitive consumers such as trading systems. Applications should avoid a hard dependency on the WebSocket stream and treat it as an optimization layer over the RPC interface.
 
 {% hint style="info" %}
-Flashblocks are simply a class of RPC API methods that are now active on GetBlock endpoints for Base and Optimism. If you already run either chain with GetBlock, the new methods are available on your existing endpoint. If you are new, set up a Base or Optimism endpoint from the [GetBlock dashboard,](https://account.getblock.io) and the methods are there.
+Flashblocks are simply a class of [RPC API methods](flashblocks-api/) that are now active on GetBlock endpoints for Base and Optimism. If you already run either chain with GetBlock, the new methods are available on your existing endpoint. If you are new, set up a Base or Optimism endpoint from the [GetBlock dashboard,](https://account.getblock.io) and the methods are there.
 {% endhint %}
-
-## Available Methods
-
-Flashblocks reuse the standard Ethereum JSON-RPC surface. The following methods return preconfirmed Flashblock state when queried with the `pending` block tag:
-
-<table data-search="false"><thead><tr><th>Method</th><th>Flashblock Behavior</th></tr></thead><tbody><tr><td><code>eth_getBlockByNumber</code></td><td>Returns the current Flashblock when called with <code>pending</code></td></tr><tr><td><code>eth_getBalance</code></td><td>Returns the balance reflecting the latest Flashblock state</td></tr><tr><td><code>eth_getTransactionCount</code></td><td>Returns a nonce that accounts for transactions in Flashblocks</td></tr><tr><td><code>eth_call</code></td><td>Executes against preconfirmed Flashblock state</td></tr><tr><td><code>eth_estimateGas</code></td><td>Estimates gas against preconfirmed Flashblock state</td></tr><tr><td><code>eth_getCode</code></td><td>Returns contract code at the preconfirmed state</td></tr><tr><td><code>eth_getStorageAt</code></td><td>Returns storage values at the preconfirmed state</td></tr></tbody></table>
-
-The following methods reflect Flashblock state directly, without a block tag:
-
-| Method                      | Flashblock Behavior                                              |
-| --------------------------- | ---------------------------------------------------------------- |
-| `eth_getTransactionReceipt` | Returns a receipt as soon as a transaction lands in a Flashblock |
-| `eth_getTransactionByHash`  | Returns transaction data for preconfirmed transactions           |
-
-#### Dedicated Flashblocks methods:
-
-| Method            | Description                                                            |
-| ----------------- | ---------------------------------------------------------------------- |
-| `eth_simulateV1`  | Simulates calls and transactions against the latest preconfirmed state |
-| `eth_subscribe`   | Opens a WebSocket subscription to a Flashblocks stream                 |
-| `eth_unsubscribe` | Cancels an active Flashblocks subscription                             |
-
-#### WebSocket subscription types (passed to `eth_subscribe`):
-
-| Subscription                | Description                                                                |
-| --------------------------- | -------------------------------------------------------------------------- |
-| `newFlashblocks`            | Full block state updates as each Flashblock is built                       |
-| `newFlashblockTransactions` | Each transaction as it becomes preconfirmed into a Flashblock              |
-| `pendingLogs`               | Contract event logs from preconfirmed transactions, with sub-block latency |
 
 ## Supported Networks
 
