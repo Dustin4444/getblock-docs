@@ -43,7 +43,7 @@ Once logged in:
 
 3. Select:
    * **Protocol:** Solana (SOL)
-   * **Network:** Mainnet
+   * **Network:** Mainnet or Devnet
    * **API Interface:** JSON-RPC or WebSocket or MEV protected (JSON-RPC)
    * **Region:** Frankfurt (EU), New York (US), or Singapore (APAC)
 

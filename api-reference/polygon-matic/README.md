@@ -23,12 +23,12 @@ _GetBlock's RPC API reference documentation is provided exclusively for informat
 
 | Property        | Value                |
 | --------------- | -------------------- |
-| Network Name    | Polygon              |
+| Network Name    | Polygon Chain        |
 | Chain ID        | 137                  |
-| Native Currency | MATIC                |
+| Native Currency | POL                  |
 | Decimals        | 18                   |
 | Block Time      | \~2 seconds          |
-| Consensus       | Proof of Staked(PoS) |
+| Consensus       | Proof-of-Stake (PoS) |
 | EVM Compatible  | Yes                  |
 
 ## Base URL
@@ -55,10 +55,10 @@ https://go.getblock.asia/<ACCESS-TOKEN>/
 
 ## Supported Networks
 
-| Network | Chain ID | JSON-RPC | WSS | Frankfurt, Germany | New York, USA | Singapore, Singapore |
-| ------- | -------- | -------- | --- | ------------------ | ------------- | -------------------- |
-| Mainnet | 137      | ✅        | ✅   | ✅                  | ✅             | ✅                    |
-| Amoy    | 80002    | ✅        | ✅   | ✅                  | ❌             | ❌                    |
+| Network | Chain ID | JSON-RPC | WSS | gRPC | Frankfurt, Germany | New York, USA | Singapore, Singapore |
+| ------- | -------- | -------- | --- | ---- | ------------------ | ------------- | -------------------- |
+| Mainnet | 137      | ✅        | ✅   | ✅    | ✅                  | ✅             | ✅                    |
+| Amoy    | 80002    | ✅        | ✅   | ✅    | ✅                  | ✅             | ❌                    |
 
 ## Quickstart
 
