@@ -1,7 +1,7 @@
 ---
 description: >-
-  GetBlock provides fast and reliable access to Robinhood nodes via JSON-RPC
-  API. Connect to the ARC network without running your own infrastructure.
+  GetBlock provides fast and reliable access to Robinhood nodes via the JSON-RPC
+  API. Connect to the Robinhood network without running your own infrastructure.
 ---
 
 # Robinhood
