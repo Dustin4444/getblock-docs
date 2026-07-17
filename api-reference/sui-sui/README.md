@@ -62,9 +62,11 @@ _For JSON-RPC method mappings, decision criteria, and common migration gotchas, 
 
 All Sui gRPC methods follow the pattern:
 
+{% code overflow="wrap" %}
 ```bash
 https://go.getblock.io/<ACCESS-TOKEN>/sui.rpc.v2.<ServiceName>/<MethodName>
 ```
+{% endcode %}
 
 For example, to call `GetServiceInfo` on the `LedgerService`:
 
@@ -118,15 +120,17 @@ cd sui-apis
 {% step %}
 ### Make your first gRPC call
 
+{% code overflow="wrap" %}
 ```bash
 grpcurl \
   -import-path proto \
   -proto sui/rpc/v2/ledger_service.proto \
   -H "x-grpc-web: 1" \
   -d '{}' \
-  go.getblock.io:443/<ACCESS-TOKEN> \
+  go.getblock.io/ca7c1d40c31f4e589f9b9e0775adc054 \
   sui.rpc.v2.LedgerService/GetServiceInfo
 ```
+{% endcode %}
 
 Replace `<ACCESS-TOKEN>` with your actual GetBlock access token.
 {% endstep %}

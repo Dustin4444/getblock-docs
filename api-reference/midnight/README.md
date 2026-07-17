@@ -14,8 +14,6 @@ The network uses a dual-token model:
 * NIGHT for governance and staking, and the shielded token&#x20;
 * DUST for transaction fees — to allow selective disclosure of sensitive information while maintaining the auditability and security of public blockchains.&#x20;
 
-Midnight is currently in its testnet-02 phase, providing a stable sandbox for production-grade dApps that require granular data protection and regulatory compliance (such as GDPR).
-
 ## Key Features
 
 * **Confidential Smart Contracts**: Smart contracts authored in TypeScript with the Compact ZK-DSL, compiling directly to zero-knowledge circuits
@@ -37,18 +35,7 @@ _GetBlock’s Midnight API reference documentation is provided exclusively for i
 
 ## Network Information
 
-| Property             | Value                                                                       |
-| -------------------- | --------------------------------------------------------------------------- |
-| Network Name         | Midnight testnet-02                                                         |
-| Stage                | Testnet (mainnet not yet launched)                                          |
-| Native Tokens        | NIGHT (governance/staking), DUST (shielded gas, 6 decimals)                 |
-| Block Time           | \~6 seconds (Substrate default)                                             |
-| Consensus            | Custom privacy-aware Proof-of-Stake (Aura authoring + GRANDPA finality)     |
-| Architecture         | Substrate partner chain to Cardano                                          |
-| Smart Contract Layer | Compact (ZK-DSL compiling to circuits); TypeScript SDK                      |
-| EVM Compatible       | No                                                                          |
-| Address Format       | SS58 (Substrate-style)                                                      |
-| Block Explorer       | [Midnight Explorer (community)](https://midnight-explorer-sand.vercel.app/) |
+<table data-search="false"><thead><tr><th>Property</th><th>Value</th></tr></thead><tbody><tr><td>Network Name</td><td>Midnight </td></tr><tr><td>Native Tokens</td><td>NIGHT (governance/staking), DUST (shielded gas, 6 decimals)</td></tr><tr><td>Block Time</td><td>~6 seconds (Substrate default)</td></tr><tr><td>Consensus</td><td>Custom privacy-aware Proof-of-Stake (Aura authoring + GRANDPA finality)</td></tr><tr><td>Architecture</td><td>Substrate partner chain to Cardano</td></tr><tr><td>Smart Contract Layer</td><td>Compact (ZK-DSL compiling to circuits); TypeScript SDK</td></tr><tr><td>EVM Compatible</td><td>No</td></tr><tr><td>Address Format</td><td>SS58 (Substrate-style)</td></tr><tr><td>Block Explorer</td><td><a href="https://midnight-explorer-sand.vercel.app/">Midnight Explorer (community)</a></td></tr></tbody></table>
 
 ## Base URL
 
@@ -175,8 +162,8 @@ Expected output (example):
 ```json
 {
     "jsonrpc": "2.0",
-    "result": "Midnight Preprod",
-    "id": "getblock.io"
+    "id": "getblock.io",
+    "result": "Midnight Mainnet"
 }
 ```
 {% endstep %}
