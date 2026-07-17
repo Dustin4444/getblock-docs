@@ -1,3 +1,9 @@
+---
+description: >-
+  GetBlock provides fast and reliable access to Polygon nodes via gRPC API.
+  Connect to the Polygon network without running your own infrastructure.
+---
+
 # Polygon gRPC
 
 Polygon gRPC is the **binary Protocol Buffers interface** exposed by Bor v2.8.3+ for high-performance consensus-layer coordination with Heimdall v2. It is not a replacement for Bor's Ethereum JSON-RPC — the `eth_*` execution surface remains the primary developer interface for smart contracts, transactions, and account state.
