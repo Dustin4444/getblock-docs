@@ -1,167 +1,221 @@
 ---
 description: >-
-  The eth_getBlockReceipts method is part of the Ethereum JSON RPC Core API and
-  is used to retrieve all transaction receipts for a given block. A transaction
-  receipt contains essential information.
+  Example code for the eth_getBlockReceipts JSON RPC method. Сomplete guide on
+  how to use eth_getBlockReceipts JSON RPC in GetBlock Web3 documentation.
 ---
 
 # eth\_getBlockReceipts - Ethereum
 
-{% hint style="success" %}
-Returns all transaction receipts for a given block.
-{% endhint %}
+This method returns all transaction receipts for a specific block in a single call. Introduced as a first-class RPC method more recently than per-transaction receipts, it replaces N separate `eth_getTransactionReceipt` calls with one batch — dramatically reducing round trips when indexing a block's activity.
 
-The eth\_getBlockReceipts method is part of the Ethereum JSON RPC Core API and is designed for retrieving transaction receipts from a specified block. This method provides all transaction receipts within a single block, enabling developers to analyze transaction outcomes in bulk.
+## Parameters
 
-### Supported Networks
+| Parameter        | Type   | Required | Description                                                                              |
+| ---------------- | ------ | -------- | ---------------------------------------------------------------------------------------- |
+| `blockParameter` | string | Yes      | Block number in hex, block hash, or `latest`, `earliest`, `pending`, `finalized`, `safe` |
 
-The eth\_getBlockReceipts RPC Ethereum method is available across all Ethereum network types, including:
-
-* Mainnet
-* Testnets: Sepolia, Hoodi
-
-### Parameters
-
-The eth\_getBlockReceipts method accepts the following parameter:
-
-* DATA, 32 Bytes: (None) The block number in hexadecimal format or one of the string tags (latest, earliest, or pending).
-
-### Request Example
-
-URL
-
-```bash
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To use this method, send a JSON object containing the jsonrpc, method, and params fields. Below is an example using curl:
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "jsonrpc": "2.0",
     "method": "eth_getBlockReceipts",
     "params": [
-        "0xacffc1"
+        "latest"
     ],
     "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/ 
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_getBlockReceipts",
-"params": ["0xacffc1"],
-"id": "getblock.io"}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_getBlockReceipts',
+    params: [
+        "latest"
+    ],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_getBlockReceipts',
+        'params': [
+        "latest"
+    ],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_getBlockReceipts",
+            "params": [
+        "latest"
+    ],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response Example
-
-The server responds with a JSON object. Below is an example response for the eth\_getBlockReceipts method:
+## Response
 
 ```json
 {
-    "result": "null",
+    "jsonrpc": "2.0",
     "id": "getblock.io",
-    "status_code": 405,
-    "message": "Method not allowed"
+    "result": [
+        {
+            "transactionHash": "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b",
+            "blockHash": "0x9ec8e2f6b78d8f5f2ac3e5d61b0d38d4d5a8f0e7c8b5a2f9d3e6c1b7a4d0f2e5c",
+            "blockNumber": "0x1720340",
+            "from": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+            "to": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "cumulativeGasUsed": "0x33450",
+            "gasUsed": "0x5208",
+            "contractAddress": null,
+            "logs": [
+                {
+                    "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                    "topics": [
+                        "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                        "0x000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045",
+                        "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+                    ],
+                    "data": "0x000000000000000000000000000000000000000000000000016345785d8a0000",
+                    "blockNumber": "0x1720340",
+                    "transactionHash": "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b",
+                    "transactionIndex": "0x0",
+                    "blockHash": "0x9ec8e2f6b78d8f5f2ac3e5d61b0d38d4d5a8f0e7c8b5a2f9d3e6c1b7a4d0f2e5c",
+                    "logIndex": "0x0",
+                    "removed": false
+                }
+            ],
+            "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "status": "0x1",
+            "type": "0x2",
+            "effectiveGasPrice": "0x9502f900",
+            "transactionIndex": "0x0",
+            "blobGasUsed": "0x0",
+            "blobGasPrice": "0x1"
+        }
+    ]
 }
 ```
 
-### Response Description
+## Response Parameters
 
-* result: The transaction receipts of the specified block. null if the method is not allowed or unavailable.
-* status\_code: The HTTP status code for the request.
-* message: A descriptive message explaining the response, e.g., "Method not allowed."
+| Parameter | Type            | Description                                                                                 |
+| --------- | --------------- | ------------------------------------------------------------------------------------------- |
+| `jsonrpc` | string          | JSON-RPC protocol version ("2.0")                                                           |
+| `id`      | string          | Request identifier matching the request                                                     |
+| `result`  | array of object | Array of transaction receipts, one per transaction in the block, in transaction-index order |
 
-### Returns
+## Use Cases
 
-When successful, the eth\_getBlockReceipts method returns all transaction receipts for a given block. Each transaction receipt includes details such as:
+* **Log-Ingestion Pipelines**: Fetch all logs from a block in one call to feed an indexer or event-processing pipeline
+* **Reduced-Round-Trip Indexing**: Replace N per-transaction receipt calls with 1 batch call — critical for indexer throughput
+* **Block-Level Analytics**: Aggregate gas usage, fee revenue, or log counts across a block in a single query
+* **Failed Transaction Detection**: Scan `status: "0x0"` receipts to find failed transactions in a block for MEV or anomaly analysis
 
-* transaction: The transaction hash and execution results.
-* block: The block containing the transaction.
-* parameters: Metadata and execution parameters associated with the receipts.
-* value: The value transferred in transactions, encoded as hexadecimal.
+## Error Handling
 
-### Use Case
+| Error Code | Message        | Description                                 |
+| ---------- | -------------- | ------------------------------------------- |
+| -32602     | Invalid params | Block parameter is malformed                |
+| -32603     | Internal error | Node failed to compile the block's receipts |
 
-The eth\_getBlockReceipts method is particularly useful for developers analyzing multiple transaction outcomes in a specific block. By retrieving all receipts in bulk, this method enables efficient debugging and transaction auditing. If a eth\_getBlockReceipts error occurs, ensure the block number or tag provided is valid and that the node supports this method. Refer to the eth\_getBlockReceipts example for constructing a correct request.
-
-### Example Code
-
-Below is an example of how to call the eth\_getBlockReceipts method programmatically using Python:
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
 
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
 
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
+const receipts = await provider.send('eth_getBlockReceipts', ['latest']);
+console.log('Receipts in block:', receipts.length);
 
-
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "eth_getBlockReceipts",
-    "params": [
-        "0xacffc1"
-    ],
-    "id": "getblock.io"
-}
-
-
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-
-# Parse the JSON response
-response_data = response.json()
-
-
-# Print the result
-print(json.dumps(response_data, indent=4))
+// Aggregate gas used across the block
+const totalGas = receipts.reduce((sum, r) => sum + BigInt(r.gasUsed), 0n);
+console.log('Total gas used:', totalGas.toString());
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript " %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-import axios from 'axios';
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
 
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/'; 
-const headers = {
-    'Content-Type': 'application/json'
-};
-const data = {
-    jsonrpc: "2.0",
-    method: "eth_getBlockReceipts",
-    params: [
-        "0xacffc1"     ],
-    id: "getblock.io"
-};
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
 
-axios.post(url, data, { headers })
-    .then(response => {
-        console.log(response.data);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
+const receipts = await client.getBlockReceipts({ blockTag: 'latest' });
+console.log('Receipts in block:', receipts.length);
 
+const totalGas = receipts.reduce((sum, r) => sum + r.gasUsed, 0n);
+console.log('Total gas used:', totalGas);
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-This Python script demonstrates how to interact with the eth\_getBlockReceipts method programmatically. Replace \<ACCESS-TOKEN> with your actual API key. The Web3 eth\_getBlockReceipts method can also be utilized via Web3 libraries for Ethereum.

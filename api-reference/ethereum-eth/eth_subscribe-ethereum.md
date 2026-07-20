@@ -1,182 +1,227 @@
 ---
 description: >-
-  The eth_subscribe method is part of the Ethereum JSON-RPC API and is used to
-  subscribe to specified event types. Available only via WebSocket
+  Example code for the eth_subscribe JSON RPC method. Сomplete guide on how to
+  use eth_subscribe JSON RPC in GetBlock Web3 documentation.
 ---
 
-# eth\_subscribe-Ethereum
+# eth\_subscribe - Ethereum
 
-{% hint style="success" %}
-Subscribes to a specified event type, optionally restricted to one ormany objects. This method is available via websocket only.
+This method creates a real-time subscription over a WebSocket connection to receive push notifications for chain events.  Returns a subscription ID; the node then pushes notifications tagged with that ID.
+
+{% hint style="warning" %}
+Requires a WSS endpoint (not HTTP). Supported subscription types: `newHeads` (new block headers), `logs` (matching event logs), `newPendingTransactions` (mempool transaction hashes), and `syncing` (node sync state changes).
 {% endhint %}
 
-The eth\_subscribe method is part of the Ethereum JSON-RPC API and is used to subscribe to specified event types. This method is available only via WebSocket connections and allows clients to receive real-time updates about blockchain events.
+## Parameters
 
-### Supported Networks
+| Parameter          | Type   | Required | Description                                                                                              |
+| ------------------ | ------ | -------- | -------------------------------------------------------------------------------------------------------- |
+| `subscriptionType` | string | Yes      | One of `newHeads`, `logs`, `newPendingTransactions`, `syncing`                                           |
+| `filter`           | object | No       | Filter criteria — only applies to `logs` (same shape as `eth_newFilter` filter object minus block range) |
 
-The eth\_subscribe RPC Ethereum method is supported on:
-
-* Mainnet
-* Testnet: Sepolia, Hoodi
-
-### Parameters
-
-The method accepts the following parameters:
-
-type (string): A subscription type. Possible values include:
-
-* newHeads: Subscribes to new headers appended to the chain, including chain reorganizations.
-* logs: Subscribes to logs included in new imported blocks that match the specified filter criteria.
-* newPendingTransactions: Subscribes to transaction hashes for all transactions added to the pending state and signed with a key available in the node.
-
-objects (optional, hex string): Additional arguments such as an address, multiple addresses, or topics for filtering logs or events.
-
-### Request
-
-URL
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To interact with the Ethereum eth\_subscribe endpoint using WebSocket, use the following example:
+## Request
 
 {% tabs %}
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/ 
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_subscribe",
-"params": ["newHeads", null],
-"id": "getblock.io"}
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "jsonrpc": "2.0",
+    "method": "eth_subscribe",
+    "params": [
+        "logs",
+        {
+            "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+            ]
+        }
+    ],
+    "id": "getblock.io"
+}'
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_subscribe',
+    params: [
+        "logs",
+        {
+            "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+            ]
+        }
+    ],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_subscribe',
+        'params': [
+        "logs",
+        {
+            "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+            ]
+        }
+    ],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_subscribe",
+            "params": [
+        "logs",
+        {
+            "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+            ]
+        }
+    ],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response
-
-The response may indicate success or an error, depending on the availability of WebSocket notifications.
-
-Response
+## Response
 
 ```json
 {
-    "id": 1,
     "jsonrpc": "2.0",
-    "result": "0xe5af64ddfd365b4632988c5935cfedb7"
+    "id": "getblock.io",
+    "result": "0x9cef478923ff08bf67fde6c64013158d"
 }
 ```
 
-### Response Description
+## Response Parameters
 
-* result: On success, returns the subscription ID for the requested event type.
-* eth\_subscribe error: On failure, provides error details, such as "notifications not supported."
-* value: The details of subscribed event updates, depending on the subscription type, such as block headers, logs, or transaction hashes.
+| Parameter | Type   | Description                                                                                     |
+| --------- | ------ | ----------------------------------------------------------------------------------------------- |
+| `jsonrpc` | string | JSON-RPC protocol version ("2.0")                                                               |
+| `id`      | string | Request identifier matching the request                                                         |
+| `result`  | string | Hex-encoded subscription ID — matches the `subscription` field on subsequent push notifications |
 
-### Use Case
+## Use Cases
 
-The eth\_subscribe RPC Ethereum method is commonly used in Web3 applications and monitoring tools to:
+* **Real-Time Log Streaming**: Subscribe to `logs` for a contract to receive events with lower latency than polling
+* **Live Block Notifications**: Subscribe to `newHeads` to drive per-block backend workflows without polling `eth_blockNumber`
+* **Mempool Monitoring**: Subscribe to `newPendingTransactions` for MEV, front-run detection, or wallet activity feeds
+* **Sync State Alerts**: Subscribe to `syncing` on a self-hosted node to alert when it falls behind
 
-* Track new block headers for real-time blockchain synchronization.
-* Monitor specific contract logs using eth\_subscribe logs to capture events emitted by smart contracts.
-* Observe new pending transactions for analytics or operational insights.
+## Error Handling
 
-For example, a Web3 application can use the Ethereum eth\_subscribe method to provide live updates about blockchain activity, enhancing user interaction and real-time feedback.
+| Error Code | Message        | Description                                          |
+| ---------- | -------------- | ---------------------------------------------------- |
+| -32602     | Invalid params | Subscription type unsupported or filter is malformed |
+| -32603     | Internal error | Node failed to create the subscription               |
 
-### Code Example
-
-Here is an eth\_subscribe example of how to query the method using JavaScript:
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import websocket
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
 
-# Replace YOUR-API-KEY with your API key
-API_KEY = "YOUR-API-KEY"
-URL = f"wss://eth.getblock.io/{API_KEY}/"
+// WebSocket endpoint required for subscriptions
+const provider = new ethers.WebSocketProvider('wss://go.getblock.io/<ACCESS-TOKEN>/');
 
-def on_message(ws, message):
-    print("Message received:", message)
+// High-level: use built-in event subscriptions (Ethers manages the subscription)
+provider.on('block', (blockNumber) => {
+    console.log('New block:', blockNumber);
+});
 
-def on_error(ws, error):
-    print("Error:", error)
-
-def on_close(ws, close_status_code, close_msg):
-    print("Connection closed")
-
-def on_open(ws):
-    # Request body to subscribe to new block headers
-    request_body = {
-        "jsonrpc": "2.0",
-        "method": "eth_subscribe",
-        "params": ["newHeads", None],
-        "id": "getblock.io"
-    }
-    ws.send(json.dumps(request_body))
-    print("Request sent:", request_body)
-
-if __name__ == "__main__":
-    websocket.enableTrace(True)
-    ws = websocket.WebSocketApp(URL, 
-                                on_message=on_message, 
-                                on_error=on_error, 
-                                on_close=on_close)
-    ws.on_open = on_open
-    ws.run_forever()
+const filter = {
+    address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    topics: ['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'],
+};
+provider.on(filter, (log) => {
+    console.log('Transfer log:', log);
+});
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-const WebSocket = require('ws');
+import { createPublicClient, webSocket } from 'viem';
+import { mainnet } from 'viem/chains';
 
-// Replace YOUR-API-KEY with your API key
-const API_KEY = 'YOUR-API-KEY';
-const URL = `wss://eth.getblock.io/${API_KEY}/`;
-
-// Connect to the WebSocket server
-const ws = new WebSocket(URL);
-
-// Event: Connection opened
-ws.on('open', function open() {
-  const requestBody = {
-    jsonrpc: '2.0',
-    method: 'eth_subscribe',
-    params: ['newHeads', null],
-    id: 'getblock.io',
-  };
-
-  ws.send(JSON.stringify(requestBody));
-  console.log('Request sent:', requestBody);
+const client = createPublicClient({
+    chain: mainnet,
+    transport: webSocket('wss://go.getblock.io/<ACCESS-TOKEN>/'),
 });
 
-// Event: Message received
-ws.on('message', function incoming(data) {
-  console.log('Message received:', data);
+// Subscribe to new block headers
+const unwatch = client.watchBlocks({
+    onBlock: (block) => console.log('New block:', block.number),
 });
 
-// Event: Error occurred
-ws.on('error', function error(err) {
-  console.error('Error:', err);
-});
-
-// Event: Connection closed
-ws.on('close', function close() {
-  console.log('Connection closed');
+// Subscribe to matching logs
+const unwatchLogs = client.watchEvent({
+    address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    onLogs: (logs) => logs.forEach(l => console.log('Transfer log:', l)),
 });
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-#### Common Errors
-
-When using the eth\_subscribe RPC Ethereum method, the following issues may occur:
-
-* Invalid URL or ACCESS-TOKEN: Ensure the WebSocket URL and token are correct and active.
-* eth\_subscribe error: This could happen if the requested event type or parameters are invalid.
-* Unsupported Notifications: If WebSocket notifications are not enabled on the node, the error "notifications not supported" may be returned.
-
-By integrating the Web3 eth\_subscribe method into your application, you can provide real-time updates for blockchain events. Use this core API method to enhance user experiences and enable live monitoring of Ethereum network activities.

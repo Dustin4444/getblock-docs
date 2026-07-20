@@ -1,158 +1,194 @@
 ---
 description: >-
-  Retrieve logs for a specified filter using eth_getFilterLogs. Essential for
-  tracking block events, transaction logs, or smart contract interactions in
-  real-time within Ethereum dApps.
+  Example code for the eth_getFilterLogs JSON RPC method. Сomplete guide on how
+  to use eth_getFilterLogs JSON RPC in GetBlock Web3 documentation.
 ---
 
 # eth\_getFilterLogs - Ethereum
 
-{% hint style="success" %}
-The eth\_getFilterLogs method is a JSON-RPC Ethereum API call that returns an array of logs for the specified filter
-{% endhint %}
+This method returns all logs matching a log filter over its entire block range. Unlike `eth_getFilterChanges` (which returns only new entries since the last poll), this returns the full historical result. Combines with `eth_newFilter` to create a filter once and reuse it for historical queries.
 
-This eth\_getFilterLogs RPC Ethereum method is crucial for developers seeking to track block events, transaction logs, or smart contract interactions in real-time. To enhance log retrieval performance, it’s recommended to leave the --auto-log-bloom-caching-enabled option set to the default value of true.
+## Parameters
 
-eth\_getFilterLogs is a core API endpoint in Ethereum development, providing an easy way to retrieve logs based on filters created by previous methods like eth\_newFilter, eth\_newPendingTransactionFilter, or eth\_newBlockFilter. If a filter is invalid or expired, eth\_getFilterLogs error responses are returned.
+| Parameter  | Type   | Required | Description                                           |
+| ---------- | ------ | -------- | ----------------------------------------------------- |
+| `filterId` | string | Yes      | Hex-encoded filter ID from a previous `eth_newFilter` |
 
-### Supported Networks
-
-* Filter ID (DATA):
-
-A unique identifier for the filter whose logs are being requested. This Filter ID must be obtained from prior methods like eth\_newFilter, eth\_newPendingTransactionFilter, or eth\_newBlockFilter. The eth\_getlogs limit can be set to manage the number of logs returned, which is useful when filtering large amounts of data.
-
-### Request
-
-URL (API Endpoint)
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \  
---header 'Content-Type: application/json' \  
---data-raw '{  
-    "jsonrpc": "2.0",  
-    "method": "eth_getFilterLogs",  
-    "params": [  
-        "0x5ace5de3985749b6a1b2b0d3f3e1fb69"  
-    ],  
-    "id": "getblock.io"  
-}'  
-```
-{% endtab %}
-
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_getFilterLogs",
-"params": ["0x5ace5de3985749b6a1b2b0d3f3e1fb69"],
-"id": "getblock.io"}
-```
-{% endtab %}
-{% endtabs %}
-
-eth\_getFilterLogs example: In this example, a JSON-RPC request is made to fetch the logs related to the specified filter ID.
-
-### Response
-
-If the filter is not found, the response will include an error
-
-```json
-{  
-    "error": {  
-        "code": -32000,  
-        "message": "filter not found"  
-    },  
-    "id": "getblock.io",  
-    "jsonrpc": "2.0"  
-} 
-```
-
-If logs are available for the filter, they will be returned as an array of log entries, which can be processed to monitor block or transaction events.
-
-### Use Case
-
-Tracking Contract Events:The Web3 eth\_getFilterLogs method allows developers to monitor smart contract events. By filtering for specific contract logs, you can track interactions with your decentralized application (dApp) in real time.
-
-Monitoring Block Events:This method is essential for applications that need to monitor block data or events on the Ethereum blockchain, such as when new blocks are mined or specific state changes occur.
-
-Transaction Logs:Developers can use Ethereum eth\_getFilterLogs to collect logs associated with transactions, including transaction receipts and their associated data.
-
-### Code Example
-
-Here’s how you can implement the eth\_getFilterLogs method using different programming languages
-
-{% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
-
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {
-    'Content-Type': 'application/json'
-}
-
-payload = {
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
     "method": "eth_getFilterLogs",
     "params": [
-        "0x5ace5de3985749b6a1b2b0d3f3e1fb69"
+        "0x16"
     ],
     "id": "getblock.io"
-}
-
-response = requests.post(url, headers=headers, data=json.dumps(payload))
-
-if response.status_code == 200:
-    print(response.json())
-else:
-    print(f"Error: {response.status_code}", response.text)
+}'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Axios" %}
+{% code title="example.js" %}
 ```javascript
 const axios = require('axios');
 
-// Replace <ACCESS-TOKEN> with your GetBlock API key
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_getFilterLogs',
+    params: [
+        "0x16"
+    ],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
 
-// Request payload
-const requestBody = {
-  jsonrpc: '2.0',
-  method: 'eth_getFilterLogs',
-  params: ['0x5ace5de3985749b6a1b2b0d3f3e1fb69'], // Filter ID
-  id: 'getblock.io',
-};
-
-// Axios POST request
-axios
-  .post(url, requestBody, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-  .then((response) => {
-    console.log('Filter Logs Response:', response.data.result);
-  })
-  .catch((error) => {
-    console.error('Error fetching filter logs:', error.message);
-  });
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_getFilterLogs',
+        'params': [
+        "0x16"
+    ],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_getFilterLogs",
+            "params": [
+        "0x16"
+    ],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-Setup:Replace \<ACCESS-TOKEN> with your GetBlock API key.Use FILTER\_ID from a prior filter creation method (e.g., eth\_newFilter).
+## Response
 
-Request:Sends a POST request to the JSON-RPC endpoint, calling the eth\_getFilterLogs method and passing the FILTER\_ID as a parameter.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": [
+        {
+            "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045",
+                "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+            ],
+            "data": "0x000000000000000000000000000000000000000000000000016345785d8a0000",
+            "blockNumber": "0x1720340",
+            "transactionHash": "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b",
+            "transactionIndex": "0x0",
+            "blockHash": "0x9ec8e2f6b78d8f5f2ac3e5d61b0d38d4d5a8f0e7c8b5a2f9d3e6c1b7a4d0f2e5c",
+            "logIndex": "0x0",
+            "removed": false
+        }
+    ]
+}
+```
 
-Response Handling:Logs any errors, such as the eth\_getFilterLogs error like "filter not found," if the filter is expired or invalid.Outputs an array of log entries if successful.
+## Response Parameters
 
-Usage:The eth\_getFilterLogs method is part of the Core API for Ethereum, enabling developers to efficiently query logs for specific filters. This method is especially helpful for applications that need to track changes to block or transaction data in real-time.
+| Parameter | Type            | Description                                            |
+| --------- | --------------- | ------------------------------------------------------ |
+| `jsonrpc` | string          | JSON-RPC protocol version ("2.0")                      |
+| `id`      | string          | Request identifier matching the request                |
+| `result`  | array of object | All matching log entries over the filter's block range |
+
+## Use Cases
+
+* **Historical Backfill**: Retrieve all events matching a filter's criteria over the filter's block window
+* **Filter Reuse**: Query historical logs multiple times without re-declaring filter criteria in each call
+* **Explorer Contract Activity**: Fetch all events for a contract page in an explorer UI
+
+## Error Handling
+
+| Error Code | Message        | Description                                      |
+| ---------- | -------------- | ------------------------------------------------ |
+| -32602     | Invalid params | Filter ID is malformed or the filter has expired |
+| -32603     | Internal error | Node failed to retrieve matching logs            |
+
+## Web3 Integration
+
+{% tabs %}
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
+
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
+
+const logs = await provider.send('eth_getFilterLogs', ['0x16']);
+console.log('Total matching logs:', logs.length);
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
+```javascript
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
+
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
+
+const logs = await client.getFilterLogs({ filter });
+console.log('Total matching logs:', logs.length);
+```
+{% endcode %}
+{% endtab %}
+{% endtabs %}

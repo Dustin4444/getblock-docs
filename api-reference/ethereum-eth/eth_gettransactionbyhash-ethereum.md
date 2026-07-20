@@ -1,192 +1,226 @@
 ---
 description: >-
-  Retrieve transaction details by transaction hash using
-  eth_getTransactionByHash. Essential for tracking and verifying individual
-  transactions on the Ethereum blockchain.
+  Example code for the eth_getTransactionByHash JSON RPC method. Сomplete guide
+  on how to use eth_getTransactionByHash JSON RPC in GetBlock Web3
+  documentation.
 ---
 
 # eth\_getTransactionByHash - Ethereum
 
-{% hint style="success" %}
-This method returns transaction information for the specified transaction hash, allowing developers to retrieve detailed data about specific transactions
-{% endhint %}
+This method returns transaction data by transaction hash. Includes all fields needed to reconstruct or verify the transaction: nonce, gas parameters, value, calldata, signature components, and (once mined) block placement.
 
-The Ethereum eth\_getTransactionByHash method is part of the Ethereum JSON RPC Core API, used to interact with Ethereum nodes. The eth\_getTransactionByHash RPC Ethereum method is crucial for tracking and verifying individual transactions.
+## Parameters
 
-### Supported Networks
+| Parameter | Type   | Required | Description              |
+| --------- | ------ | -------- | ------------------------ |
+| `txHash`  | string | Yes      | 32-byte transaction hash |
 
-The eth\_getTransactionByHash RPC Ethereum method supports the following network types:
-
-* Mainnet
-* Testnet: Sepolia, Hoodi
-
-### Parameters
-
-* DATA: The 32-byte hash transaction.
-
-### Request
-
-URL
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To make a request, send a JSON object with the jsonrpc, method, and params fields. Below is an example of how to make a request using curl:
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "jsonrpc": "2.0",
     "method": "eth_getTransactionByHash",
     "params": [
-        "0xcd718a69d478340dc28fdf6bf8056374a52dc95841b44083163ced8dfe29310c"
+        "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b"
     ],
     "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_getTransactionByHash",
-"params": ["0xcd718a69d478340dc28fdf6bf8056374a52dc95841b44083163ced8dfe29310c"],
-"id": "getblock.io"}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_getTransactionByHash',
+    params: [
+        "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b"
+    ],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_getTransactionByHash',
+        'params': [
+        "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b"
+    ],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_getTransactionByHash",
+            "params": [
+        "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b"
+    ],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response
-
-The server responds with a JSON object containing the transaction details for the specified hash. Below is an example of a typical response:
+## Response
 
 ```json
 {
-    "id": "getblock.io",
     "jsonrpc": "2.0",
+    "id": "getblock.io",
     "result": {
-        "accessList": [],
-        "blockHash": "0xe6262c1924326d12b88aaa35a95a0c7cdd11f2d20ebae84618484120bd037c34",
-        "blockNumber": "0x107d7b0",
-        "chainId": "0x1",
-        "from": "0x901c7c311d39e0b26257219765e71e8db3107a81",
-        "gas": "0x31d74",
-        "gasPrice": "0xb9029a7ea",
-        "hash": "0xcd718a69d478340dc28fdf6bf8056374a52dc95841b44083163ced8dfe29310c",
-        "input": "0x3593564c000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000646701fb000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000a968163f0a57b400000000000000000000000000000000000000000000000000000000000010326d79400000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002bb7135877cd5d40aa3b086ac6f21c51bbafbbb41f002710dac17f958d2ee523a2206206994597c13d831ec7000000000000000000000000000000000000000000",
-        "maxFeePerGas": "0xf22a22912",
-        "maxPriorityFeePerGas": "0x5f5e100",
-        "nonce": "0x4",
-        "r": "0xef566fc229bb0a10eee5f99c9cabe47f0f20ebaa6d16e4f7b90ee144086b21e9",
-        "s": "0x109de5d9baca8daeee1ce1b7d1a304e223d07b1420b37704e675ccffd364a4dc",
-        "to": "0xef1c6e67703c7bd7107eed8303fbe6ec2554bf6b",
-        "transactionIndex": "0xfc",
-        "type": "0x2",
+        "hash": "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b",
+        "nonce": "0x462",
+        "blockHash": "0x9ec8e2f6b78d8f5f2ac3e5d61b0d38d4d5a8f0e7c8b5a2f9d3e6c1b7a4d0f2e5c",
+        "blockNumber": "0x1720340",
+        "transactionIndex": "0x0",
+        "from": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+        "to": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "value": "0x0",
+        "gas": "0x186a0",
+        "gasPrice": "0x9502f900",
+        "maxFeePerGas": "0xb2d05e00",
+        "maxPriorityFeePerGas": "0x3b9aca00",
+        "input": "0xa9059cbb000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480000000000000000000000000000000000000000000000000de0b6b3a7640000",
         "v": "0x0",
-        "value": "0x0"
+        "r": "0xa3b4c5d6e7f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a",
+        "s": "0xb6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7",
+        "chainId": "0x1",
+        "type": "0x2",
+        "accessList": [],
+        "yParity": "0x0"
     }
 }
 ```
 
-### Response Description
+## Response Parameters
 
-* accessList: A list of addresses and storage keys the transaction accesses (EIP-2930).
-* blockHash: The hash of the block containing the transaction.
-* blockNumber: The number of the block containing the transaction.
-* chainId: The chain ID of the Ethereum network.
-* from: The address of the sender.
-* gas: The gas provided by the sender.
-* gasPrice: The gas price provided by the sender in Wei.
-* hash: The hash of the transaction.
-* input: The input data for the transaction.
-* maxFeePerGas: Maximum fee per gas that the sender is willing to pay.
-* maxPriorityFeePerGas: Maximum priority fee per gas.
-* nonce: The number of transactions made by the sender prior to this one.
-* r, s, v: Components of the transaction signature.
-* to: The address of the receiver.
-* transactionIndex: The index position of the transaction within the block.
-* type: The transaction type.
-* value: The value transferred in Wei.
+| Parameter                     | Type            | Description                                                                                                  |
+| ----------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------ |
+| `jsonrpc`                     | string          | JSON-RPC protocol version ("2.0")                                                                            |
+| `id`                          | string          | Request identifier matching the request                                                                      |
+| `result.hash`                 | string          | Transaction hash                                                                                             |
+| `result.nonce`                | string          | Nonce of the sender at the time of signing                                                                   |
+| `result.blockHash`            | string          | Hash of the block containing this transaction (`null` if pending)                                            |
+| `result.blockNumber`          | string          | Block number containing this transaction (`null` if pending)                                                 |
+| `result.transactionIndex`     | string          | Position of this transaction within its block (`null` if pending)                                            |
+| `result.from`                 | string          | Sender address                                                                                               |
+| `result.to`                   | string          | Recipient address (`null` for contract creation)                                                             |
+| `result.value`                | string          | Value transferred (wei, hex)                                                                                 |
+| `result.gas`                  | string          | Gas limit for this transaction                                                                               |
+| `result.gasPrice`             | string          | Effective gas price (wei, hex)                                                                               |
+| `result.maxFeePerGas`         | string          | EIP-1559 maximum total fee per gas (type-2 transactions)                                                     |
+| `result.maxPriorityFeePerGas` | string          | EIP-1559 priority fee per gas (type-2 transactions)                                                          |
+| `result.input`                | string          | Encoded call data                                                                                            |
+| `result.v`                    | string          | Signature v value                                                                                            |
+| `result.r`                    | string          | Signature r value                                                                                            |
+| `result.s`                    | string          | Signature s value                                                                                            |
+| `result.chainId`              | string          | Chain ID the transaction is bound to (EIP-155)                                                               |
+| `result.type`                 | string          | Transaction type (`0x0` legacy, `0x1` EIP-2930, `0x2` EIP-1559, `0x3` EIP-4844 blob, `0x4` EIP-7702 SetCode) |
+| `result.accessList`           | array of object | EIP-2930 access list (type-1+ transactions)                                                                  |
+| `result.yParity`              | string          | Signature parity (post-London)                                                                               |
 
-### Use Case
+## Use Cases
 
-The eth\_getTransactionByHash method is particularly useful for retrieving detailed information about a specific transaction, which can be critical for verifying and tracking transactions on the Ethereum blockchain. In case of an eth\_getTransactionByHash error, developers should verify that the provided transaction hash is correct and corresponds to an existing transaction. An eth\_getTransactionByHash example can help developers understand the correct usage of this method.
+* **Transaction Explorer Detail**: Fetch transaction data for an explorer's transaction detail page
+* **Signature Verification**: Recover the signer's address from `v`, `r`, `s` to verify authorization off-chain
+* **Calldata Decoding**: Decode `input` against an ABI to display human-readable transaction actions in a wallet UI
+* **Post-Submit Confirmation**: Poll after sending a transaction to detect mining (`blockNumber` becomes non-null)
 
-### Code Example
+## Error Handling
 
-You can also make requests to the eth\_getTransactionByHash method programmatically using Python. Below is an example using the requests library:
+| Error Code | Message        | Description                            |
+| ---------- | -------------- | -------------------------------------- |
+| -32602     | Invalid params | Transaction hash is malformed          |
+| -32603     | Internal error | Node failed to look up the transaction |
+
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
 
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
 
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "eth_getTransactionByHash",
-    "params": [
-        "0xcd718a69d478340dc28fdf6bf8056374a52dc95841b44083163ced8dfe29310c"
-    ],
-    "id": "getblock.io"
-}
-
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
+const tx = await provider.getTransaction('0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b');
+console.log('From:', tx.from);
+console.log('To:', tx.to);
+console.log('Value:', ethers.formatEther(tx.value), 'ETH');
+console.log('Nonce:', tx.nonce);
+console.log('Block:', tx.blockNumber);
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-const axios = require('axios');
+import { createPublicClient, http, formatEther } from 'viem';
+import { mainnet } from 'viem/chains';
 
-// Replace ACCESS_TOKEN with your actual Access Token
-const url = 'https://go.getblock.io/ACCESS_TOKEN/';
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
 
-// Request payload
-const payload = {
-  jsonrpc: '2.0',
-  method: 'eth_getTransactionByHash',
-  params: [
-    '0xcd718a69d478340dc28fdf6bf8056374a52dc95841b44083163ced8dfe29310c', // Transaction hash
-  ],
-  id: 'getblock.io',
-};
-
-// Axios POST request
-axios
-  .post(url, payload, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-  .then((response) => {
-    console.log('Response:', response.data);
-  })
-  .catch((error) => {
-    console.error('Error:', error.message);
-  });
+const tx = await client.getTransaction({ hash: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b' });
+console.log('From:', tx.from);
+console.log('To:', tx.to);
+console.log('Value:', formatEther(tx.value), 'ETH');
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-This Python script sends a request to the eth\_getTransactionByHash method and prints the returned transaction information. Make sure to replace \<ACCESS-TOKEN> with your actual API token. This script serves as an eth\_getTransactionByHash example for developers to understand the implementation in Python.
-
-The Web3 eth\_getTransactionByHash method can also be used in Web3 libraries for Ethereum, providing an interface to access detailed transaction data based on a specific transaction hash.

@@ -1,44 +1,23 @@
 ---
 description: >-
-  The net_peerCount method is part of the Ethereum JSON-RPC Core API and returns
-  the number of peers connected to the Ethereum client. It provides a
-  hexadecimal response.
+  Example code for the net_peerCount JSON RPC method. Сomplete guide on how to
+  use net_peerCount JSON RPC in GetBlock Web3 documentation.
 ---
 
 # net\_peerCount - Ethereum
 
-{% hint style="success" %}
-The net\_peerCount method returns the number of peers currently connected to the Ethereum client.
-{% endhint %}
+This method returns the number of peers currently connected to the node's P2P layer, as a hex-encoded integer. Managed RPC endpoints commonly aggregate this across a load-balanced fleet or return the peer count of the specific backend node handling the request.
 
-The net\_peerCount method is part of the Ethereum JSON RPC Core API, used to retrieve the number of peers currently connected to the Ethereum client. This method provides a hexadecimal response representing the peer count, which is essential for monitoring the health and connectivity of the client.
+## Parameters
 
-### Supported Networks
+This method takes no parameters.
 
-The net\_peerCount RPC Ethereum method supports the following network types:
-
-* Mainnet
-* Testnet: Sepolia, Hoodi
-
-### Parameters
-
-{% hint style="info" %}
-This method does not require any parameters.
-{% endhint %}
-
-### Request
-
-URL
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To make a request, send a JSON object with the jsonrpc, method, and params fields. Below is an example of how to make a request using curl:
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -48,102 +27,143 @@ curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
     "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "net_peerCount",
-"params": [],
-"id": "getblock.io"}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'net_peerCount',
+    params: [],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'net_peerCount',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "net_peerCount",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response
-
-The server responds with a JSON object containing the current peer count. Below is an example of a typical response:
+## Response
 
 ```json
 {
-    "id": "getblock.io",
     "jsonrpc": "2.0",
-    "result": "0x10"
+    "id": "getblock.io",
+    "result": "0x40"
 }
 ```
 
-**Response Description**
+## Response Parameters
 
-* result: A hexadecimal value representing the number of peers currently connected to the client.
+| Parameter | Type   | Description                             |
+| --------- | ------ | --------------------------------------- |
+| `jsonrpc` | string | JSON-RPC protocol version ("2.0")       |
+| `id`      | string | Request identifier matching the request |
+| `result`  | string | Hex-encoded number of active peers      |
 
-### Use Case
+## Use Cases
 
-The net\_peerCount method is particularly useful for developers and system administrators who need to monitor the network connectivity of their Ethereum node. A high peer count indicates good connectivity, while a low or zero count may suggest issues with the node’s network configuration. In case of a net\_peerCount error, ensure that the client is properly configured to connect to peers. An example of correct usage is provided in this documentation under the net\_peerCount example. A low peer count may also delay transaction propagation, affecting performance.
+* **Node Isolation Detection**: Detect when a node has dropped below a peer-count threshold indicating a network problem
+* **Fleet Health Monitoring**: Track peer count distribution across a managed node fleet for capacity planning
+* **Self-Hosted Node Diagnostics**: Diagnose connectivity issues when a node stops syncing
 
-### Code Example
+## Error Handling
 
-You can also make requests to the net\_peerCount method programmatically using Python. Below is an example using the requests library:
+| Error Code | Message        | Description                         |
+| ---------- | -------------- | ----------------------------------- |
+| -32603     | Internal error | Node's peer table could not be read |
+
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
 
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
 
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "net_peerCount",
-    "params": [],
-    "id": "getblock.io"
-}
-
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
+const peerCountHex = await provider.send('net_peerCount', []);
+const peerCount = parseInt(peerCountHex, 16);
+console.log('Peer count:', peerCount);
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-import axios from 'axios'; 
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
 
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
 
-const data = {
-  jsonrpc: '2.0',
-  method: 'net_peerCount',
-  params: [],
-  id: 'getblock.io',
-};
-
-axios.post(url, data, {
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
-  .then(response => {
-    console.log('Response:', response.data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-
+const peerCountHex = await client.request({ method: 'net_peerCount' });
+const peerCount = parseInt(peerCountHex, 16);
+console.log('Peer count:', peerCount);
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-This Python script sends a request to the net\_peerCount method and prints the returned peer count. Make sure to replace \<ACCESS-TOKEN> with your actual API token. The Web3 net\_peerCount method is also available in Web3 libraries for Ethereum, providing a convenient interface for developers to monitor peer connectivity.
-
-The Ethereum net\_peerCount method is a key tool for assessing the network connectivity of an Ethereum client. By providing the number of connected peers, this method helps ensure that the client is fully operational and well-connected. This functionality is a vital part of the Ethereum JSON RPC API and Core API Endpoints.

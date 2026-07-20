@@ -1,214 +1,263 @@
 ---
 description: >-
-  Retrieve detailed information about a specific Ethereum block by its block
-  number using eth_getBlockByNumber. Essential for interacting with the Ethereum
-  blockchain via JSON-RPC.
+  Example code for the eth_getBlockByNumber JSON RPC method. Сomplete guide on
+  how to use eth_getBlockByNumber JSON RPC in GetBlock Web3 documentation.
 ---
 
 # eth\_getBlockByNumber - Ethereum
 
-{% hint style="success" %}
-The eth\_getBlockByNumber method is a part of the eth\_getBlockByNumber RPC Ethereum protocol and allows users to retrieve detailed information about a specific Ethereum block, identified by its block number.
-{% endhint %}
+This method returns block data given a block number or tag. The block reference can be a hex-encoded number or one of the tags `latest`, `earliest`, `pending`, `finalized` (post-Merge finalized block), or `safe` (justified block). This is the most common block-lookup method — used by every block explorer, indexer, and chain-observation tool.
 
-This method works by connecting to the Ethereum network via JSON-RPC, a remote procedure call (RPC) protocol used for communication between clients and servers. Core API endpoints provide the functionality to interact with the blockchain, and eth\_getBlockByNumber is one of the most commonly used methods within these endpoints.
+## Parameters
 
-### Supported Networks
+| Parameter                | Type    | Required | Description                                                                              |
+| ------------------------ | ------- | -------- | ---------------------------------------------------------------------------------------- |
+| `blockParameter`         | string  | Yes      | Block number in hex, or `latest`, `earliest`, `pending`, `finalized`, `safe`             |
+| `fullTransactionObjects` | boolean | Yes      | If `true`, returns full transaction objects; if `false`, returns just transaction hashes |
 
-The eth\_getBlockByNumber RPC Ethereum method works on the following Ethereum network types
-
-* **Mainnet**
-* **Testnet**: Sepolia, Hoodi
-
-### Parameters
-
-1. QUANTITY | TAG (required): An integer representing a block number or one of the following string tags:
-   * latest: The most recent block.
-   * earliest: The first block of the blockchain.
-   * pending: The block currently being mined.
-
-Boolean (required): If set to true, the method returns full transaction objects with complete details. If set to false, only the transaction hashes are returned.
-
-### Request
-
-URL
-
-{% code fullWidth="false" %}
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-{% endcode %}
-
-To request a block by its number using the eth\_getBlockByNumber method, the following JSON object is sent in a POST request via the Ethereum Web3 API
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' 
---header 'Content-Type: application/json' 
---data-raw {
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
     "method": "eth_getBlockByNumber",
     "params": [
-        "0x68B3",
-        true
+        "latest",
+        false
     ],
     "id": "getblock.io"
-}
+}'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="wss" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_getBlockByNumber",
-"params": ["0x68B3", true],
-"id": "getblock.io"}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_getBlockByNumber',
+    params: [
+        "latest",
+        false
+    ],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_getBlockByNumber',
+        'params': [
+        "latest",
+        false
+    ],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_getBlockByNumber",
+            "params": [
+        "latest",
+        false
+    ],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response
-
-The server will respond with a JSON object containing block information. An example response when full transaction objects are requested looks like this
+## Response
 
 ```json
 {
-    "id": "getblock.io",
     "jsonrpc": "2.0",
+    "id": "getblock.io",
     "result": {
-        "difficulty": "0x1046bb7e3f8",
-        "extraData": "0x476574682f76312e302e302d30636463373634372f6c696e75782f676f312e34",
-        "gasLimit": "0x1388",
-        "gasUsed": "0x0",
-        "hash": "0xf7756d836b6716aaeffc2139c032752ba5acf02fe94acb65743f0d177554b2e2",
-        "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-        "miner": "0x33bc13fdf135073277971b4d9f4f72082e907996",
-        "mixHash": "0x8c2dc0f970fa3aa6beb64c9f06a202a4314acfa4effaa4c75fd5bc9f9c77a519",
-        "nonce": "0x28df43dd283aab1d",
-        "number": "0x68b3",
-        "parentHash": "0xbc33aa8829350cc2e3ba7cf64d4beb2f1b554d570efc8bccb7b05ef50d76a47a",
-        "receiptsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "number": "0x1720340",
+        "hash": "0x9ec8e2f6b78d8f5f2ac3e5d61b0d38d4d5a8f0e7c8b5a2f9d3e6c1b7a4d0f2e5c",
+        "parentHash": "0x8db7d1e5a67c7e4f1bb2d4c50a9c27c3b4a7f9e6b7a4919c2d5b0a6f3d9e1c4b",
+        "nonce": "0x0000000000000000",
         "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
-        "size": "0x223",
-        "stateRoot": "0x8af5429b649f9fc633ce3c95219026fd08a249867e28c7eab22994eaa6125bb9",
-        "timestamp": "0x55bf47e3",
-        "totalDifficulty": "0x3f3cfd84833af0",
-        "transactions": [],
-        "transactionsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
-        "uncles": []
+        "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "transactionsRoot": "0x9c8f0e4f8d2e7c6b5a4f3e2d1c0b9a8e7f6d5c4b3a2b1c9d8e7f6a5b4c3d2e1f",
+        "stateRoot": "0x5eae9c5cbe0e8d3e2f5cd8b0a4e3b1f2c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4",
+        "receiptsRoot": "0x3a2b1c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b",
+        "miner": "0x1f9090aae28b8a3dceadf281b0f12828e676c326",
+        "difficulty": "0x0",
+        "totalDifficulty": "0xc70d815d562d3cfa955",
+        "extraData": "0x546974616e2028746974616e6275696c6465722e78797a29",
+        "size": "0x28a4b",
+        "gasLimit": "0x39dc7fb",
+        "gasUsed": "0x1c7db2c",
+        "timestamp": "0x67abcdef",
+        "baseFeePerGas": "0x5f5e100",
+        "blobGasUsed": "0x180000",
+        "excessBlobGas": "0x2a0000",
+        "withdrawalsRoot": "0x1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3",
+        "parentBeaconBlockRoot": "0x2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4",
+        "requestsHash": "0x3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5",
+        "mixHash": "0x9ac2e6f3a5b8c1d4e7f0a3b6c9d2e5f8a1b4c7d0e3f6a9b2c5d8e1f4a7b0c3d6",
+        "uncles": [],
+        "transactions": [
+            "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b",
+            "0x1cd7d1e5a67c7e4f1bb2d4c50a9c27c3b4a7f9e6b7a4919c2d5b0a6f3d9e1c4b"
+        ],
+        "withdrawals": [
+            {
+                "index": "0x1a2b3c",
+                "validatorIndex": "0x1234",
+                "address": "0x1234567890abcdef1234567890abcdef12345678",
+                "amount": "0x1c9c380"
+            }
+        ]
     }
 }
 ```
 
-### Response Description
+## Response Parameters
 
-The response includes various details about the block:
+| Parameter                      | Type            | Description                                                                      |
+| ------------------------------ | --------------- | -------------------------------------------------------------------------------- |
+| `jsonrpc`                      | string          | JSON-RPC protocol version ("2.0")                                                |
+| `id`                           | string          | Request identifier matching the request                                          |
+| `result.number`                | string          | Hex-encoded block number                                                         |
+| `result.hash`                  | string          | 32-byte block hash                                                               |
+| `result.parentHash`            | string          | Hash of the parent block                                                         |
+| `result.nonce`                 | string          | 8-byte block nonce (deprecated post-Merge, always `0x0000000000000000`)          |
+| `result.sha3Uncles`            | string          | keccak256 of the uncles list (empty post-Merge)                                  |
+| `result.logsBloom`             | string          | 256-byte bloom filter over the block's logs                                      |
+| `result.transactionsRoot`      | string          | Root of the transactions trie                                                    |
+| `result.stateRoot`             | string          | Root of the state trie after processing the block                                |
+| `result.receiptsRoot`          | string          | Root of the receipts trie                                                        |
+| `result.miner`                 | string          | Address that received the block-level fee (fee recipient / proposer)             |
+| `result.difficulty`            | string          | Block difficulty (`0x0` post-Merge)                                              |
+| `result.totalDifficulty`       | string          | Cumulative chain difficulty at this block                                        |
+| `result.extraData`             | string          | Arbitrary extra data (up to 32 bytes)                                            |
+| `result.size`                  | string          | Size of the block in bytes (hex)                                                 |
+| `result.gasLimit`              | string          | Maximum gas allowed in the block (hex)                                           |
+| `result.gasUsed`               | string          | Actual gas consumed by transactions in the block                                 |
+| `result.timestamp`             | string          | Unix timestamp of block production (hex)                                         |
+| `result.baseFeePerGas`         | string          | EIP-1559 base fee per gas (wei, hex)                                             |
+| `result.blobGasUsed`           | string          | Total blob gas consumed by blob transactions in the block (post-Cancun)          |
+| `result.excessBlobGas`         | string          | Excess blob gas carried into next block (post-Cancun)                            |
+| `result.withdrawalsRoot`       | string          | Root of the block's withdrawals list (post-Shapella)                             |
+| `result.parentBeaconBlockRoot` | string          | Beacon block root of the parent (post-Cancun / EIP-4788)                         |
+| `result.requestsHash`          | string          | Hash of the block's execution-layer requests list (post-Pectra / EIP-7685)       |
+| `result.mixHash`               | string          | Prev-randao value (post-Merge, formerly PoW mix digest)                          |
+| `result.uncles`                | array of string | Uncle block hashes (empty post-Merge)                                            |
+| `result.transactions`          | array           | Transaction hashes, or full transaction objects if `fullTransactionObjects=true` |
+| `result.withdrawals`           | array of object | Consensus-layer withdrawals credited in the block (post-Shapella)                |
 
-* difficulty: The mining difficulty of the block.
-* extraData: Additional data related to the block.
-* gasLimit: The maximum amount of gas allowed for the block.
-* gasUsed: The total gas used by all transactions in the block.
-* hash: The block's hash.
-* logsBloom: A bloom filter for the logs of the block.
-* miner: The address of the miner who mined the block.
-* mixHash: The hash used for the mining process.
-* nonce: The proof-of-work nonce.
-* number: The block number.
-* parentHash: The hash of the previous block.
-* receiptsRoot: The root hash of the receipts.
-* sha3Uncles: A hash representing the uncles (if any).
-* size: The size of the block.
-* stateRoot: The root hash of the state trie.
-* timestamp: The block's timestamp.
-* totalDifficulty: The cumulative difficulty of the chain up to and including the block.
-* transactions: A list of transaction objects (if true was passed for full transaction details).
-* uncles: A list of uncles associated with the block.
+## Use Cases
 
-### Use Case
+* **Latest Block Polling**: Poll `latest` to detect chain progress and drive per-block indexing workflows
+* **Finality-Aware Reads**: Use `finalized` to read from the beacon-chain-finalized tip, immune to reorgs
+* **Historical Backfill**: Iterate through historical block numbers to backfill an indexer or analytics database
+* **Transaction Enumeration**: Pass `fullTransactionObjects=true` to fetch every transaction in a block in a single call
 
-The eth\_getBlockByNumber method is primarily used to query a block in the Ethereum blockchain by its block number or one of the predefined tags such as latest or pending. This can be useful for blockchain explorers, wallet apps, or anyone who needs to retrieve detailed block data, including transaction information or general block metrics. It’s part of the Ethereum API that allows developers to interact with the blockchain programmatically.
+## Error Handling
 
-### Code Example
+| Error Code | Message        | Description                                                             |
+| ---------- | -------------- | ----------------------------------------------------------------------- |
+| -32602     | Invalid params | Block parameter is malformed or a numeric value is beyond the chain tip |
+| -32603     | Internal error | Node failed to retrieve the block                                       |
 
-Below is an example Python code snippet to make a request to the eth\_getBlockByNumber method using the requests library
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
 
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
 
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "eth_getBlockByNumber",
-    "params": [
-        "0x68B3",
-        True
-    ],
-    "id": "getblock.io"
-}
+// Latest block
+const latest = await provider.getBlock('latest');
+console.log('Latest:', latest.number);
 
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
+// Finality-aware read
+const finalized = await provider.getBlock('finalized');
+console.log('Finalized:', finalized.number);
 
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
+// With full transactions
+const blockWithTxs = await provider.getBlock('latest', true);
+console.log('Transactions:', blockWithTxs.transactions.length);
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-const axios = require('axios');
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
 
-// Define the API URL and access token
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
-const headers = { 'Content-Type': 'application/json' };
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
 
-// Prepare the request data
-const data = {
-  jsonrpc: '2.0',
-  method: 'eth_getBlockByNumber',
-  params: [
-    '0x68B3',
-    true
-  ],
-  id: 'getblock.io'
-};
+const latest = await client.getBlock({ blockTag: 'latest' });
+console.log('Latest:', latest.number);
 
-// Send the POST request
-axios.post(url, data, { headers })
-  .then(response => {
-    // Print the result
-    console.log(JSON.stringify(response.data, null, 4));
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+const finalized = await client.getBlock({ blockTag: 'finalized' });
+console.log('Finalized:', finalized.number);
+
+const blockWithTxs = await client.getBlock({ blockTag: 'latest', includeTransactions: true });
+console.log('Transactions:', blockWithTxs.transactions.length);
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-### Common Errors
-
-Invalid Block Number or Tag: If an invalid block number or tag (e.g., latest, earliest, or pending) is provided, the API will return an error.
-
-* Error Message: "eth\_getBlockByNumber error": "Invalid block number or tag"
-
-Transaction Data Retrieval Failure: If the requested block does not contain transaction data, an empty array will be returned for the transactions field.
-
-* Error Message: "eth\_getBlockByNumber error": "No transaction data available"
-
-API Rate Limiting: If too many requests are made in a short period, you may encounter rate-limiting errors.
-
-Error Message: "eth\_getBlockByNumber error": "Rate limit exceeded"

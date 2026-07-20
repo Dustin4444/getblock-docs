@@ -1,191 +1,227 @@
 ---
 description: >-
-  Retrieve transaction information by block number and index using
-  eth_getTransactionByBlockNumberAndIndex. Essential for tracking and validating
-  transactions within specific blocks on the Ethereum.
+  Example code for the eth_getTransactionByBlockNumberAndIndex JSON RPC method.
+  Сomplete guide on how to use eth_getTransactionByBlockNumberAndIndex JSON RPC
+  in GetBlock Web3 documentation.
 ---
 
 # eth\_getTransactionByBlockNumberAndIndex - Ethereum
 
-{% hint style="success" %}
-This method returns transaction information for the specified block number and transaction index position. It is an essential tool for developers needing detailed transaction data from specific blocks.
-{% endhint %}
+This method returns transaction data by block number and transaction index within that block. Same output as `eth_getTransactionByBlockHashAndIndex`, but with block-number-based lookup — the convenient path for indexers iterating over historical blocks.
 
-The Ethereum eth\_getTransactionByBlockNumberAndIndex method is part of the Ethereum JSON RPC Core API, used to interact with Ethereum nodes. The eth\_getTransactionByBlockNumberAndIndex RPC Ethereum method is especially helpful for tracking and validating transactions within particular blocks.
+## Parameters
 
-### Supported Networks
+| Parameter          | Type   | Required | Description                                                                  |
+| ------------------ | ------ | -------- | ---------------------------------------------------------------------------- |
+| `blockParameter`   | string | Yes      | Block number in hex, or `latest`, `earliest`, `pending`, `finalized`, `safe` |
+| `transactionIndex` | string | Yes      | Hex-encoded transaction index within the block (0-based)                     |
 
-The eth\_getTransactionByBlockNumberAndIndex RPC Ethereum method supports the following network types:
-
-* Mainnet
-* Testnet: Sepolia, Hoodi
-
-### Parameters
-
-* QUANTITY | TAG: An integer representing a block number or one of the string tags latest, earliest, or pending, as described in Block Parameter.
-* QUANTITY: An integer representing the transaction index position within the block.
-
-### Request
-
-URL
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To make a request, send a JSON object with the jsonrpc, method, and params fields. Below is an example of how to make a request using curl:
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "jsonrpc": "2.0",
     "method": "eth_getTransactionByBlockNumberAndIndex",
     "params": [
-        "0x52A96E",
-        "0x1"
+        "latest",
+        "0x0"
     ],
     "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_getTransactionByBlockNumberAndIndex",
-"params": ["0x52A96E", "0x1"],
-"id": "getblock.io"}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_getTransactionByBlockNumberAndIndex',
+    params: [
+        "latest",
+        "0x0"
+    ],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_getTransactionByBlockNumberAndIndex',
+        'params': [
+        "latest",
+        "0x0"
+    ],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_getTransactionByBlockNumberAndIndex",
+            "params": [
+        "latest",
+        "0x0"
+    ],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response
-
-The server responds with a JSON object containing the transaction details at the specified block number and index. Below is an example of a typical response:
+## Response
 
 ```json
 {
-    "id": "getblock.io",
     "jsonrpc": "2.0",
+    "id": "getblock.io",
     "result": {
-        "blockHash": "0x7f0c47c49d70010028085c26f2fa9dfd7b6406a86fd522610f70852249632a81",
-        "blockNumber": "0x52a96e",
+        "hash": "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b",
+        "nonce": "0x462",
+        "blockHash": "0x9ec8e2f6b78d8f5f2ac3e5d61b0d38d4d5a8f0e7c8b5a2f9d3e6c1b7a4d0f2e5c",
+        "blockNumber": "0x1720340",
+        "transactionIndex": "0x0",
+        "from": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+        "to": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "value": "0x0",
+        "gas": "0x186a0",
+        "gasPrice": "0x9502f900",
+        "maxFeePerGas": "0xb2d05e00",
+        "maxPriorityFeePerGas": "0x3b9aca00",
+        "input": "0xa9059cbb000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480000000000000000000000000000000000000000000000000de0b6b3a7640000",
+        "v": "0x0",
+        "r": "0xa3b4c5d6e7f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a",
+        "s": "0xb6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7",
         "chainId": "0x1",
-        "from": "0xfbb1b73c4f0bda4f67dca266ce6ef42f520fbb98",
-        "gas": "0x249f0",
-        "gasPrice": "0xba43b7400",
-        "hash": "0x0bf895891745037c4dce90f873b84cccd37396abcf32d113154b82fe16016b0d",
-        "input": "0xa9059cbb0000000000000000000000009f050bc566289fe08f9534eb8b5b7437071a85ca000000000000000000000000000000000000000000000589b9c8aed550c82400",
-        "nonce": "0x515f4c",
-        "r": "0xe0ec15e49c7ef372fe7393dbb814bc69a007a89632f2921a540a6b975a2099cf",
-        "s": "0x62f9e1d600011370d83c8ec2a04f0d4e406eb286120c8c0767ff176b3ac1789d",
-        "to": "0xa74476443119a942de498590fe1f2454d7d4ac0d",
-        "transactionIndex": "0x1",
-        "type": "0x0",
-        "v": "0x26",
-        "value": "0x0"
+        "type": "0x2",
+        "accessList": [],
+        "yParity": "0x0"
     }
 }
 ```
 
-### Response Description
+## Response Parameters
 
-* beforeblockHash: The hash of the block containing the transaction.
-* blockNumber: The number of the block containing the transaction.
-* chainId: The chain ID of the Ethereum network.
-* from: The address of the sender.
-* gas: The gas provided by the sender.
-* gasPrice: The gas price provided by the sender in Wei.
-* hash: The hash of the transaction.
-* input: The input data for the transaction.
-* nonce: The number of transactions made by the sender prior to this one.
-* r, s, v: Components of the transaction signature.
-* to: The address of the receiver.
-* transactionIndex: The index position of the transaction within the block.
-* type: The transaction type.
-* value: The value transferred in Wei.
+| Parameter                     | Type            | Description                                                                                                  |
+| ----------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------ |
+| `jsonrpc`                     | string          | JSON-RPC protocol version ("2.0")                                                                            |
+| `id`                          | string          | Request identifier matching the request                                                                      |
+| `result.hash`                 | string          | Transaction hash                                                                                             |
+| `result.nonce`                | string          | Nonce of the sender at the time of signing                                                                   |
+| `result.blockHash`            | string          | Hash of the block containing this transaction (`null` if pending)                                            |
+| `result.blockNumber`          | string          | Block number containing this transaction (`null` if pending)                                                 |
+| `result.transactionIndex`     | string          | Position of this transaction within its block (`null` if pending)                                            |
+| `result.from`                 | string          | Sender address                                                                                               |
+| `result.to`                   | string          | Recipient address (`null` for contract creation)                                                             |
+| `result.value`                | string          | Value transferred (wei, hex)                                                                                 |
+| `result.gas`                  | string          | Gas limit for this transaction                                                                               |
+| `result.gasPrice`             | string          | Effective gas price (wei, hex)                                                                               |
+| `result.maxFeePerGas`         | string          | EIP-1559 maximum total fee per gas (type-2 transactions)                                                     |
+| `result.maxPriorityFeePerGas` | string          | EIP-1559 priority fee per gas (type-2 transactions)                                                          |
+| `result.input`                | string          | Encoded call data                                                                                            |
+| `result.v`                    | string          | Signature v value                                                                                            |
+| `result.r`                    | string          | Signature r value                                                                                            |
+| `result.s`                    | string          | Signature s value                                                                                            |
+| `result.chainId`              | string          | Chain ID the transaction is bound to (EIP-155)                                                               |
+| `result.type`                 | string          | Transaction type (`0x0` legacy, `0x1` EIP-2930, `0x2` EIP-1559, `0x3` EIP-4844 blob, `0x4` EIP-7702 SetCode) |
+| `result.accessList`           | array of object | EIP-2930 access list (type-1+ transactions)                                                                  |
+| `result.yParity`              | string          | Signature parity (post-London)                                                                               |
 
-### Use Case
+## Use Cases
 
-The eth\_getTransactionByBlockNumberAndIndex method is useful for tracking and verifying transactions within specific blocks. By using the block number and transaction index, developers can easily access detailed information about individual transactions. In case of an eth\_getTransactionByBlockNumberAndIndex error, developers should verify that the provided block number and index are correct and correspond to an existing transaction within the block. An eth\_getTransactionByBlockNumberAndIndex example can help developers understand the correct usage of this method.
+* **Historical Backfill**: Iterate `(blockNumber, index)` pairs to backfill transaction data into an indexer database
+* **Live Transaction Feed**: Combine `eth_blockNumber` polling with per-block transaction iteration for a live feed
+* **Positional Studies**: Fetch a specific index across many blocks (e.g. always position 0) for MEV analysis
 
-### Code Example
+## Error Handling
 
-You can also make requests to the eth\_getTransactionByBlockNumberAndIndex method programmatically using Python. Below is an example using the requests library:
+| Error Code | Message        | Description                                                       |
+| ---------- | -------------- | ----------------------------------------------------------------- |
+| -32602     | Invalid params | Block parameter is malformed or transaction index is out of range |
+| -32603     | Internal error | Node failed to look up the block or transaction                   |
+
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
 
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
 
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "eth_getTransactionByBlockNumberAndIndex",
-    "params": [
-        "0x52A96E",
-        "0x1"
-    ],
-    "id": "getblock.io"
-}
-
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
+const tx = await provider.send('eth_getTransactionByBlockNumberAndIndex', ['latest', '0x0']);
+console.log('First transaction in latest block:', tx.hash);
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-const axios = require('axios');
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
 
-// Replace YOUR-API-KEY with your actual API key
-const url = 'https://go.getblock.io/YOUR-API-KEY/';
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
 
-// Request payload
-const payload = {
-  jsonrpc: '2.0',
-  method: 'eth_getTransactionByBlockNumberAndIndex',
-  params: [
-    '0x52A96E', // Block number
-    '0x1',      // Transaction index
-  ],
-  id: 'getblock.io',
-};
-
-// Axios POST request
-axios
-  .post(url, payload, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-  .then((response) => {
-    console.log('Response:', response.data);
-  })
-  .catch((error) => {
-    console.error('Error:', error.message);
-  });
-
+const tx = await client.getTransaction({
+    blockTag: 'latest',
+    index: 0,
+});
+console.log('First transaction in latest block:', tx.hash);
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-This Python script sends a request to the eth\_getTransactionByBlockNumberAndIndex method and prints the returned transaction information. Make sure to replace \<ACCESS-TOKEN> with your actual API token. This script serves as an eth\_getTransactionByBlockNumberAndIndex example for developers to understand the implementation in Python.
-
-The Web3 eth\_getTransactionByBlockNumberAndIndex method can also be used in Web3 libraries for Ethereum, providing an interface to retrieve detailed transaction data by referencing a specific block and index.

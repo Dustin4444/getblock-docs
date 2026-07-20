@@ -1,12 +1,12 @@
 ---
 description: >-
-  Example code for the eth_newBlockFilter JSON RPC method. Сomplete guide on how
-  to use eth_newBlockFilter JSON RPC in GetBlock Web3 documentation.
+  Example code for the eth_chainId JSON RPC method. Сomplete guide on how to use
+  eth_chainId JSON RPC in GetBlock Web3 documentation.
 ---
 
-# eth\_newBlockFilter - Ethereum
+# eth\_chainId - Ethereum
 
-This method creates a filter that fires each time a new block is added to the chain. Returns a filter ID that subsequent `eth_getFilterChanges` calls poll to receive block hashes. Lighter-weight than log filters — no criteria, just chain-tip advancement notifications.
+This method returns the currently configured chain ID as a hex-encoded integer. Chain ID is defined by EIP-155 and is the value applications sign into transactions to prevent replay across chains. Ethereum mainnet returns `0x1`, Sepolia returns `0xaa36a7`, and Hoodi returns `0x88bb0`.
 
 ## Parameters
 
@@ -22,7 +22,7 @@ curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "jsonrpc": "2.0",
-    "method": "eth_newBlockFilter",
+    "method": "eth_chainId",
     "params": [],
     "id": "getblock.io"
 }'
@@ -37,7 +37,7 @@ const axios = require('axios');
 
 const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
     jsonrpc: '2.0',
-    method: 'eth_newBlockFilter',
+    method: 'eth_chainId',
     params: [],
     id: 'getblock.io'
 }, {
@@ -59,7 +59,7 @@ response = requests.post(
     headers={'Content-Type': 'application/json'},
     json={
         'jsonrpc': '2.0',
-        'method': 'eth_newBlockFilter',
+        'method': 'eth_chainId',
         'params': [],
         'id': 'getblock.io'
     }
@@ -85,7 +85,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .header("Content-Type", "application/json")
         .json(&json!({
             "jsonrpc": "2.0",
-            "method": "eth_newBlockFilter",
+            "method": "eth_chainId",
             "params": [],
             "id": "getblock.io"
         }))
@@ -108,29 +108,30 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 {
     "jsonrpc": "2.0",
     "id": "getblock.io",
-    "result": "0x1a"
+    "result": "0x1"
 }
 ```
 
 ## Response Parameters
 
-| Parameter | Type   | Description                                                                        |
-| --------- | ------ | ---------------------------------------------------------------------------------- |
-| `jsonrpc` | string | JSON-RPC protocol version ("2.0")                                                  |
-| `id`      | string | Request identifier matching the request                                            |
-| `result`  | string | Hex-encoded filter ID — pass to `eth_getFilterChanges` to receive new block hashes |
+| Parameter | Type   | Description                                                                              |
+| --------- | ------ | ---------------------------------------------------------------------------------------- |
+| `jsonrpc` | string | JSON-RPC protocol version ("2.0")                                                        |
+| `id`      | string | Request identifier matching the request                                                  |
+| `result`  | string | Hex-encoded chain ID (`0x1` = Ethereum mainnet, `0xaa36a7` = Sepolia, `0x88bb0` = Hoodi) |
 
 ## Use Cases
 
-* **New Block Notifications**: Poll to receive block hashes for each newly produced block without subscribing over WSS
-* **Simple Chain-Progress Indicators**: Feed a UI 'live block' badge without full block details
-* **Trigger Periodic Work**: Kick off backend work (indexer runs, reorg checks) once per new block
+* **Transaction Signing**: Wallets and signers include the chain ID in signed transactions per EIP-155 to prevent replay attacks across chains
+* **Chain-Selection Logic**: dApps confirm the connected endpoint matches the intended network before initiating a write
+* **Multi-Chain Router Behavior**: Cross-chain aggregators verify the target chain before sending calldata to the correct contract
+* **Wallet UX**: Prompt users to switch networks when the connected chain ID doesn't match the dApp's expected chain
 
 ## Error Handling
 
-| Error Code | Message        | Description                      |
-| ---------- | -------------- | -------------------------------- |
-| -32603     | Internal error | Node failed to create the filter |
+| Error Code | Message        | Description                                   |
+| ---------- | -------------- | --------------------------------------------- |
+| -32603     | Internal error | Node failed to return its configured chain ID |
 
 ## Web3 Integration
 
@@ -142,13 +143,8 @@ import { ethers } from 'ethers';
 
 const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
 
-const filterId = await provider.send('eth_newBlockFilter', []);
-console.log('Block filter ID:', filterId);
-
-setInterval(async () => {
-    const hashes = await provider.send('eth_getFilterChanges', [filterId]);
-    hashes.forEach(h => console.log('New block:', h));
-}, 12000);
+const network = await provider.getNetwork();
+console.log('Chain ID:', network.chainId.toString());  // "1" for Ethereum mainnet
 ```
 {% endcode %}
 {% endtab %}
@@ -164,13 +160,8 @@ const client = createPublicClient({
     transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
 });
 
-const filter = await client.createBlockFilter();
-console.log('Block filter ID:', filter.id);
-
-setInterval(async () => {
-    const hashes = await client.getFilterChanges({ filter });
-    hashes.forEach(h => console.log('New block:', h));
-}, 12000);
+const chainId = await client.getChainId();
+console.log('Chain ID:', chainId);  // 1 for Ethereum mainnet
 ```
 {% endcode %}
 {% endtab %}

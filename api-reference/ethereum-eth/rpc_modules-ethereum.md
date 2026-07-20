@@ -1,44 +1,23 @@
 ---
 description: >-
-  The rpc_modules method is part of the Ethereum JSON-RPC Core API and lists all
-  enabled APIs and their versions on the Ethereum node. It helps developers
-  verify module availability .
+  Example code for the rpc_modules JSON RPC method. Сomplete guide on how to use
+  rpc_modules JSON RPC in GetBlock Web3 documentation.
 ---
 
 # rpc\_modules - Ethereum
 
-{% hint style="success" %}
-The rpc\_modules method lists all enabled JSON-RPC APIs and their versions on the Ethereum node, helping developers verify module availability and compatibility.
-{% endhint %}
+This method returns the list of available RPC modules exposed by the node, along with their versions. Modules are logical namespaces (`eth`, `net`, `web3`, `debug`, `trace`, `txpool`, etc.) — the returned map indicates which of them are enabled and can be called on this endpoint. Useful for feature detection.
 
-The rpc\_modules method is part of the Ethereum JSON RPC Core API, used to list all enabled APIs and their corresponding versions on the Ethereum node. This method is particularly relevant when developers are working with specific modules, such as block or transaction, to ensure compatibility with Ethereum node configurations. Understanding the versioning and availability of these modules simplifies integration and reduces errors during implementation. The response includes all relevant module details, which can be used to validate the value of specific module interactions.
+## Parameters
 
-### Supported Networks
+This method takes no parameters.
 
-The rpc\_modules RPC Ethereum method supports all Ethereum network types, including:
-
-* Mainnet
-* Testnets: Sepolia, Hoodi
-
-### Parameters
-
-{% hint style="info" %}
-This method does not require any parameters.
-{% endhint %}
-
-### Request Example
-
-URL
-
-```
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To make a request, send a JSON object with the jsonrpc, method, and params fields. Below is an example of how to make a request using curl:
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -48,108 +27,152 @@ curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
     "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "rpc_modules",
-"params": [],
-"id": "getblock.io"}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'rpc_modules',
+    params: [],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'rpc_modules',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "rpc_modules",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response Example
-
-The server responds with a JSON object containing a list of enabled APIs and their respective versions. Below is an example of a typical response:
+## Response
 
 ```json
 {
-    "id": "getblock.io",
     "jsonrpc": "2.0",
+    "id": "getblock.io",
     "result": {
-        "debug": "1.0",
         "eth": "1.0",
         "net": "1.0",
-        "rpc": "1.0",
-        "txpool": "1.0",
-        "web3": "1.0"
+        "web3": "1.0",
+        "debug": "1.0",
+        "rpc": "1.0"
     }
 }
 ```
 
-### Response Description
+## Response Parameters
 
-* result: An object containing the names of the enabled APIs as keys and their corresponding versions as values.
+| Parameter | Type   | Description                                                                                                                  |
+| --------- | ------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `jsonrpc` | string | JSON-RPC protocol version ("2.0")                                                                                            |
+| `id`      | string | Request identifier matching the request                                                                                      |
+| `result`  | object | Map of module name → module version. Presence of a module indicates its methods (`<module>_*`) are callable on this endpoint |
 
-### Use Case
+## Use Cases
 
-The rpc\_modules method is essential for developers who need to verify which APIs are enabled on an Ethereum node. This can be useful for debugging, setting up environments, or ensuring compatibility with specific features. In case of an rpc\_modules error, developers should confirm that the node supports this method and is configured correctly. An rpc\_modules example is included in this documentation to demonstrate the correct usage of this method.
+* **Feature Detection**: Detect whether `debug_*` methods are available before attempting them (avoids `method not found` errors)
+* **Tier Discovery**: Distinguish shared-node endpoints (typically no `debug`/`trace` modules) from dedicated-node endpoints (full module set)
+* **Client Compatibility Checks**: Verify a client-specific extension module is enabled before using it
 
-## Example Code
+## Error Handling
 
-You can also make requests to the rpc\_modules method programmatically using Python. Below is an example using the requests library:
+| Error Code | Message        | Description                              |
+| ---------- | -------------- | ---------------------------------------- |
+| -32603     | Internal error | Node failed to enumerate its RPC modules |
+
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
 
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
 
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "rpc_modules",
-    "params": [],
-    "id": "getblock.io"
+const modules = await provider.send('rpc_modules', []);
+console.log('Available modules:', modules);
+
+// Feature-detect debug module before calling debug_*:
+if ('debug' in modules) {
+    console.log('debug_* methods available');
 }
-
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-const axios = require('axios');
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
 
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
 
-const data = {
-  jsonrpc: '2.0',
-  method: 'rpc_modules',
-  params: [],
-  id: 'getblock.io',
-};
-
-axios.post(url, data, {
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
-  .then(response => {
-    console.log('Response:', response.data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+const modules = await client.request({ method: 'rpc_modules' });
+console.log('Available modules:', modules);
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-This Python script sends a request to the rpc\_modules method and prints the returned list of enabled APIs and their versions. Replace \<ACCESS-TOKEN> with your actual API token. The Web3 rpc\_modules method can also be accessed through Web3 libraries for Ethereum, offering a convenient way to retrieve module information programmatically.
-
-The Ethereum rpc\_modules method is a key tool for developers working with the Ethereum JSON RPC API, enabling them to identify available APIs and their versions quickly. As part of the Core API Endpoints, this method enhances compatibility and debugging workflows by providing transparent module information.

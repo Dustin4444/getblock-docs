@@ -1,166 +1,193 @@
 ---
 description: >-
-  Retrieve the value of a storage position at a specified address using
-  eth_getStorageAt. Essential for accessing specific data stored within smart
-  contracts on the Ethereum blockchain
+  Example code for the eth_getStorageAt JSON RPC method. Сomplete guide on how
+  to use eth_getStorageAt JSON RPC in GetBlock Web3 documentation.
 ---
 
 # eth\_getStorageAt - Ethereum
 
-{% hint style="success" %}
-This method returns the value of a storage position at a specified address, allowing developers to access specific data stored within smart contracts.
-{% endhint %}
+This method returns the value at a specific storage slot of a contract at a given block, hex-encoded. Storage slots are 32-byte keys that map to 32-byte values in the contract's state trie. Reading arbitrary slots lets applications inspect contract state directly without a public getter — useful for proxy inspection, storage-layout debugging, and reading private fields.
 
-The Ethereum eth\_getStorageAt method is part of the Ethereum JSON RPC Core API, used to interact with Ethereum nodes. The eth\_getStorageAt RPC Ethereum method is essential for retrieving on-chain data directly from the storage of a contract.
+## Parameters
 
-### Supported Networks
+| Parameter        | Type   | Required | Description                                                                  |
+| ---------------- | ------ | -------- | ---------------------------------------------------------------------------- |
+| `address`        | string | Yes      | Contract address (hex-encoded with `0x` prefix)                              |
+| `storageSlot`    | string | Yes      | Storage slot key (hex-encoded 32-byte value)                                 |
+| `blockParameter` | string | Yes      | Block number in hex, or `latest`, `earliest`, `pending`, `finalized`, `safe` |
 
-The eth\_getStorageAt RPC Ethereum method supports the following network types
-
-* Mainnet
-* Testnet: Sepolia, Hoodi
-
-### Parameters
-
-* DATA: The 20-byte address of the storage (account or contract) for which to retrieve the storage value.
-* DATA: The integer index of the storage position to access.
-* QUANTITY | TAG: An integer representing a block number or one of the string tags latest, earliest, or pending, as described in Block Parameter.
-
-### Request
-
-URL
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To make a request, send a JSON object with the jsonrpc, method, and params fields. Below is an example of how to make a request using curl, eth\_getStorageAt example:
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "jsonrpc": "2.0",
     "method": "eth_getStorageAt",
     "params": [
-        "0x9EC55d57208cb28a7714A2eA3468bD9d5bB15125",
-        "0x0",
+        "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
         "latest"
     ],
     "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_getStorageAt",
-"params": ["0x9EC55d57208cb28a7714A2eA3468bD9d5bB15125", "0x0", "latest"],
-"id": "getblock.io"}
-```
-{% endtab %}
-{% endtabs %}
-
-### Response
-
-The server responds with a JSON object containing the value at the specified storage position. Below is an example of a typical response
-
-```json
-{
-    "id": "getblock.io",
-    "jsonrpc": "2.0",
-    "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
-}
-```
-
-### Response Description
-
-* result: The value at the specified storage position, represented as a hexadecimal string.
-
-### Use Case
-
-The eth\_getStorageAt method is particularly useful for developers who need to retrieve specific storage values from smart contracts on the Ethereum blockchain. This can be used for debugging or for accessing critical data stored within a contract. In case of an eth\_getStorageAt error, developers should ensure that the provided address, storage index, and block tag are correct.
-
-### Code Example
-
-You can also make requests to the eth\_getStorageAt method programmatically using Python. Below is an example using the requests library:
-
-{% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
-
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
-
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "eth_getStorageAt",
-    "params": [
-        "0x9EC55d57208cb28a7714A2eA3468bD9d5bB15125",
-        "0x0",
-        "latest"
-    ],
-    "id": "getblock.io"
-}
-
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
-
-```
-{% endtab %}
-
-{% tab title="JavaScript" %}
+{% tab title="Axios" %}
+{% code title="example.js" %}
 ```javascript
 const axios = require('axios');
 
-// Replace <ACCESS-TOKEN> with your actual API key
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_getStorageAt',
+    params: [
+        "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "latest"
+    ],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
 
-// Request payload
-const requestBody = {
-  jsonrpc: '2.0',
-  method: 'eth_getStorageAt',
-  params: [
-    '0x9EC55d57208cb28a7714A2eA3468bD9d5bB15125', // Address
-    '0x0', // Storage slot
-    'latest', // Block tag
-  ],
-  id: 'getblock.io',
-};
-
-// Axios POST request
-axios
-  .post(url, requestBody, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-  .then((response) => {
-    console.log('Storage Value:', response.data.result);
-  })
-  .catch((error) => {
-    console.error('Error fetching storage value:', error.message);
-  });
-
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_getStorageAt',
+        'params': [
+        "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "latest"
+    ],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_getStorageAt",
+            "params": [
+        "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "latest"
+    ],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-This Python script sends a request to the eth\_getStorageAt method and prints the returned storage value. Make sure to replace \<ACCESS-TOKEN> with your actual API token.
+## Response
 
-Web3 eth\_getStorageAt libraries , providing an interface to access contract storage data for various use cases, including contract interaction, debugging, and data analysis.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": "0x000000000000000000000000000000000000000000000000000000000000000a"
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                                                                     |
+| --------- | ------ | ----------------------------------------------------------------------------------------------- |
+| `jsonrpc` | string | JSON-RPC protocol version ("2.0")                                                               |
+| `id`      | string | Request identifier matching the request                                                         |
+| `result`  | string | Hex-encoded 32-byte value at the requested slot (zero-padded if the underlying type is smaller) |
+
+## Use Cases
+
+* **Proxy Implementation Detection**: Read the EIP-1967 implementation slot (`0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc`) to identify the current logic contract behind a proxy
+* **Storage-Layout Debugging**: Inspect specific state variables during development when public getters are unavailable
+* **Private Field Reading**: Read private state variables whose slots are known from the contract's storage layout
+* **Cross-Chain Storage Proofs**: Combined with `eth_getProof`, verify storage values via Merkle proofs on other chains
+
+## Error Handling
+
+| Error Code | Message        | Description                                                         |
+| ---------- | -------------- | ------------------------------------------------------------------- |
+| -32602     | Invalid params | Address or storage slot is malformed, or block parameter is invalid |
+| -32603     | Internal error | Node failed to look up storage at the requested block               |
+
+## Web3 Integration
+
+{% tabs %}
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
+
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
+
+// Read WETH storage slot 0 (the totalSupply-adjacent slot in the WETH9 layout)
+const value = await provider.getStorage('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', 0);
+console.log('Storage value:', value);
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
+```javascript
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
+
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
+
+const value = await client.getStorageAt({
+    address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    slot: '0x0',
+});
+console.log('Storage value:', value);
+```
+{% endcode %}
+{% endtab %}
+{% endtabs %}

@@ -1,383 +1,345 @@
 ---
 description: >-
-  This Ethereum API Reference provides everything you need to interact with
-  Ethereum nodes using GetBlock’s infrastructure.
+  GetBlock provides fast and reliable access to Ethereum nodes via JSON-RPC API.
+  Connect to the Ethereum network without running your own infrastructure.
 ---
 
-# Ethereum (ETH)
+# Ethereum(ETH)
 
-GetBlock provides RPC endpoints that implement the Ethereum JSON-RPC API standard. These methods are core functionalities for interacting with Ethereum nodes. Many Ethereum-compatible blockchains (EVM chains) – such as BNB Chain, Polygon, Linea, Base, Optimism, and Arbitrum – also adopt this standard, making it applicable across various ecosystems.
+Ethereum is the largest smart-contract platform by total value settled, secured by a proof-of-stake consensus layer of over one million validators. Built by the Ethereum Foundation and a broad developer community, it is the reference L1 execution environment for the EVM and settles the majority of Layer-2 rollup activity, DeFi TVL, and stablecoin volume across all blockchains. As of the Fusaka upgrade (December 2025), the network operates with a 60M gas limit, up to 21 blobs per block via EIP-4844 + PeerDAS, and EOA-to-contract delegation via EIP-7702 (Pectra, May 2025).
 
-**Overview of Ethereum Network Methods**
+### Key Features
 
-The Ethereum network offers a comprehensive suite of methods that enable developers to interact seamlessly with its blockchain infrastructure. This overview provides an in-depth examination of these methods, categorizing them into key functional areas for better understanding and implementation.
-
-### What you can expect to find in this documentation
-
-* Compatibility with the Ethereum mainnet and testnets
-* Purpose, functionality, and use cases of each Ethereum method
-* Required input parameters
-* Sample requests and responses
-* Code examples in multiple programming languages (Python, JavaScript)
-
-### What you can do with this API: <a href="#what-you-can-do-with-this-api" id="what-you-can-do-with-this-api"></a>
-
-* Query real-time blockchain data
-* Manage and monitor accounts and balances.
-* Interact with smart contracts
-* Submit and track transactions
-* Monitor network activity in real-time
+* **Proof-of-Stake Consensus**: Secured by \~1M validators via the beacon chain since The Merge (September 2022)
+* **12-Second Block Time**: One block per slot, with finality reached in two epochs (\~13 minutes) under normal conditions
+* **EIP-1559 Fee Market**: Base fee + priority tip pricing with dynamic base-fee adjustment per block
+* **EIP-4844 Blob Data Availability**: Post-Fusaka, up to 21 blobs per block enable L2 rollups to post compressed batches at low cost
+* **EIP-7702 Account Delegation**: EOAs can temporarily execute smart-contract code, unlocking batching, gas sponsorship, and social recovery without wallet migration
 
 {% hint style="info" %}
 _TECHNICAL DISCLAIMER: AUTHORITATIVE JSON-RPC API SPECIFICATION._&#x20;
 
-_GetBlock's RPC API reference documentation is provided exclusively for informational purposes and streamlined developer experience optimization. The canonical and normative specification for Ethereum Virtual Machine (EVM) JSON-RPC methods is solely maintained and published through the official Ethereum Foundation documentation portal at_ [_ethereum.org_](http://ethereum.org/)_. This resource constitutes the sole authoritative reference implementation of the JSON-RPC 2.0 protocol interface across EVM-compatible execution clients._
+_GetBlock's RPC API reference documentation is provided exclusively for informational purposes and to optimize the developer experience. The canonical and normative specification for Ethereum Virtual Machine (EVM) JSON-RPC methods is maintained and published solely through the official Ethereum Foundation documentation portal at_ [_ethereum.org_](http://ethereum.org/)_. This resource is the sole authoritative reference implementation of the JSON-RPC 2.0 protocol for EVM-compatible execution clients._
 {% endhint %}
 
-***
+### Network Information
 
-To effectively use the Ethereum methods listed above, you'll need a reliable tool to send requests to the network. One such tool is Axios, a lightweight and widely used HTTP client. With Axios, you can easily interact with Ethereum's JSON-RPC API to execute transactions, retrieve blockchain data, and much more.
+| Property        | Value                |
+| --------------- | -------------------- |
+| Network Name    | Ethereum             |
+| Chain ID        | 1                    |
+| Native Currency | ETH                  |
+| Decimals        | 18                   |
+| Block Time      | \~3 seconds          |
+| Consensus       | Proof of Stake (PoS) |
+| EVM Compatible  | Yes                  |
 
-#### Quickstart with Axios
+### Base URL
 
-Axios is a powerful HTTP client that streamlines communication with APIs, including Ethereum's JSON-RPC interface. By using Axios, developers can effortlessly send requests and process responses, making blockchain integration straightforward and efficient. Below, we provide a detailed guide to help you get started:
-
-Developers new to Ethereum can efficiently interact with the Ethereum API by leveraging Axios, a well-regarded HTTP client. It simplifies API integration, making it user-friendly and effective. Here’s how you can get started:
-
-**1. Set Up Your Project**
-
-Choose a package manager and initialize your project:
-
+{% tabs %}
+{% tab title="Frankfurt, Germany" %}
+```bash
+https://go.getblock.io/<ACCESS-TOKEN>/
 ```
-mkdir ethereum-api-quickstart
-cd ethereum-api-quickstart
+{% endtab %}
+
+{% tab title="New York, USA" %}
+```bash
+https://shared.us-east-1.getblock.io/<ACCESS_TOKEN>
+```
+{% endtab %}
+
+{% tab title="Singapore, Singapore" %}
+```bash
+https://shared.ap-southeast-1.getblock.io/<ACCESS_TOKEN>
+```
+{% endtab %}
+{% endtabs %}
+
+### Supported Networks
+
+| Network | Chain ID | JSON-RPC | WSS | GraphQL | MEV protected (WebSocket) | MEV protected (JSON-RPC) | MEV protected -RElay (JSON\_RPC) | Frankfurt, Germany | New York, USA | Singapore, Singapore |
+| ------- | -------- | -------- | --- | ------- | ------------------------- | ------------------------ | -------------------------------- | ------------------ | ------------- | -------------------- |
+| Mainnet | 1        | ✅        | ✅   | ✅       | ✅                         | ✅                        | ✅                                | ✅                  | ✅             | ✅                    |
+| Hoodi   | 17000    | ✅        | ✅   | ✅       | ❌                         | ❌                        | ❌                                | ✅                  | ✅             | ✅                    |
+| Sepolia | 11155111 | ✅        | ✅   | ✅       | ❌                         | ❌                        | ❌                                | ✅                  | ❌             | ❌                    |
+
+### Quickstart
+
+{% tabs %}
+{% tab title="Javascript(Axios)" %}
+{% stepper %}
+{% step %}
+#### Setup project
+
+Create and initialize a new project:
+
+```bash
+mkdir eth-api-quickstart
+cd eth-api-quickstart
 npm init --yes
 ```
+{% endstep %}
 
-Or, using Yarn:
+{% step %}
+#### Install Axios
 
-```
-mkdir ethereum-api-quickstart
-cd ethereum-api-quickstart
-yarn init -y
-```
-
-**2. Install Axios**
-
-Install Axios to make API requests:
-
-```
+```bash
 npm install axios
 ```
+{% endstep %}
 
-Or, using Yarn:
+{% step %}
+#### Create file
 
-```
-yarn add axios
-```
+Create a new file named `index.js`. This is where you will make your first call.
+{% endstep %}
 
-**3. Make Your First Request**
+{% step %}
+#### Set ES module type
 
-Set up a new file named index.js and insert the code snippet provided below:
+Set the ES module `"type": "module"` in your `package.json`.
+{% endstep %}
 
+{% step %}
+#### Add code
+
+Add the following code to `index.js`:
+
+{% code title="index.js" %}
 ```javascript
-import axios from "axios";
+const axios = require('axios');
 
-
-const url = `https://go.getblock.io/<ACCESS-TOKEN>/`;
-
+const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
 
 const payload = {
   jsonrpc: '2.0',
-  id: 1,
-  method: 'eth_blockNumber',
-  params: []
+  method: 'eth_chainId',
+  params: [],
+  id: 'getblock.io'
 };
 
-
-axios.post(url, payload)
-  .then(response => {
-    console.log('Latest block number', parseInt(response.data.result, 16));
-  })
-  .catch(error => {
-    console.error(error);
-  });
+axios.post(url, payload, {
+  headers: { 'Content-Type': 'application/json' }
+})
+.then(response => {
+  const blockNumber = parseInt(response.data.result, 16);
+  console.log('Current Block Number:', blockNumber);
+})
+.catch(error => console.error(error));
 ```
+{% endcode %}
 
-Replace \<ACCESS-TOKEN> with your actual API key from the GetBlock. You can also use other networks by replacing the URL with those of Sepolia or Holesky testnets.
+Replace `<ACCESS-TOKEN>` with your actual GetBlock access token.
+{% endstep %}
 
-**4. Run Your Script**
-
-Execute your script with:
-
-node index.js
-
-You should see the latest block number logged to your console.\\
-
-#### Quickstart with Python and requests
-
-requests is a powerful and easy-to-use HTTP library for Python that simplifies API interactions, including Ethereum’s JSON-RPC API. With requests, developers can send requests, handle responses, and easily integrate blockchain functionality into their projects. Here’s a step-by-step guide to get started:
-
-**1. Set Up Your Project**
-
-Create a new directory for your project and navigate into it:
+{% step %}
+#### Run the script
 
 ```bash
-mkdir ethereum-api-quickstart
-cd ethereum-api-quickstart
+node index.js
 ```
 
-Set up a virtual environment to isolate dependencies:
+Expected output (example):
+
+```json
+{
+    "jsonrpc": "2.0",
+    "result": "0x1",
+    "id": "getblock.io"
+}
+```
+{% endstep %}
+{% endstepper %}
+{% endtab %}
+
+{% tab title="Python(Request)" %}
+{% stepper %}
+{% step %}
+#### Set up the project directory
+
+```bash
+mkdir eth-api-quickstart
+cd eth-api-quickstart
+```
+{% endstep %}
+
+{% step %}
+#### Create and activate a virtual environment
 
 ```bash
 python -m venv venv
-source venv/bin/activate  # On Windows, use venv\Scripts\activate
-```
+source venv/bin/activate
 
-Install the requests library:
+# On Windows, use:
+venv\Scripts\activate
+```
+{% endstep %}
+
+{% step %}
+#### Install requests
 
 ```bash
- pip install requests
+pip install requests
 ```
+{% endstep %}
 
-**2. Write Your First Script**
+{% step %}
+### Create script
 
-Create a new file called main.py and insert the following code:
+Create a file called `main.py` with the following content:
 
+{% code title="main.py" %}
 ```python
-python import requests
+import requests
+import json
 
-# Replace <ACCESS-TOKEN> with your actual API key from GetBlock
 url = "https://go.getblock.io/<ACCESS-TOKEN>/"
 
-# Create a JSON-RPC payload
-payload = {
+payload = json.dumps({
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "eth_blockNumber",
-    "params": []
-}
+    "method": "eth_chainId",
+    "params": [],
+    "id": "getblock.io"
+})
 
 headers = {
-    "Content-Type": "application/json"
+    'Content-Type': 'application/json'
 }
 
-try:
-    # Send the POST request
-    response = requests.post(url, json=payload, headers=headers)
-    response.raise_for_status()  # Check for HTTP errors
-    data = response.json()
-
-    # Convert the result to a decimal number and print it
-    latest_block = int(data["result"], 16)
-    print(f"Latest block number: {latest_block}")
-except requests.exceptions.RequestException as e:
-    print(f"An error occurred: {e}")
-except KeyError:
-    print("Unexpected response format:", response.text)
+response = requests.post(url, headers=headers, data=payload)
+print(response.text)
 ```
+{% endcode %}
 
-**3. Run Your Script**
+Replace `<ACCESS-TOKEN>` with your actual GetBlock access token.
+{% endstep %}
 
-Execute the script with:
+{% step %}
+#### Run the script
 
 ```bash
- python main.py
+python main.py
 ```
+{% endstep %}
+{% endstepper %}
+{% endtab %}
+{% endtabs %}
 
-You should see the latest block number retrieved from the Ethereum network printed to your console.
+### Available Methods
 
-***
+#### Chain & Client Info
 
-\
-**1. Account and Balance Management**
+| Method               | Description                                       |
+| -------------------- | ------------------------------------------------- |
+| `web3_clientVersion` | Client software version identifier                |
+| `web3_sha3`          | Keccak-256 hash of hex-encoded data               |
+| `net_version`        | Network ID (decimal string)                       |
+| `net_listening`      | Whether the node is listening for P2P connections |
+| `net_peerCount`      | Number of connected peers                         |
+| `eth_chainId`        | Chain ID per EIP-155                              |
+| `eth_blockNumber`    | Current chain tip block number                    |
+| `eth_syncing`        | Sync status (or `false` if fully synced)          |
 
-These methods allow users to retrieve information about Ethereum accounts and their balances.
+#### Gas & Fees
 
-* eth\_getBalance: Allows developers to query the Ether balance of any account at a precise blockchain height for better transaction tracking and financial auditing.
-  * Parameters: Address, Block Identifier
-  * Response: Balance in Wei
-* eth\_accounts: Lists all accounts managed by the connected Ethereum node.
-  * Response: Array of account addresses\\
+| Method                     | Description                                          |
+| -------------------------- | ---------------------------------------------------- |
+| `eth_gasPrice`             | Legacy gas price estimate (wei)                      |
+| `eth_maxPriorityFeePerGas` | Suggested EIP-1559 priority fee (wei)                |
+| `eth_blobBaseFee`          | Current blob base fee for EIP-4844 blob transactions |
+| `eth_feeHistory`           | Historical base fees + priority-fee percentiles      |
 
-**2. Block and Transaction Retrieval**
+#### Account & State
 
-Key methods to fetch block and transaction data from the blockchain.
+| Method                    | Description                                               |
+| ------------------------- | --------------------------------------------------------- |
+| `eth_getBalance`          | ETH balance of an address at a given block                |
+| `eth_accounts`            | Accounts owned by the client (returns `[]` on public RPC) |
+| `eth_getStorageAt`        | Value at a specific storage slot of a contract            |
+| `eth_getTransactionCount` | Address nonce (transaction count)                         |
+| `eth_getCode`             | Deployed bytecode at an address                           |
+| `eth_getProof`            | Merkle-Patricia proof for account and storage slots       |
 
-* eth\_blockNumber: Retrieves the latest block number.
-  * Response: Block number
-* eth\_getBlockByNumber: Fetches a block by its number.
-  * Parameters: Block Number, Boolean (for full transaction objects)
-  * Response: Block data
-* eth\_getBlockByHash: Retrieves a block using its hash.
-  * Parameters: Block Hash, Boolean (for full transaction objects)
-  * Response: Block data
-* eth\_getTransactionByHash: Fetches details of a specific transaction.
-  * Parameters: Transaction Hash
-  * Response: Transaction object
-* eth\_getTransactionReceipt: Provides the receipt of a processed transaction.
-  * Parameters: Transaction Hash
-  * Response: Receipt object
-* eth\_getBlockReceipts: Retrieves all transaction receipts for a specific block.
-  * Parameters: Block Identifier (hash or number)
-  * Response: Array of transaction receipts
-* eth\_getBlockTransactionCountByHash: Retrieves the number of transactions in a block identified by its hash.
-  * Parameters: Block Hash
-  * Response: Integer
-* eth\_getBlockTransactionCountByNumber: Retrieves the number of transactions in a block identified by its number.
-  * Parameters: Block Number
-  * Response: Integer
-* eth\_getTransactionByBlockHashAndIndex: Retrieves a transaction by block hash and index.
-  * Parameters: Block Hash, Index
-  * Response: Transaction object
-* eth\_getTransactionByBlockNumberAndIndex: Retrieves a transaction by block number and index.
-  * Parameters: Block Number, Index
-  * Response: Transaction object
+#### Blocks
 
-***
+| Method                                 | Description                             |
+| -------------------------------------- | --------------------------------------- |
+| `eth_getBlockByHash`                   | Block data by block hash                |
+| `eth_getBlockByNumber`                 | Block data by block number or tag       |
+| `eth_getBlockTransactionCountByHash`   | Transaction count in a block, by hash   |
+| `eth_getBlockTransactionCountByNumber` | Transaction count in a block, by number |
+| `eth_getBlockReceipts`                 | All transaction receipts for a block    |
 
-**3. Smart Contract Interaction**
+#### Transactions
 
-Methods to interact with deployed smart contracts on the Ethereum network.
+| Method                                    | Description                             |
+| ----------------------------------------- | --------------------------------------- |
+| `eth_getTransactionByHash`                | Transaction data by transaction hash    |
+| `eth_getTransactionByBlockHashAndIndex`   | Transaction by block hash and index     |
+| `eth_getTransactionByBlockNumberAndIndex` | Transaction by block number and index   |
+| `eth_getTransactionReceipt`               | Transaction receipt (status, gas, logs) |
 
-* eth\_call: Executes a read-only call to a smart contract.
-  * Parameters: Transaction object, Block Identifier
-  * Response: Returned data from the contract
-* eth\_estimateGas: Estimates the gas required to execute a transaction.
-  * Parameters: Transaction object
-  * Response: Estimated gas value
-* eth\_getCode: Retrieves the bytecode of a smart contract.
-  * Parameters: Address, Block Identifier
-  * Response: Contract bytecode
-* eth\_getStorageAt: Retrieves the value of a specific storage slot at an address.
-  * Parameters: Address, Storage Slot, Block Identifier
-  * Response: Data
-* eth\_getProof: Retrieves the Merkle proof for a storage slot.
-  * Parameters: Address, Storage Slots, Block Identifier
-  * Response: Proof object
+#### Execution & Simulation
 
-***
+| Method                 | Description                                       |
+| ---------------------- | ------------------------------------------------- |
+| `eth_call`             | Execute a message call without a transaction      |
+| `eth_estimateGas`      | Estimate gas required to execute a transaction    |
+| `eth_createAccessList` | Compute an EIP-2930 access list for a transaction |
+| `eth_simulateV1`       | Simulate a bundle of transactions against a block |
 
-**4. Debug and Trace Utilities**
+#### Filters & Logs
 
-Advanced methods for developers requiring detailed blockchain insights.
+| Method                            | Description                                     |
+| --------------------------------- | ----------------------------------------------- |
+| `eth_newFilter`                   | Create a log filter with address+topic criteria |
+| `eth_newBlockFilter`              | Create a filter for new block hashes            |
+| `eth_newPendingTransactionFilter` | Create a filter for pending transaction hashes  |
+| `eth_uninstallFilter`             | Remove a previously created filter              |
+| `eth_getFilterChanges`            | Poll new entries for a filter since last poll   |
+| `eth_getFilterLogs`               | Get all matching logs for a log filter          |
+| `eth_getLogs`                     | Query logs matching criteria (one-shot)         |
 
-* debug\_accountRange: Fetches a specified range of accounts based on a particular block height for detailed analysis.
-  * Parameters: Block Identifier, Start Account, Limit
-  * Response: List of accounts
-* debug\_batchSendRawTransaction: Sends a batch of raw transactions to the network.
-  * Parameters: Array of raw transactions
-  * Response: Array of transaction hashes
-* debug\_getBadBlocks: Lists blocks considered invalid by the node.
-  * Response: Array of block details
-* debug\_storageRangeAt: Retrieves a range of storage keys from a specific address.
-  * Parameters: Block Identifier, Address, Start Key, Limit
-  * Response: Storage range details
-* debug\_traceBlock: Traces all transactions in a block by number.
-  * Parameters: Block Number
-  * Response: Array of traces
-* debug\_traceBlockByHash: Traces all transactions in a block by hash.
-  * Parameters: Block Hash
-  * Response: Array of traces
-* debug\_traceBlockByNumber: Traces all transactions in a block by number.
-  * Parameters: Block Number
-  * Response: Array of traces
-* debug\_traceCall: Simulates a contract call for debugging.
-  * Parameters: Transaction object, Block Identifier, Options
-  * Response: Trace details
-* debug\_traceTransaction: Provides an execution trace of a transaction.
-  * Parameters: Transaction Hash
-  * Response: Trace details
+#### Transaction Submission
 
-***
+| Method                   | Description                                |
+| ------------------------ | ------------------------------------------ |
+| `eth_sendRawTransaction` | Submit a signed transaction to the network |
 
-**5. Mining and Node Management**
+#### WebSocket Subscriptions
 
-Methods to manage and monitor the Ethereum node itself.
+| Method            | Description                                                             |
+| ----------------- | ----------------------------------------------------------------------- |
+| `eth_subscribe`   | Subscribe to `newHeads`, `logs`, `newPendingTransactions`, or `syncing` |
+| `eth_unsubscribe` | Cancel a subscription                                                   |
 
-* eth\_mining: Indicates if the node is currently mining.
-  * Response: Boolean
-* eth\_hashrate: Provides the current hash rate of the node.
-  * Response: Hash rate in hashes per second
-* eth\_syncing: Provides information about the node's syncing status, indicating whether it is fully synchronized with the network.
-  * Response: Syncing object or false
-* eth\_submitWork: Submits a proof-of-work solution.
-  * Parameters: Nonce, PowHash, MixDigest
-  * Response: Boolean
-* eth\_submitHashrate: Submits the hash rate of a mining node.
-  * Parameters: Hashrate, ID
-  * Response: Boolean
-* eth\_getWork: Provides the data a miner needs to produce the proof-of-work.
-  * Response: Work data
-* eth\_coinbase: Retrieves the current coinbase address (the address to which mining rewards are directed).
-  * Response: Address
+#### RPC Module Discovery
 
-***
+| Method        | Description                                   |
+| ------------- | --------------------------------------------- |
+| `rpc_modules` | List available RPC modules and their versions |
 
-**6. Event and Log Management**
+### Debug & Trace
 
-Facilitate tracking of specific events on the blockchain.
+| Method                          | Description                                     |
+| ------------------------------- | ----------------------------------------------- |
+| `debug_accountRange`            | Enumerate accounts from the state trie          |
+| `debug_batchSendRawTransaction` | Submit multiple signed transactions in one call |
+| `debug_getBadBlocks`            | List recently rejected invalid blocks           |
+| `debug_storageRangeAt`          | Enumerate storage slots of a contract           |
+| `debug_traceBlock`              | Trace execution of a block by RLP               |
+| `debug_traceBlockByHash`        | Trace all transactions in a block by hash       |
+| `debug_traceBlockByNumber`      | Trace all transactions in a block by number     |
+| `debug_traceCall`               | Trace a simulated message call                  |
+| `debug_traceTransaction`        | Trace execution of a mined transaction          |
 
-* eth\_getLogs: Retrieves logs matching filter criteria.
-  * Parameters: Filter object (addresses, topics, block range)
-  * Response: Array of logs
-* eth\_newFilter: Creates a new filter object for events.
-  * Parameters: Filter object
-  * Response: Filter ID
-* eth\_uninstallFilter: Removes a filter object.
-  * Parameters: Filter ID
-  * Response: Boolean
-* eth\_newBlockFilter: Creates a filter for new block notifications.
-  * Response: Filter ID
-* eth\_newPendingTransactionFilter: Creates a filter for pending transaction notifications.
-  * Response: Filter ID
-* eth\_getFilterChanges: Retrieves changes for a given filter.
-  * Parameters: Filter ID
-  * Response: Array of changes
-* eth\_getFilterLogs: Retrieves all logs for a filter.
-  * Parameters: Filter ID
-  * Response: Array of logs
+## Support
 
-***
+For technical support and questions:
 
-**7. Miscellaneous Utility Methods**
+* Support: [support@getblock.io](mailto:support@getblock.io)
 
-These methods provide various utilities to aid Ethereum developers.
+## See Also
 
-* eth\_gasPrice: Retrieves the current gas price in the network.
-  * Response: Gas price in Wei
-* eth\_chainId: Returns the ID of the current blockchain.
-  * Response: Chain ID
-* eth\_maxPriorityFeePerGas: Retrieves the maximum priority fee per gas.
-  * Response: Gas fee in Wei
-* eth\_feeHistory: Provides historical data on gas fees.
-  * Parameters: Block Count, Newest Block, Reward Percentiles
-  * Response: Fee history object
-* eth\_sendRawTransaction: Sends a raw transaction to the network.
-  * Parameters: Signed transaction data
-  * Response: Transaction hash
-* web3\_clientVersion: Provides the client software version.
-  * Response: String
-* web3\_sha3: Returns the Keccak-256 hash of input data.
-  * Parameters: Data (hex string)
-  * Response: Hash (hex string)
-* rpc\_modules: Lists available RPC modules.
-  * Response: Object of module names and versions
-* net\_listening: Indicates if the node is accepting connections.
-  * Response: Boolean
-* net\_peerCount: Returns the number of connected peers.
-  * Response: Integer
-* net\_version: Provides the network ID.
-  * Response: String
-* eth\_subscribe: Subscribes to a particular event stream, such as new blocks or logs.
-  * Parameters: Subscription type, Options
-  * Response: Subscription ID
-* eth\_unsubscribe: Unsubscribes from a previously created subscription.
-  * Parameters: Subscription ID
-  * Response: Boolean
-
-***
-
-#### Conclusion
-
-The Ethereum network methods are versatile and cater to diverse use cases, from simple account balance queries to advanced transaction tracing. The added quickstart guide demonstrates how to leverage Axios for making efficient API requests, enabling developers to start building on Ethereum seamlessly. By categorizing and simplifying these concepts, this overview aims to enhance productivity for both new and experienced Ethereum developers.
+* [Ethereum JSON-RPC Specification](https://ethereum.org/developers/docs/apis/json-rpc/)&#x20;

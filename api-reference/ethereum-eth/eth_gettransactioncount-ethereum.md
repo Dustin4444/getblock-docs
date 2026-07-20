@@ -1,50 +1,32 @@
 ---
 description: >-
-  Retrieve the number of transactions sent from a specified address using
-  eth_getTransactionCount. Essential for tracking account activity and
-  determining the next nonce for transactions on the Ethereum
+  Example code for the eth_getTransactionCount JSON RPC method. Сomplete guide
+  on how to use eth_getTransactionCount JSON RPC in GetBlock Web3 documentation.
 ---
 
 # eth\_getTransactionCount - Ethereum
 
-{% hint style="success" %}
-This method returns the number of transactions sent from a specified address.
-{% endhint %}
+This method returns the number of transactions sent from an address, hex-encoded. This is the address's nonce — the counter used to order transactions from the same sender. Wallets read this before signing to set the correct nonce; nonce-management bugs are a common source of stuck or replaced transactions.
 
-The eth\_getTransactionCount method is part of the Ethereum JSON RPC Core API, used to interact with Ethereum nodes.By using the pending tag, developers can get the next account nonce that has not been used by any pending transactions. The eth\_getTransactionCount RPC Ethereum method is essential for tracking account activity and determining the next available nonce for new transactions.
+## Parameters
 
-### Supported Networks
+| Parameter        | Type   | Required | Description                                                                  |
+| ---------------- | ------ | -------- | ---------------------------------------------------------------------------- |
+| `address`        | string | Yes      | 20-byte address to query (hex-encoded with `0x` prefix)                      |
+| `blockParameter` | string | Yes      | Block number in hex, or `latest`, `earliest`, `pending`, `finalized`, `safe` |
 
-The eth\_getTransactionCount RPC Ethereum method supports the following network types:
-
-* Mainnet
-* Testnet: Sepolia, Hoodi
-
-### Parameters
-
-* DATA: The 20-byte account address.
-* QUANTITY | TAG: An integer representing a block number or one of the string tags latest, earliest, or pending as described in the Block Parameter.
-
-### Request
-
-URL
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To make a request, send a JSON object with the jsonrpc, method, and params fields. Below is an example of how to make a request using curl:
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "jsonrpc": "2.0",
     "method": "eth_getTransactionCount",
     "params": [
-        "0xc94770007dda54cF92009BFF0dE90c06F603a09f",
+        "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
         "latest"
     ],
     "id": "getblock.io"
@@ -52,111 +34,149 @@ curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 ```
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_getTransactionCount",
-"params": ["0xc94770007dda54cF92009BFF0dE90c06F603a09f", "latest"],
-"id": "getblock.io"}
-```
-{% endtab %}
-{% endtabs %}
-
-### Response
-
-The server responds with a JSON object containing the number of transactions sent from the specified address. Below is an example of a typical response:
-
-```json
-{
-    "id": "getblock.io",
-    "jsonrpc": "2.0",
-    "result": "0x219"
-}
-```
-
-### Response Description
-
-* result: The number of transactions value sent from the specified address, represented as a hexadecimal string.
-
-### Use Case
-
-The eth\_getTransactionCount method is particularly useful for developers who need to determine the next available nonce for a given account. This is important when constructing new transactions, as the nonce must be unique for each transaction sent by an address. Using the eth\_gettransactioncount pending tag allows developers to retrieve the nonce that will be used for the next transaction that has not yet been mined. In case of an eth\_getTransactionCount error, developers should verify that the provided account address and block tag are correct. An eth\_getTransactionCount example can help illustrate how to properly use this method.
-
-### Code Example
-
-You can also make requests to the eth\_getTransactionCount method programmatically using Python. Below is an example using the requests library:
-
-{% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
-
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
-
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "eth_getTransactionCount",
-    "params": [
-        "0xc94770007dda54cF92009BFF0dE90c06F603a09f",
-        "latest"
-    ],
-    "id": "getblock.io"
-}
-
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
-```
-{% endtab %}
-
-{% tab title="JavaScript" %}
+{% tab title="Axios" %}
 ```javascript
 const axios = require('axios');
 
-// Replace <ACCESS-TOKEN> with your actual Access Token
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_getTransactionCount',
+    params: [
+        "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+        "latest"
+    ],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
 
-// Request payload
-const payload = {
-  jsonrpc: '2.0',
-  method: 'eth_getTransactionCount',
-  params: [
-    '0xc94770007dda54cF92009BFF0dE90c06F603a09f', // Address
-    'latest', // Block parameter
-  ],
-  id: 'getblock.io',
-};
+console.log(response.data.result);
+```
+{% endtab %}
 
-// Axios POST request
-axios
-  .post(url, payload, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-  .then((response) => {
-    console.log('Transaction Count Response:', response.data);
-  })
-  .catch((error) => {
-    console.error('Error:', error.message);
-  });
+{% tab title="Request" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_getTransactionCount',
+        'params': [
+        "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+        "latest"
+    ],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endtab %}
+
+{% tab title="Rust" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_getTransactionCount",
+            "params": [
+        "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+        "latest"
+    ],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
 ```
 {% endtab %}
 {% endtabs %}
 
-This Python script sends a request to the eth\_getTransactionCount method and prints the returned transaction count. Make sure to replace \<ACCESS-TOKEN> with your actual API token. The eth\_gettransactioncount pending tag is useful for retrieving the next available nonce that has not been used by any pending transactions.
+## Response
 
-The Web3 eth\_getTransactionCount method can also be used in Web3 libraries for Ethereum, providing an interface to access transaction count data for various use cases, including constructing new transactions and debugging account activity.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": "0x462"
+}
+```
 
-The Ethereum eth\_getTransactionCount method provides a reliable way to query the number of transactions for a given account address across different network types, making it a versatile tool for developers working with Ethereum's JSON RPC API and Core API Endpoints.
+## Response Parameters
+
+| Parameter | Type   | Description                                                                  |
+| --------- | ------ | ---------------------------------------------------------------------------- |
+| `jsonrpc` | string | JSON-RPC protocol version ("2.0")                                            |
+| `id`      | string | Request identifier matching the request                                      |
+| `result`  | string | Hex-encoded transaction count (nonce) for the address at the requested block |
+
+## Use Cases
+
+* **Nonce Management**: Set the `nonce` field when signing a transaction — typically use `pending` to include queued but unmined transactions
+* **Account Activity Snapshots**: Show total sent-transaction count for an address in an explorer or wallet UI
+* **Stuck-Transaction Recovery**: Diagnose whether a transaction is truly stuck by comparing on-chain nonce to expected nonce
+* **Batch Transaction Sequencing**: Reliably enqueue N transactions with sequential nonces from a hot wallet
+
+## Error Handling
+
+| Error Code | Message        | Description                                                 |
+| ---------- | -------------- | ----------------------------------------------------------- |
+| -32602     | Invalid params | Address is malformed, or block parameter is invalid         |
+| -32603     | Internal error | Node failed to look up account state at the requested block |
+
+## Web3 Integration
+
+{% tabs %}
+{% tab title="Ethers.js" %}
+```javascript
+import { ethers } from 'ethers';
+
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
+
+const nonce = await provider.getTransactionCount('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', 'latest');
+console.log('Nonce:', nonce);
+
+// Use 'pending' when queueing a new transaction to account for unmined queued txs:
+const pendingNonce = await provider.getTransactionCount('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', 'pending');
+console.log('Next nonce to use:', pendingNonce);
+```
+{% endtab %}
+
+{% tab title="Viem" %}
+```javascript
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
+
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
+
+const nonce = await client.getTransactionCount({ address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045' });
+console.log('Nonce:', nonce);
+
+const pendingNonce = await client.getTransactionCount({
+    address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
+    blockTag: 'pending',
+});
+console.log('Next nonce to use:', pendingNonce);
+```
+{% endtab %}
+{% endtabs %}

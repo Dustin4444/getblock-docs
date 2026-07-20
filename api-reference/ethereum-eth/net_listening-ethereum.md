@@ -1,44 +1,23 @@
 ---
 description: >-
-  The net_listening method is part of the Ethereum JSON-RPC Core API and checks
-  whether the Ethereum client is actively listening for network connections. It
-  returns a boolean value.
+  Example code for the net_listening JSON RPC method. Сomplete guide on how to
+  use net_listening JSON RPC in GetBlock Web3 documentation.
 ---
 
 # net\_listening - Ethereum
 
-{% hint style="success" %}
-The net\_listening method checks if the Ethereum client is actively listening for network connections.
-{% endhint %}
+This method returns whether the node is actively listening for network connections from peers. On managed RPC endpoints the response is virtually always `true` — the field's diagnostic value is highest on self-hosted nodes where isolation from the P2P network indicates a configuration or connectivity issue.
 
-The net\_listening method is part of the Ethereum JSON RPC Core API, used to determine whether the Ethereum client is actively listening for network connections. This method provides a simple boolean response, which is particularly useful for diagnosing network connectivity issues or verifying that the client is configured to accept connections
+## Parameters
 
-### Supported Networks
+This method takes no parameters.
 
-The net\_listening RPC Ethereum method supports the following network types:
-
-* Mainnet
-* Testnet: Sepolia, Hoodi
-
-### Parameters
-
-{% hint style="info" %}
-This method does not require any parameters. The request can be sent with an empty parameters array.
-{% endhint %}
-
-### Request
-
-URL
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To make a request, send a JSON object with the jsonrpc, method, and params fields. Below is an example of how to make a request using curl:
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -48,102 +27,141 @@ curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
     "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/ 
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "net_listening",
-"params": [],
-"id": "getblock.io"}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'net_listening',
+    params: [],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'net_listening',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "net_listening",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response
-
-The server responds with a JSON object containing a boolean value indicating whether the client is listening for network connections. Below is an example of a typical response:
+## Response
 
 ```json
 {
-    "id": "getblock.io",
     "jsonrpc": "2.0",
+    "id": "getblock.io",
     "result": true
 }
 ```
 
-**Response Description**
+## Response Parameters
 
-* result: A boolean value that indicates whether the client is actively listening for network connections. true means the client is listening, and false means it is not.
+| Parameter | Type    | Description                                                                                       |
+| --------- | ------- | ------------------------------------------------------------------------------------------------- |
+| `jsonrpc` | string  | JSON-RPC protocol version ("2.0")                                                                 |
+| `id`      | string  | Request identifier matching the request                                                           |
+| `result`  | boolean | `true` if the node is listening for peers, `false` if the P2P listener is disabled or unreachable |
 
-### Use Case
+## Use Cases
 
-The net\_listening method is particularly useful for developers and system administrators who need to verify the network status of their Ethereum node. For example, this method can help diagnose network connectivity issues or confirm that the client is ready to accept incoming connections. In case of a net\_listening error, verify that the Ethereum client is running and properly configured to listen for connections. An example of correct usage is included in this documentation under the net\_listening example.
+* **Node Health Probes**: Basic reachability check as part of an endpoint availability monitor
+* **Self-Hosted Node Diagnostics**: Detect P2P isolation on a self-run node (managed endpoints won't return `false` in normal operation)
+* **Load Balancer Health Checks**: Simple boolean liveness probe for infrastructure-level health checks
 
-### Code Example
+## Error Handling
 
-You can also make requests to the net\_listening method programmatically using Python. Below is an example using the requests library:
+| Error Code | Message        | Description                                        |
+| ---------- | -------------- | -------------------------------------------------- |
+| -32603     | Internal error | Node's P2P listener status could not be determined |
+
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
 
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
 
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "net_listening",
-    "params": [],
-    "id": "getblock.io"
-}
-
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
+const isListening = await provider.send('net_listening', []);
+console.log('Listening for peers:', isListening);
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-import axios from 'axios'; 
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
 
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/'; 
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
 
-const data = {
-  jsonrpc: '2.0',
-  method: 'net_listening',
-  params: [],
-  id: 'getblock.io',
-};
-
-axios.post(url, data, {
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
-  .then(response => {
-    console.log('Response:', response.data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-
+const isListening = await client.request({ method: 'net_listening' });
+console.log('Listening for peers:', isListening);
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-This Python script sends a request to the net\_listening method and prints the returned boolean status. Make sure to replace \<ACCESS-TOKEN> with your actual API token. The Web3 net\_listening method is also available in Web3 libraries for Ethereum, providing developers with a convenient interface to check the network status.
-
-The Ethereum net\_listening method is an essential tool for diagnosing network issues and ensuring that the Ethereum client is actively accepting connections. This method is a key part of the Ethereum JSON RPC API and Core API Endpoints.

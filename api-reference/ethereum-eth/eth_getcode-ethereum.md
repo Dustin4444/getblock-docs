@@ -1,198 +1,189 @@
 ---
 description: >-
-  Retrieve the compiled bytecode of a smart contract at a specific address using
-  eth_getCode. Essential for verifying contract deployment and analyzing
-  bytecode in Web3 development.
+  Example code for the eth_getCode JSON RPC method. Сomplete guide on how to use
+  eth_getCode JSON RPC in GetBlock Web3 documentation.
 ---
 
 # eth\_getCode - Ethereum
 
-{% hint style="success" %}
-The eth\_getCode RPC Ethereum method is part of the Ethereum JSON RPC protocol. It retrieves the compiled code of a smart contract located at a specific address.
-{% endhint %}
+This method returns the deployed bytecode at a specific address, hex-encoded. For contract addresses it returns the runtime bytecode; for EOAs it returns `0x`. Post-Pectra (EIP-7702) EOAs can temporarily delegate to smart-contract code, in which case this returns the delegated code marker (`0xef0100` + implementation address).
 
-The response is returned as a hexadecimal value, representing the contract's bytecode.
+## Parameters
 
-This method is commonly used by developers working with Web3 and smart contract platforms to verify if a contract is deployed at a specific address or to fetch the bytecode for analysis. Ethereum eth\_getCode is an essential part of the Ethereum endpoints for blockchain interaction via JSON-RPC.
+| Parameter        | Type   | Required | Description                                                                  |
+| ---------------- | ------ | -------- | ---------------------------------------------------------------------------- |
+| `address`        | string | Yes      | 20-byte address to query (hex-encoded with `0x` prefix)                      |
+| `blockParameter` | string | Yes      | Block number in hex, or `latest`, `earliest`, `pending`, `finalized`, `safe` |
 
-### Supported Networks
-
-The eth\_getCode RPC Ethereum method supports the following network types
-
-* Mainnet
-* Testnet: Sepolia, Hoodi
-
-### Parameters
-
-* **DATA**: A 20-byte address of the contract whose code you want to retrieve.
-* **QUANTITY or TAG**:
-  * `latest`: Retrieves data from the most recently mined block.
-  * `earliest`: Retrieves data from the genesis block.
-  * `pending`: Retrieves data from the block currently being mined.
-
-### Request Example
-
-URL (API Endpoint)
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-Here is an eth\_getCode example of how to use the method in a JSON-RPC request
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "jsonrpc": "2.0",
     "method": "eth_getCode",
     "params": [
-        "0xa50a51c09a5c451c52bb714527e1974b686d8e77",
+        "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
         "latest"
     ],
     "id": "getblock.io"
 }'
-
 ```
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_getCode",
-"params": ["0xa50a51c09a5c451c52bb714527e1974b686d8e77", "latest"],
-"id": "getblock.io"}
-```
-{% endtab %}
-{% endtabs %}
-
-* method: Specifies the API method (eth\_getCode).
-* params: Contains:
-  1. The 20-byte contract address.
-  2. The block parameter indicating the block to reference (latest).
-
-id: A unique identifier for the request.
-
-### Response Example
-
-The response from the eth\_getBlockTransactionCountByNumber method will look like this:
-
-```json
-{
-    "id": "getblock.io",
-    "jsonrpc": "2.0",
-    "result": "0x"
-}
-```
-
-### Response Description
-
-* id: Matches the id from the request to help correlate responses.
-* jsonrpc: Confirms the JSON-RPC protocol version ("2.0").
-* result:
-*
-  * A hexadecimal string containing the smart contract’s compiled bytecode if the contract exists.
-  * "0x" if no smart contract is present at the queried address.
-
-#### Error Response Example
-
-```json5
-{
-    "jsonrpc": "2.0",
-    "id": "getblock.io",
-    "error": {
-        "code": -32602,
-        "message": "Invalid params"
-    }
-}
-```
-
-\
-Developers may encounter common issues such as an eth\_getCode error, which typically occurs due to invalid parameters or an inaccessible block. Always ensure your request includes a valid contract address and block parameter.
-
-### Use Case
-
-Checking for the presence of a smart contract\
-Use eth\_getCode to verify whether a smart contract is deployed at a given address. If the result is "0x", no contract exists at the address.
-
-Fetching contract bytecode\
-Retrieve the bytecode of a deployed smart contract for further analysis, such as reverse engineering or debugging.
-
-Integrating with Web3\
-This method is commonly used by developers working with Web3 eth\_getCode to interact with Ethereum smart contracts programmatically.
-
-### Code Example
-
-Here is an example request for getting contract code using different programming languages
-
-{% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
-
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
-
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "eth_getCode",
-    "params": [
-        "0xa50a51c09a5c451c52bb714527e1974b686d8e77",
-        "latest"
-    ],
-    "id": "getblock.io"
-}
-
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
-
-```
-{% endtab %}
-
-{% tab title="JavaScript" %}
+{% tab title="Axios" %}
 ```javascript
 const axios = require('axios');
 
-// Define the API URL and access token
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
-const headers = { 'Content-Type': 'application/json' };
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_getCode',
+    params: [
+        "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "latest"
+    ],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
 
-// Prepare the request data
-const data = {
-  jsonrpc: '2.0',
-  method: 'eth_getCode',
-  params: [
-    '0xa50a51c09a5c451c52bb714527e1974b686d8e77',
-    'latest'
-  ],
-  id: 'getblock.io'
-};
+console.log(response.data.result);
+```
+{% endtab %}
 
-// Send the POST request
-axios.post(url, data, { headers })
-  .then(response => {
-    // Print the result
-    console.log(JSON.stringify(response.data, null, 4));
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+{% tab title="Request" %}
+```python
+import requests
 
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_getCode',
+        'params': [
+        "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "latest"
+    ],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endtab %}
+
+{% tab title="Rust" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    const response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_getCode",
+            "params": [
+        "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "latest"
+    ],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
 ```
 {% endtab %}
 {% endtabs %}
 
-Request Setup:The API method eth\_getCode is invoked with the necessary parameters (address and block). Error Handling:Handles HTTP errors (e.g., server not reachable) and JSON-RPC-specific errors (e.g., invalid parameters or method issues). Result Usage:If a contract is present, logs its bytecode value for further processing.
+## Response
+
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": "0x6060604052361561015a5763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166306fdde0381146101a0578063095ea7b31461022a57806318160ddd1461024b57806323b872dd1461025457806326782247146102db578063313ce56714610304578063352389f31461030d5780633950935114610319578063452a9320146103375780635c60da1b1461034057806361d027b31461034957806366188463146103525780636352211e1461037057806366188463146103b25780636352211e146103d05780636db27d5c146103e457806370a0823114610411575050"
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                                                                                    |
+| --------- | ------ | -------------------------------------------------------------------------------------------------------------- |
+| `jsonrpc` | string | JSON-RPC protocol version ("2.0")                                                                              |
+| `id`      | string | Request identifier matching the request                                                                        |
+| `result`  | string | Hex-encoded contract runtime bytecode. `0x` for EOAs. Post-Pectra: `0xef0100...` for delegated EOAs (EIP-7702) |
+
+## Use Cases
+
+* **Contract Existence Check**: Detect whether an address is a contract (non-empty code) or an EOA (`0x`)
+* **EIP-7702 Delegation Detection**: Detect when an EOA has delegated to smart-contract code by checking for the `0xef0100` prefix (post-Pectra)
+* **Contract Verification**: Compare deployed bytecode against expected/compiled bytecode to detect tampering
+* **Bytecode Analysis**: Feed contract bytecode into tools like `evm-disassembler`, `heimdall`, or `Panoramix` for reverse engineering
+
+## Error Handling
+
+| Error Code | Message        | Description                                                 |
+| ---------- | -------------- | ----------------------------------------------------------- |
+| -32602     | Invalid params | Address is malformed, or block parameter is invalid         |
+| -32603     | Internal error | Node failed to look up account state at the requested block |
+
+## Web3 Integration
+
+{% tabs %}
+{% tab title="Ethers.js" %}
+```javascript
+import { ethers } from 'ethers';
+
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
+
+const code = await provider.getCode('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2');
+
+if (code === '0x') {
+    console.log('EOA (no contract code)');
+} else if (code.startsWith('0xef0100')) {
+    // EIP-7702: EOA has delegated to a smart contract
+    const delegateAddr = '0x' + code.slice(8);
+    console.log('EIP-7702 delegated EOA — delegate:', delegateAddr);
+} else {
+    console.log('Contract, bytecode length:', (code.length - 2) / 2, 'bytes');
+}
+```
+{% endtab %}
+
+{% tab title="Viem" %}
+```javascript
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
+
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
+
+const code = await client.getCode({ address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2' });
+
+if (!code || code === '0x') {
+    console.log('EOA (no contract code)');
+} else if (code.startsWith('0xef0100')) {
+    const delegateAddr = '0x' + code.slice(8);
+    console.log('EIP-7702 delegated EOA — delegate:', delegateAddr);
+} else {
+    console.log('Contract, bytecode length:', (code.length - 2) / 2, 'bytes');
+}
+```
+{% endtab %}
+{% endtabs %}

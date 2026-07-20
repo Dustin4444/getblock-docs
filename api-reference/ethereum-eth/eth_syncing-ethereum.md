@@ -1,44 +1,23 @@
 ---
 description: >-
-  The eth_syncing method is part of the Ethereum JSON-RPC API and is used to
-  check the synchronization status of an Ethereum node. It returns detailed
-  synchronization data if the node is syncing
+  Example code for the eth_syncing JSON RPC method. Сomplete guide on how to use
+  eth_syncing JSON RPC in GetBlock Web3 documentation.
 ---
 
-# eth\_syncing-Ethereum
+# eth\_syncing - Ethereum
 
-{% hint style="success" %}
-Returns an object with data about the synchronization status, or falseif not synchronizing.
-{% endhint %}
+This method returns an object with sync status data when the node is catching up to the chain tip, or `false` when the node is fully synced. Managed RPC endpoints typically return `false` unless a specific backend node is currently mid-sync.
 
-The eth\_syncing method is part of the Ethereum JSON-RPC API and is used to check the synchronization status of an Ethereum node. This method returns detailed synchronization data if the node is syncing, or false if the node is fully synchronized.
+## Parameters
 
-### Supported Networks
+This method takes no parameters.
 
-The eth\_syncing RPC Ethereum method works on the following network types:
-
-* Mainnet
-* Testnet: Sepolia, Hoodi
-
-### Parameters
-
-{% hint style="info" %}
-This method does not require any parameters. The request can be sent with an empty parameters array.
-{% endhint %}
-
-### Request
-
-URL
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To interact with the Ethereum eth\_syncing endpoint using JSON-RPC, use the following examples:
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -48,137 +27,149 @@ curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
     "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_syncing",
-"params": [],
-"id": "getblock.io"}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_syncing',
+    params: [],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_syncing',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_syncing",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response
-
-The response indicates whether the node is synchronizing. If the node is synchronizing, an object with detailed synchronization status is returned. If the node is fully synchronized, false is returned.
-
-Example Response
+## Response
 
 ```json
 {
-    "id": "getblock.io",
     "jsonrpc": "2.0",
+    "id": "getblock.io",
     "result": false
 }
 ```
 
-Example Response (Node Synchronizing)
+## Response Parameters
 
-```json
-{
-    "id": "getblock.io",
-    "jsonrpc": "2.0",
-    "result": {
-        "startingBlock": "0x384",
-        "currentBlock": "0x386",
-        "highestBlock": "0x454"
-    }
-}
-```
+| Parameter | Type              | Description                                                                                                     |
+| --------- | ----------------- | --------------------------------------------------------------------------------------------------------------- |
+| `jsonrpc` | string            | JSON-RPC protocol version ("2.0")                                                                               |
+| `id`      | string            | Request identifier matching the request                                                                         |
+| `result`  | boolean or object | `false` if fully synced, or an object with `startingBlock`, `currentBlock`, `highestBlock` (hex) if catching up |
 
-**Response Description**
+## Use Cases
 
-* result: The synchronization status:
-  * false: The node is fully synchronized.
-  * Object: Detailed data about synchronization status, including:
-    * startingBlock: The block at which the node started syncing.
-    * currentBlock: The block number the node has currently synced to.
-    * highestBlock: The highest block the node is aware of.
-* value: Represents the synchronization progress, implicitly indicated by the currentBlock and highestBlock values.
+* **Node Freshness Verification**: Confirm a node is at chain tip before treating its reads as canonical
+* **Sync Progress Monitoring**: Track a self-hosted node's catch-up progress via the `currentBlock` / `highestBlock` fields
+* **Failover Decisioning**: Skip a syncing backend and route to a fully-synced one at the load balancer level
 
-### Use Case
+## Error Handling
 
-The eth\_syncing RPC Ethereum method is widely used in monitoring and analytics tools to:
+| Error Code | Message        | Description                             |
+| ---------- | -------------- | --------------------------------------- |
+| -32603     | Internal error | Node failed to determine its sync state |
 
-* Determine the synchronization status of a node.
-* Track progress during node setup or recovery.
-* Provide insights into blockchain synchronization behavior.
-
-For example, a Web3 monitoring application may use the Ethereum eth\_syncing method to notify users when their node has completed synchronization or to display real-time sync progress.
-
-### Code Example
-
-Here is an eth\_syncing example of how to query the method using Python and JavaScript:
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
 
-# Define the API URL and headers
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
 
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "eth_syncing",
-    "params": [],
-    "id": "getblock.io"
+const syncStatus = await provider.send('eth_syncing', []);
+if (syncStatus === false) {
+    console.log('Node is fully synced');
+} else {
+    console.log('Syncing:', syncStatus);
 }
-
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-import axios from 'axios';
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
 
-// Define the API URL and headers
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
-const headers = { 'Content-Type': 'application/json' };
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
 
-// Prepare the request data
-const data = {
-  jsonrpc: '2.0',
-  method: 'eth_syncing',
-  params: [],
-  id: 'getblock.io'
-};
-
-// Send the POST request
-axios.post(url, data, { headers })
-  .then(response => {
-    // Print the result
-    console.log('Response:', response.data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-
+const syncStatus = await client.request({ method: 'eth_syncing' });
+if (syncStatus === false) {
+    console.log('Node is fully synced');
+} else {
+    console.log('Syncing:', syncStatus);
+}
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-#### Common Errors
-
-When using the eth\_syncing RPC Ethereum method, the following issues may occur:
-
-* Invalid URL or ACCESS-TOKEN: Ensure the URL and token are correct and active.
-* eth\_syncing error: This could happen if the node is unreachable or the request format is incorrect.
-* Unexpected Response: Verify that the node supports synchronization queries and is actively syncing if expected.
-
-By integrating the Web3 eth\_syncing method into your application, you can monitor synchronization status efficiently. Use this core API method to ensure your node is up-to-date and ready for blockchain operations.

@@ -1,43 +1,28 @@
 ---
 description: >-
-  The eth_newPendingTransactionFilter method creates a filter in the node to
-  notify when new pending transactions arrive.
+  Example code for the eth_newPendingTransactionFilter JSON RPC method. Сomplete
+  guide on how to use eth_newPendingTransactionFilter JSON RPC in GetBlock Web3
+  documentation.
 ---
 
-# eth\_newPendingTransactionFilter-Ethereum
+# eth\_newPendingTransactionFilter - Ethereum
 
-{% hint style="success" %}
-Creates a filter in the node, to notify when new pending transactionsarrive. To check if the state has changed, call eth\_getFilterChanges.
-{% endhint %}
-
-The eth\_newPendingTransactionFilter method is part of the Ethereum JSON-RPC API and is used to create a filter in the node to notify when new pending transactions arrive. This method is essential for monitoring transaction activity in real time. To check for updates, the eth\_getFilterChanges method can be called.
-
-### Supported Networks
-
-The eth\_newPendingTransactionFilter RPC Ethereum method works across various Ethereum network types, including:
-
-* Mainnet
-* Testnet: Sepolia, Hoodi
-
-### Parameters
+This method creates a filter that fires on new transactions entering the node's mempool. Returns a filter ID that subsequent `eth_getFilterChanges` calls poll to receive pending transaction hashes.&#x20;
 
 {% hint style="info" %}
-This method does not require any parameters. The request can be sent with an empty parameters array.
+Note that visibility of pending transactions is inherently node-specific — public RPC endpoints typically see only a partial mempool view.
 {% endhint %}
 
-### Request
+## Parameters
 
-URL
+This method takes no parameters.
 
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To interact with the Ethereum eth\_newPendingTransactionFilter endpoints using JSON-RPC, use the following examples
+## Request
 
 {% tabs %}
-{% tab title="JSON" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -47,114 +32,151 @@ curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
     "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="WS" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/ 
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_newPendingTransactionFilter",
-"params": [],
-"id": "getblock.io"}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_newPendingTransactionFilter',
+    params: [],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_newPendingTransactionFilter',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_newPendingTransactionFilter",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response
-
-The response contains the ID of the newly created filter, which can be used to query changes.
+## Response
 
 ```json
 {
-    "id": "getblock.io",
     "jsonrpc": "2.0",
-    "result": "0x55c90c9069cac4e02c8868aa6e437dbb"
+    "id": "getblock.io",
+    "result": "0x1b"
 }
 ```
 
-### Response Description
+## Response Parameters
 
-* result: A string containing the filter ID in hexadecimal format. This value can be used with methods such as eth\_getFilterChanges or eth\_uninstallFilter to manage and query the filter.
+| Parameter | Type   | Description                                                                                      |
+| --------- | ------ | ------------------------------------------------------------------------------------------------ |
+| `jsonrpc` | string | JSON-RPC protocol version ("2.0")                                                                |
+| `id`      | string | Request identifier matching the request                                                          |
+| `result`  | string | Hex-encoded filter ID — pass to `eth_getFilterChanges` to receive new pending transaction hashes |
 
-### Use Case
+## Use Cases
 
-The eth\_newPendingTransactionFilter RPC Ethereum method is widely used in decentralized applications (DApps) and monitoring tools to:
+* **Wallet Post-Submit Tracking**: Track a user's just-submitted transaction as it enters the mempool
+* **Mempool Monitoring**: Feed pending transaction hashes into mempool analytics or MEV detection systems
+* **Live Activity Dashboards**: Show a 'live pending' feed of transactions arriving at the node
 
-* Track pending transactions in real time.
-* Monitor network activity for transaction patterns or anomalies.
-* Provide dynamic notifications to users about transactions in progress.
+## Error Handling
 
-For instance, a Web3 application may use the Ethereum eth\_newPendingTransactionFilter method to notify users about their pending transactions and update the application state based on transaction status.
+| Error Code | Message        | Description                      |
+| ---------- | -------------- | -------------------------------- |
+| -32603     | Internal error | Node failed to create the filter |
 
-### Code Example
-
-Here is an eth\_newPendingTransactionFilter example of how to query the method using Python and JavaScript:
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" overflow="wrap" %}
+```javascript
+import { ethers } from 'ethers';
 
-# Define the API URL and headers
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
 
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "eth_newPendingTransactionFilter",
-    "params": [],
-    "id": "getblock.io"
-}
+const filterId = await provider.send('eth_newPendingTransactionFilter', []);
+console.log('Pending tx filter ID:', filterId);
 
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
+setInterval(async () => {
+    const hashes = await provider.send('eth_getFilterChanges', [filterId]);
+    hashes.forEach(h => console.log('Pending tx:', h));
+}, 2000);
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-import axios from 'axios';
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
 
-// Define the API URL and headers
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
-const headers = { 'Content-Type': 'application/json' };
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
 
-// Prepare the request data
-const data = {
-  jsonrpc: '2.0',
-  method: 'eth_newPendingTransactionFilter',
-  params: [],
-  id: 'getblock.io'
-};
+const filter = await client.createPendingTransactionFilter();
+console.log('Pending tx filter ID:', filter.id);
 
-// Send the POST request
-axios.post(url, data, { headers })
-  .then(response => {
-    // Print the result
-    console.log('Filter ID:', response.data.result);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+setInterval(async () => {
+    const hashes = await client.getFilterChanges({ filter });
+    hashes.forEach(h => console.log('Pending tx:', h));
+}, 2000);
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-#### Common Errors
-
-When using the eth\_newPendingTransactionFilter RPC Ethereum method, the following issues may occur:
-
-* Invalid URL or ACCESS-TOKEN: Ensure the URL and token are correct and active.
-* Network Connectivity Problems: Verify that the network being queried is reachable and the correct endpoint is being used.
-* eth\_newPendingTransactionFilter error: This error may occur if the node does not support filtering or if the request is malformed.
-
-By integrating the Web3 eth\_newPendingTransactionFilter method into your application, you can efficiently track transaction activity. Use this core API method to monitor pending transactions and provide a responsive user experience in real time.

@@ -1,164 +1,167 @@
 ---
 description: >-
-  Retrieve a list of Ethereum account addresses owned by the client using
-  eth_accounts. Useful for displaying available accounts in dApps without
-  requesting wallet access.
+  Example code for the eth_accounts JSON RPC method. Сomplete guide on how to
+  use eth_accounts JSON RPC in GetBlock Web3 documentation.
 ---
 
 # eth\_accounts - Ethereum
 
-{% hint style="success" %}
-The **eth\_accounts** method in the **Ethereum JSON-RPC** protocol retrieves a list of Ethereum account addresses owned by the client.
-{% endhint %}
+This method returns the list of accounts owned by the client. On managed RPC endpoints like GetBlock, this always returns an empty array `[]` — the endpoint doesn't hold user keys. On self-hosted Geth or similar with unlocked wallet accounts, it would return the list of managed addresses.
 
-This method is particularly useful in **Web3 applications** that need to access and display the available accounts for actions such as signing transactions or interacting with smart contracts. Unlike **eth\_requestAccounts**, which is used to request access to accounts in a MetaMask-enabled Web3 environment, **eth\_accounts** simply returns accounts already available to the client.
+## Parameters
 
-### Supported Networks
+This method takes no parameters.
 
-The eth\_accounts **RPC Ethereum** method supports the following network types
+## Request
 
-* **Mainnet**
-* **Testnet**: Sepolia, Hoodi
-
-### Parameters
-
-{% hint style="info" %}
-This method does not accept any parameters
-{% endhint %}
-
-### Request
-
-#### URL
-
-{% code fullWidth="false" %}
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
+{% tabs %}
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "jsonrpc": "2.0",
+    "method": "eth_accounts",
+    "params": [],
+    "id": "getblock.io"
+}'
 ```
 {% endcode %}
-
-To retrieve the list of accounts, use the following eth\_accounts request with the JSON-RPC API
-
-{% tabs %}
-{% tab title="curl " %}
-```json
-curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' 
---header 'Content-Type: application/json' 
---data-raw {
-    "jsonrpc": "2.0",
-    "method": "eth_accounts",
-    "params": [],
-    "id": "getblock.io"
-}
-```
 {% endtab %}
 
-{% tab title="wss" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_accounts",
-"params": [],
-"id": "getblock.io"}
-```
-{% endtab %}
-{% endtabs %}
-
-### Response
-
-Here’s a sample response for the eth\_accounts method, providing an array of Ethereum addresses
-
-```json
-{
-    "result": "null",
-    "id": "getblock.io",
-    "status_code": 405,
-    "message": "Method not allowed"
-}
-```
-
-### Body Params
-
-{% hint style="info" %}
-Since eth\_accounts does not require body parameters, it is often a straightforward call to integrate when accessing the client’s accounts for Web3 applications.
-{% endhint %}
-
-### Use Case
-
-The **eth\_accounts** method is commonly used in **dApps** and **Web3 applications** to retrieve a list of Ethereum accounts already accessible to the client. It allows applications to display accounts for actions like sending **transactions**, signing data, or interacting with **Ethereum smart contracts** without requiring additional user permissions each time.
-
-In contrast, **eth\_requestAccounts** requests explicit user permission to access accounts, typically used when the app first needs access or when permissions are revoked. The main difference is that **eth\_accounts** returns already available accounts, while **eth\_requestAccounts** prompts the user for approval.
-
-Understanding this distinction is important for creating secure Web3 applications, as **eth\_accounts** offers a seamless user experience, whereas **eth\_requestAccounts** ensures user control over wallet access.\\
-
-### Code Example
-
-Here is an example of how to use the eth\_accounts method in Python to retrieve a list of client-owned addresses
-
-{% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
-
-url = "https://go.getblock.io/<ACCESS-TOKEN>/"
-headers = {
-    "Content-Type": "application/json"
-}
-payload = {
-    "jsonrpc": "2.0",
-    "method": "eth_accounts",
-    "params": [],
-    "id": "getblock.io"
-}
-
-response = requests.post(url, headers=headers, data=json.dumps(payload))
-
-# Check the response and print the list of accounts
-if response.status_code == 200:
-    accounts = response.json().get("result", [])
-    print("Available Accounts:", accounts)
-else:
-    print("Error:", response.status_code, response.text)
-
-```
-{% endtab %}
-
-{% tab title="JavaScript" %}
+{% tab title="Axios" %}
+{% code title="example.js" %}
 ```javascript
 const axios = require('axios');
 
-// Define the API URL and headers
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/";
-const headers = { "Content-Type": "application/json" };
-
-// Prepare the request payload
-const payload = {
-    jsonrpc: "2.0",
-    method: "eth_accounts",
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_accounts',
     params: [],
-    id: "getblock.io"
-};
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
 
-// Send the POST request
-axios.post(url, payload, { headers })
-    .then(response => {
-        if (response.status === 200) {
-            // Extract the list of accounts from the response
-            const accounts = response.data.result || [];
-            console.log("Available Accounts:", accounts);
-        } else {
-            // Handle unexpected HTTP statuses
-            console.error("Error:", response.status, response.statusText);
-        }
-    })
-    .catch(error => {
-        // Handle network or server errors
-        console.error("Error:", error.response ? error.response.data : error.message);
-    });
-
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_accounts',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_accounts",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-In this Python example, we use **eth\_accounts** to retrieve the list of accounts currently accessible to the client. This functionality can be essential in **dApps** or **Web3** projects that need to interact with user wallets seamlessly without repeatedly requesting permissions from MetaMask or similar wallet extensions.In case of an error, such as when the **eth\_accounts** request fails, the response may contain an error code or message, which can help troubleshoot the issue. For example, a **405 Method Not Allowed** error indicates that the requested method is not allowed on the server. Handling **eth\_accounts errors** properly ensures the smooth functioning of **Web3** applications that depend on client accounts for interaction.
+## Response
+
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": []
+}
+```
+
+## Response Parameters
+
+| Parameter | Type            | Description                                                                          |
+| --------- | --------------- | ------------------------------------------------------------------------------------ |
+| `jsonrpc` | string          | JSON-RPC protocol version ("2.0")                                                    |
+| `id`      | string          | Request identifier matching the request                                              |
+| `result`  | array of string | Array of account addresses owned by the client — always `[]` on public RPC endpoints |
+
+## Use Cases
+
+* **Client Behavior Detection**: Confirm the endpoint is a public-RPC provider (empty array) rather than a wallet-managing self-hosted node
+* **Legacy Wallet Compatibility**: Support older wallet UIs that check `eth_accounts` before initiating a transaction (though modern wallets use `wallet_requestAccounts` via injected providers)
+* **Tooling Sanity Checks**: Verify the endpoint responds to standard JSON-RPC method calls
+
+## Error Handling
+
+| Error Code | Message        | Description                           |
+| ---------- | -------------- | ------------------------------------- |
+| -32603     | Internal error | Node failed to enumerate its accounts |
+
+## Web3 Integration
+
+{% tabs %}
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
+
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
+
+const accounts = await provider.send('eth_accounts', []);
+console.log('Accounts:', accounts);  // [] on public RPC
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
+```javascript
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
+
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
+
+const accounts = await client.request({ method: 'eth_accounts' });
+console.log('Accounts:', accounts);
+```
+{% endcode %}
+{% endtab %}
+{% endtabs %}

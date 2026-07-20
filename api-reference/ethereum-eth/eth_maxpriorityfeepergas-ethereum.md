@@ -1,158 +1,170 @@
 ---
 description: >-
-  The eth_maxPriorityFeePerGas method returns the hex value of the priority fee
-  needed for a transaction to be included in a block. It helps estimate
-  transaction costs in Ethereum-based applications
+  Example code for the eth_maxPriorityFeePerGas JSON RPC method. Сomplete guide
+  on how to use eth_maxPriorityFeePerGas JSON RPC in GetBlock Web3
+  documentation.
 ---
 
 # eth\_maxPriorityFeePerGas - Ethereum
 
-{% hint style="success" %}
-Returns the hex value of the priority fee necessary to be included in ablock.
-{% endhint %}
+This method returns a node-suggested priority fee (tip) for inclusion in the next block, in wei, hex-encoded. Introduced with EIP-1559, this value is added to the block's `baseFeePerGas` to compute the effective gas price for a type-2 transaction. Node implementations use different heuristics — typical values are 1-2 gwei on Ethereum mainnet under normal conditions.
 
-The eth\_maxPriorityFeePerGas method is part of the Ethereum JSON RPC API and is designed to return the hexadecimal value of the priority fee required to be included in a block. This method is critical for estimating transaction costs in Ethereum-based applications and is widely used in Web3 integrations.
+## Parameters
 
-### Supported Networks
+This method takes no parameters.
 
-The eth\_maxPriorityFeePerGas RPC Ethereum method works across various Ethereum network types, including
-
-* Mainnet
-* Testnet: Sepolia, Hoodi
-
-### Parameters
-
-{% hint style="info" %}
-This method does not require any parameters. The request can be sent with an empty parameters array.
-{% endhint %}
-
-### Request
-
-URL (API Endpoint)
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To interact with the Ethereum eth\_maxPriorityFeePerGas endpoint using JSON-RPC, use the following examples
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' 
---header 'Content-Type: application/json' 
---data-raw {
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
     "method": "eth_maxPriorityFeePerGas",
     "params": [],
     "id": "getblock.io"
-}
-
+}'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_maxPriorityFeePerGas",
-"params": [],
-"id": "getblock.io"}
-```
-{% endtab %}
-{% endtabs %}
-
-### Response
-
-The response contains the priority fee in hexadecimal format, indicating the minimum fee necessary for a transaction to be included in a block.
-
-```json
-{
-    "id": "getblock.io",
-    "jsonrpc": "2.0",
-    "result": "0x5f5e100"
-}
-```
-
-### Response Description
-
-* result: The hexadecimal representation of the priority fee. In the example above, 0x5f5e100 translates to 100,000,000 Wei in decimal.
-
-### Use Case
-
-The eth\_maxPriorityFeePerGas method is used in Ethereum-based decentralized applications (DApps) to determine the appropriate priority fee for transactions. By querying the eth\_maxPriorityFeePerGas RPC Ethereum method, developers can ensure their transactions are processed efficiently without overpaying for gas fees. This is particularly useful for applications integrating Web3, where transaction cost estimation is crucial.
-
-For instance, a wallet application may call the Ethereum eth\_maxPriorityFeePerGas method to calculate a competitive transaction fee in real time, enhancing the user experience.
-
-### Code Example
-
-Here is an eth\_maxPriorityFeePerGas example of how to query the method using Python and JavaScript:
-
-{% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
-
-# Define the API URL and headers
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
-
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "eth_maxPriorityFeePerGas",
-    "params": [],
-    "id": "getblock.io"
-}
-
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
-```
-{% endtab %}
-
-{% tab title="JavaScript" %}
+{% tab title="Axios" %}
+{% code title="example.js" %}
 ```javascript
 const axios = require('axios');
 
-// Define the API URL and headers
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
-const headers = { 'Content-Type': 'application/json' };
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_maxPriorityFeePerGas',
+    params: [],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
 
-// Prepare the request data
-const data = {
-  jsonrpc: '2.0',
-  method: 'eth_maxPriorityFeePerGas',
-  params: [],
-  id: 'getblock.io'
-};
-
-// Send the POST request
-axios.post(url, data, { headers })
-  .then(response => {
-    // Print the result
-    console.log(JSON.stringify(response.data, null, 4));
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_maxPriorityFeePerGas',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_maxPriorityFeePerGas",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-**Common Errors**
+## Response
 
-While querying the eth\_maxPriorityFeePerGas RPC Ethereum method, developers may encounter some common issues:
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": "0x3b9aca00"
+}
+```
 
-* Invalid URL or ACCESS-TOKEN: Ensure that the URL and token are correct and active.
-* Network Connectivity Problems: Verify that the network being queried is reachable and the correct endpoint is being used.
-* eth\_maxPriorityFeePerGas error: This could occur if the method is not supported on the selected network. Check the supported network types and ensure compatibility.
+## Response Parameters
 
-By integrating the Web3 eth\_maxPriorityFeePerGas method into your applications, you can provide precise and efficient transaction fee estimations, enhancing your DApp's functionality and user experience. Use this core API method to ensure your transactions are included in the block seamlessly.
+| Parameter | Type   | Description                                |
+| --------- | ------ | ------------------------------------------ |
+| `jsonrpc` | string | JSON-RPC protocol version ("2.0")          |
+| `id`      | string | Request identifier matching the request    |
+| `result`  | string | Hex-encoded priority fee suggestion in wei |
+
+## Use Cases
+
+* **EIP-1559 Transaction Pricing**: Set `maxPriorityFeePerGas` on type-2 transactions to bid for inclusion in the next block
+* **Wallet Fee Estimation**: Combine with the current base fee to produce a user-facing 'total fee' estimate
+* **Congestion Detection**: Track priority fee over time to detect network congestion spikes
+* **MEV-Aware Bidding**: Automated systems bidding for block-space use this as a floor and add competitive premium
+
+## Error Handling
+
+| Error Code | Message        | Description                                           |
+| ---------- | -------------- | ----------------------------------------------------- |
+| -32603     | Internal error | Node's priority fee oracle failed to produce a result |
+
+## Web3 Integration
+
+{% tabs %}
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
+
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
+
+const feeData = await provider.getFeeData();
+console.log('Max priority fee (gwei):', ethers.formatUnits(feeData.maxPriorityFeePerGas ?? 0n, 'gwei'));
+console.log('Max fee per gas (gwei):', ethers.formatUnits(feeData.maxFeePerGas ?? 0n, 'gwei'));
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
+```javascript
+import { createPublicClient, http, formatGwei } from 'viem';
+import { mainnet } from 'viem/chains';
+
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
+
+const priorityFee = await client.estimateMaxPriorityFeePerGas();
+console.log('Max priority fee (gwei):', formatGwei(priorityFee));
+```
+{% endcode %}
+{% endtab %}
+{% endtabs %}

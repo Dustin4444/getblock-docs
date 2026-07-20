@@ -1,167 +1,168 @@
 ---
 description: >-
-  Retrieve the latest Ethereum block number using eth_blockNumber. Ideal for
-  tracking blockchain progress and keeping dApps synchronized with the current
-  chain height via JSON-RPC.
+  Example code for the eth_blockNumber JSON RPC method. Сomplete guide on how to
+  use eth_blockNumber JSON RPC in GetBlock Web3 documentation.
 ---
 
 # eth\_blockNumber - Ethereum
 
-{% hint style="success" %}
-The **eth\_blockNumber** method in Ethereum retrieves the latest block number from the current chain head, offering real-time insight into the blockchain's progress.
-{% endhint %}
+This method returns the number of the most recent block, hex-encoded. On Ethereum mainnet this advances every \~12 seconds (one slot). Polling this method is the most common way to detect chain progress from off-chain services.
 
-This method is essential for applications that need to stay updated with the latest state of the blockchain without diving into detailed block data. By using this RPC method, Web3 developers can maintain synchronized blockchain data with minimal overhead, and it provides a straightforward way to gauge the chain’s current height. This method is available through specific **API endpoints** that are part of the **Core API**, making it easy for developers to access blockchain data. The **eth\_blockNumber** method is particularly useful for monitoring the state of the **transaction** chain and ensuring that applications remain synchronized with the latest block height.
+## Parameters
 
-### Supported Networks
+This method takes no parameters.
 
-The eth\_blockNumber **RPC Ethereum** method supports the following network types
+## Request
 
-* **Mainnet**
-* **Testnet**: Sepolia, Hoodi
-
-### Parameters
-
-{% hint style="info" %}
-This method does not accept any parameters
-{% endhint %}
-
-### Request
-
-#### URL
-
-{% code fullWidth="false" %}
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
+{% tabs %}
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "jsonrpc": "2.0",
+    "method": "eth_blockNumber",
+    "params": [],
+    "id": "getblock.io"
+}'
 ```
 {% endcode %}
-
-To request the chain ID using the eth\_blockNumber **RPC Ethereum** method via JSON-RPC, use the following **curl** command:
-
-{% tabs %}
-{% tab title="curl" %}
-```json
-curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' 
---header 'Content-Type: application/json' 
---data-raw {
-    "jsonrpc": "2.0",
-    "method": "eth_blockNumber",
-    "params": [],
-    "id": "getblock.io"
-}
-```
 {% endtab %}
 
-{% tab title="wss" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_blockNumber",
-"params": [],
-"id": "getblock.io"}
-```
-{% endtab %}
-{% endtabs %}
-
-### Response
-
-A successful response provides the latest block number as a hexadecimal value
-
-```json
-{
-    "id": "getblock.io",
-    "jsonrpc": "2.0",
-    "result": "0x109238e"
-}
-```
-
-### Body Parameters
-
-* **`id`**: A unique request identifier, matching the `id` sent in the request body.
-* **`jsonrpc`**: Specifies the use of JSON-RPC version 2.0.
-* **`result`**: The method result:
-  * A string representing the latest block number in the Ethereum blockchain, provided in HEX format.
-  * For example, `"0x109238e"` in decimal equals `10923886`.
-
-### Use Case
-
-The eth\_blockNumber method is ideal for applications needing to check the latest Ethereum block number quickly. For instance, Web3 applications can use it to verify the synchronization state with the Ethereum network, monitor blockchain progression, or trigger actions based on block height conditions. By contrast, other methods like eth\_call are used for data retrieval within contracts rather than simply identifying the current block number.
-
-### Code Example
-
-Here’s a Python example using the eth\_blockNumber method to get the current chain head in Web3
-
-{% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
-
-url = "https://go.getblock.io/<ACCESS-TOKEN>/"
-headers = {
-    "Content-Type": "application/json"
-}
-payload = {
-    "jsonrpc": "2.0",
-    "method": "eth_blockNumber",
-    "params": [],
-    "id": "getblock.io"
-}
-
-response = requests.post(url, headers=headers, data=json.dumps(payload))
-
-# Check the response and print the result
-if response.status_code == 200:
-    # Convert hexadecimal to decimal
-    block_number = int(response.json().get("result"), 16)
-    print("Current Block Number:", block_number)
-else:
-    print("Error:", response.status_code, response.text)
-
-```
-{% endtab %}
-
-{% tab title="JavaScript" %}
+{% tab title="Axios" %}
+{% code title="example.js" %}
 ```javascript
 const axios = require('axios');
 
-// Define the API URL and headers
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/";
-const headers = { "Content-Type": "application/json" };
-
-// Prepare the request payload
-const payload = {
-    jsonrpc: "2.0",
-    method: "eth_blockNumber",
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_blockNumber',
     params: [],
-    id: "getblock.io"
-};
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
 
-// Send the POST request
-axios.post(url, payload, { headers })
-    .then(response => {
-        if (response.status === 200) {
-            // Extract the block number from the response
-            const hexBlockNumber = response.data.result;
-
-            // Convert the hexadecimal block number to decimal
-            const blockNumber = parseInt(hexBlockNumber, 16);
-
-            // Print the current block number
-            console.log("Current Block Number:", blockNumber);
-        } else {
-            // Handle unexpected HTTP statuses
-            console.error("Error:", response.status, response.statusText);
-        }
-    })
-    .catch(error => {
-        // Handle network or server errors
-        console.error("Error:", error.response ? error.response.data : error.message);
-    });
-
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_blockNumber',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_blockNumber",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-This Python example utilizes **eth\_blockNumber** to retrieve the latest block index in decimal format, making it easy to incorporate into applications that need to monitor Ethereum’s current block. With this method, developers can programmatically stay updated on chain status, enabling features like block synchronization and blockchain-based triggers in Web3 projects. If an **eth\_blockNumber error** occurs, it could indicate issues with the connection to the blockchain, improper request formatting, or network-related problems, and should be handled appropriately to ensure smooth operation.
+## Response
+
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": "0x1720340"
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                       |
+| --------- | ------ | ------------------------------------------------- |
+| `jsonrpc` | string | JSON-RPC protocol version ("2.0")                 |
+| `id`      | string | Request identifier matching the request           |
+| `result`  | string | Hex-encoded block number of the current chain tip |
+
+## Use Cases
+
+* **Chain Progress Monitoring**: Poll to detect that new blocks are being produced — the primary liveness signal
+* **Log Backfill Boundary**: Anchor the upper bound of a range for backfilling historical event logs
+* **Reorg-Safety Windows**: Wait until `blockNumber - N` before treating a transaction as finalized (typically N=32 for finalized, N=64 for defense-in-depth)
+* **Confirmation Counting**: Compute `latestBlock - txBlock` to display confirmation counts in a wallet UI
+
+## Error Handling
+
+| Error Code | Message        | Description                                      |
+| ---------- | -------------- | ------------------------------------------------ |
+| -32603     | Internal error | Node failed to return the chain tip block number |
+
+## Web3 Integration
+
+{% tabs %}
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
+
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
+
+const blockNumber = await provider.getBlockNumber();
+console.log('Latest block:', blockNumber);
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
+```javascript
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
+
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
+
+const blockNumber = await client.getBlockNumber();
+console.log('Latest block:', blockNumber);
+```
+{% endcode %}
+{% endtab %}
+{% endtabs %}

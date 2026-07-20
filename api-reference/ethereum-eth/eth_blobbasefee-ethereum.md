@@ -1,12 +1,12 @@
 ---
 description: >-
-  Example code for the eth_newBlockFilter JSON RPC method. Сomplete guide on how
-  to use eth_newBlockFilter JSON RPC in GetBlock Web3 documentation.
+  Example code for the eth_blobBaseFee JSON RPC method. Сomplete guide on how to
+  use eth_blobBaseFee JSON RPC in GetBlock Web3 documentation.
 ---
 
-# eth\_newBlockFilter - Ethereum
+# eth\_blobBaseFee - Ethereum
 
-This method creates a filter that fires each time a new block is added to the chain. Returns a filter ID that subsequent `eth_getFilterChanges` calls poll to receive block hashes. Lighter-weight than log filters — no criteria, just chain-tip advancement notifications.
+This method returns the current blob base fee in wei, hex-encoded. Introduced with EIP-4844 (Dencun, March 2024), blob transactions carry their data-availability payload separately from calldata and are priced independently via `blobGasPrice`. Post-Fusaka (December 2025) and its BPO forks, blob capacity is 14 target / 21 max blobs per block. Rollups and any application posting blob-carrying transactions read this to price their data-availability spend.
 
 ## Parameters
 
@@ -22,7 +22,7 @@ curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "jsonrpc": "2.0",
-    "method": "eth_newBlockFilter",
+    "method": "eth_blobBaseFee",
     "params": [],
     "id": "getblock.io"
 }'
@@ -37,7 +37,7 @@ const axios = require('axios');
 
 const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
     jsonrpc: '2.0',
-    method: 'eth_newBlockFilter',
+    method: 'eth_blobBaseFee',
     params: [],
     id: 'getblock.io'
 }, {
@@ -59,7 +59,7 @@ response = requests.post(
     headers={'Content-Type': 'application/json'},
     json={
         'jsonrpc': '2.0',
-        'method': 'eth_newBlockFilter',
+        'method': 'eth_blobBaseFee',
         'params': [],
         'id': 'getblock.io'
     }
@@ -85,7 +85,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .header("Content-Type", "application/json")
         .json(&json!({
             "jsonrpc": "2.0",
-            "method": "eth_newBlockFilter",
+            "method": "eth_blobBaseFee",
             "params": [],
             "id": "getblock.io"
         }))
@@ -107,48 +107,45 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ```json
 {
     "jsonrpc": "2.0",
-    "id": "getblock.io",
-    "result": "0x1a"
+    "result": "0x7ad94d",
+    "id": "getblock.io"
 }
 ```
 
 ## Response Parameters
 
-| Parameter | Type   | Description                                                                        |
-| --------- | ------ | ---------------------------------------------------------------------------------- |
-| `jsonrpc` | string | JSON-RPC protocol version ("2.0")                                                  |
-| `id`      | string | Request identifier matching the request                                            |
-| `result`  | string | Hex-encoded filter ID — pass to `eth_getFilterChanges` to receive new block hashes |
+| Parameter | Type   | Description                                        |
+| --------- | ------ | -------------------------------------------------- |
+| `jsonrpc` | string | JSON-RPC protocol version ("2.0")                  |
+| `id`      | string | Request identifier matching the request            |
+| `result`  | string | Hex-encoded blob base fee in wei per blob gas unit |
 
 ## Use Cases
 
-* **New Block Notifications**: Poll to receive block hashes for each newly produced block without subscribing over WSS
-* **Simple Chain-Progress Indicators**: Feed a UI 'live block' badge without full block details
-* **Trigger Periodic Work**: Kick off backend work (indexer runs, reorg checks) once per new block
+* **L2 Rollup Cost Modeling**: L2 sequencers price blob-posting cost before submitting compressed batches to L1
+* **Blob Congestion Detection**: Track the blob base fee to detect L2 batch-posting congestion or blob market spikes
+* **Blob Transaction Pricing**: Applications posting EIP-4844 blob transactions compute `maxFeePerBlobGas` bids based on this floor
+* **Data Availability Analytics**: Research and dashboards tracking DA spend across the rollup ecosystem
 
 ## Error Handling
 
-| Error Code | Message        | Description                      |
-| ---------- | -------------- | -------------------------------- |
-| -32603     | Internal error | Node failed to create the filter |
+| Error Code | Message        | Description                                        |
+| ---------- | -------------- | -------------------------------------------------- |
+| -32603     | Internal error | Node's blob fee tracker failed to produce a result |
 
 ## Web3 Integration
 
 {% tabs %}
 {% tab title="Ethers.js" %}
-{% code title="ethers-example.js" overflow="wrap" %}
+{% code title="ethers-example.js" %}
 ```javascript
 import { ethers } from 'ethers';
 
 const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
 
-const filterId = await provider.send('eth_newBlockFilter', []);
-console.log('Block filter ID:', filterId);
-
-setInterval(async () => {
-    const hashes = await provider.send('eth_getFilterChanges', [filterId]);
-    hashes.forEach(h => console.log('New block:', h));
-}, 12000);
+const blobBaseFeeHex = await provider.send('eth_blobBaseFee', []);
+const blobBaseFee = BigInt(blobBaseFeeHex);
+console.log('Blob base fee (wei):', blobBaseFee.toString());
 ```
 {% endcode %}
 {% endtab %}
@@ -164,13 +161,8 @@ const client = createPublicClient({
     transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
 });
 
-const filter = await client.createBlockFilter();
-console.log('Block filter ID:', filter.id);
-
-setInterval(async () => {
-    const hashes = await client.getFilterChanges({ filter });
-    hashes.forEach(h => console.log('New block:', h));
-}, 12000);
+const blobBaseFee = await client.getBlobBaseFee();
+console.log('Blob base fee (wei):', blobBaseFee);
 ```
 {% endcode %}
 {% endtab %}

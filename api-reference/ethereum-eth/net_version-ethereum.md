@@ -1,44 +1,23 @@
 ---
 description: >-
-  The net_version method is part of the Ethereum JSON-RPC Core API and returns
-  the network ID of the Ethereum client. It helps identify the current network
-  the client is connected to, such as Mainnet.
+  Example code for the net_version JSON RPC method. Сomplete guide on how to use
+  net_version JSON RPC in GetBlock Web3 documentation.
 ---
 
 # net\_version - Ethereum
 
-{% hint style="success" %}
-The net\_version method returns the network ID of the Ethereum client, identifying the current network (e.g., Mainnet, Sepolia, or a test network) it is connected to.
-{% endhint %}
+This method returns the current network ID as a decimal string. For Ethereum mainnet the value is `"1"`. Network ID historically distinguished chains before the `eth_chainId` method was standardized; modern applications generally prefer `eth_chainId` for chain-selection logic.
 
-The net\_version method is part of the Ethereum JSON RPC Core API, used to retrieve the network ID of the Ethereum client. This network ID is crucial for identifying the current Ethereum network that the client is connected to, such as Mainnet, Sepolia, or other test networks.
+## Parameters
 
-### Supported Networks
+This method takes no parameters.
 
-The net\_version RPC Ethereum method supports the following network types:
-
-* Mainnet
-* Testnet: Sepolia, Hoodi
-
-### Parameters
-
-{% hint style="info" %}
-This method does not require any parameters.
-{% endhint %}
-
-### Request
-
-URL
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To make a request, send a JSON object with the jsonrpc, method, and params fields. Below is an example of how to make a request using curl:
+## Request
 
 {% tabs %}
-{% tab title="JSON" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -48,107 +27,153 @@ curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
     "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="WS" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "net_version",
-"params": [],
-"id": "getblock.io"}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'net_version',
+    params: [],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'net_version',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "net_version",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response
-
-The server responds with a JSON object containing the network ID. Below is an example of a typical response:
+## Response
 
 ```json
 {
-    "id": "getblock.io",
     "jsonrpc": "2.0",
+    "id": "getblock.io",
     "result": "1"
 }
 ```
 
-**Response Description**
+## Response Parameters
 
-* result: A string representing the network ID. For example:
-  * "1": Mainnet
-  * "11155111": Sepolia
-  * "3": Ropsten (deprecated)
-  * "4": Rinkeby (deprecated)
+| Parameter | Type   | Description                                                                                                 |
+| --------- | ------ | ----------------------------------------------------------------------------------------------------------- |
+| `jsonrpc` | string | JSON-RPC protocol version ("2.0")                                                                           |
+| `id`      | string | Request identifier matching the request                                                                     |
+| `result`  | string | Network ID as a decimal string (`"1"` for Ethereum mainnet, `"11155111"` for Sepolia, `"560048"` for Hoodi) |
 
-### Use Case
+## Use Cases
 
-The net\_version method is essential for developers who need to verify the network their Ethereum client is connected to. This is particularly useful in multi-network applications where the client must dynamically switch between networks. In case of a net\_version error, ensure the client is correctly configured and connected to the desired network. An example of proper usage is included under the net\_version example in this documentation.
+* **Legacy Chain Detection**: Support older tooling that predates `eth_chainId` standardization
+* **Cross-Reference Verification**: Sanity-check that `net_version` and `eth_chainId` agree (they generally do on Ethereum-derived chains)
+* **Endpoint Environment Discovery**: Detect whether an endpoint points to mainnet vs a testnet without knowing in advance
+* **Multi-Chain Dashboards**: Display the network name in an administrative UI by looking up the ID
 
-### Code Example
+## Error Handling
 
-You can also make requests to the net\_version method programmatically using Python. Below is an example using the requests library:
+| Error Code | Message        | Description                             |
+| ---------- | -------------- | --------------------------------------- |
+| -32603     | Internal error | Node failed to determine its network ID |
+
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
 
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
 
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "net_version",
-    "params": [],
-    "id": "getblock.io"
-}
+// Modern approach — prefer getNetwork() which returns rich network info:
+const network = await provider.getNetwork();
+console.log('Chain ID:', network.chainId.toString());
+console.log('Name:', network.name);
 
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
+// Raw net_version if specifically needed:
+const netVersion = await provider.send('net_version', []);
+console.log('Network ID:', netVersion);
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-import axios from 'axios'; // Ensure axios is installed: npm install axios
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
 
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
 
-const data = {
-  jsonrpc: '2.0',         
-  method: 'net_version',  
-  params: [],             
-  id: 'getblock.io',      
-};
+// Modern approach — prefer getChainId (uses eth_chainId under the hood):
+const chainId = await client.getChainId();
+console.log('Chain ID:', chainId);
 
-
-axios.post(url, data, {
-  headers: {
-    'Content-Type': 'application/json', 
-  },
-})
-  .then(response => {
-    console.log('Response:', response.data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-
+// Raw net_version if specifically needed:
+const netVersion = await client.request({ method: 'net_version' });
+console.log('Network ID:', netVersion);
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-This Python script sends a request to the net\_version method and prints the returned network ID. Replace \<ACCESS-TOKEN> with your actual API token. The Web3 net\_version method can also be accessed via Web3 libraries for Ethereum, providing a simplified way to query network information.
-
-The Ethereum net\_version method is a key tool for developers working with the Ethereum JSON RPC API. By identifying the current network through its ID, this method ensures that transactions and operations are executed on the intended blockchain. As part of the Core API Endpoints, it plays a critical role in maintaining network integrity and compatibility.As part of the Core API Endpoints, it plays a critical role in maintaining network integrity and compatibility, while ensuring accurate block and transaction management.

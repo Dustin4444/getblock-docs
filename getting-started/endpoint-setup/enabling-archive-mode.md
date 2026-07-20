@@ -12,8 +12,8 @@ This page covers **Archive Mode** – a setting that turns on archive-node acces
 
 Common RPC use cases enabled by Archive Mode:
 
-* Read contract/account state at any past block, not just `latest` , using methods like [`eth_getBalance`](../../api-reference/ethereum-eth/eth_getbalance-ethereum.md)`(address, blockNumber)`, [`eth_getStorageAt`](../../api-reference/ethereum-eth/eth_getstorageat-ethereum.md)`(contract, slot, blockNumber)`, [`eth_getCode`](../../api-reference/ethereum-eth/eth_getcode-ethereum.md)`(address, blockNumber)`, etc.
-* Call view functions against historical state: e.g. [`eth_call`](../../api-reference/ethereum-eth/eth_call-ethereum.md)`(..., blockNumber)`.
+* Read contract/account state at any past block, not just `latest` , using methods like [`eth_getBalance`](/broken/pages/OvREWedjZcQXOfAINKFw)`(address, blockNumber)`, [`eth_getStorageAt`](/broken/pages/Z0x91Xd7rpVHeey1bVlX)`(contract, slot, blockNumber)`, [`eth_getCode`](/broken/pages/7DySAS1tp87clonhiSNK)`(address, blockNumber)`, etc.
+* Call view functions against historical state: e.g. [`eth_call`](/broken/pages/wdvTR5ND1nsYC5wFdcMi)`(..., blockNumber)`.
 * Run historical queries and debugging that rely on old state: forensics, audits, explorers, indexing, and retroactive analytics.
 * Support tracing and higher-fidelity debugging that may require historical state.
 

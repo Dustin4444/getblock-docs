@@ -1,204 +1,241 @@
 ---
 description: >-
-  Retrieve transaction receipt details using eth_getTransactionReceipt.
-  Essential for obtaining information about transaction execution, including gas
-  usage, status, and logs on the Ethereum blockchain.
+  Example code for the eth_getTransactionReceipt JSON RPC method. Сomplete guide
+  on how to use eth_getTransactionReceipt JSON RPC in GetBlock Web3
+  documentation.
 ---
 
-# eth\_getTransactionReceipt - Ethereum
+# eth\_getTransactionReceipt- Ethereum
 
-{% hint style="success" %}
-This method returns the receipt of a transaction by its transaction hash.
-{% endhint %}
+This method returns the receipt for a transaction — status (success/reverted), gas used, event logs emitted, and post-EIP-4844 blob-related fields. Receipts are only available after the transaction is mined; polling this method is the standard way to detect confirmation and read emitted events after submission.
 
-The eth\_getTransactionReceipt method is part of the Ethereum JSON RPC Core API, used to interact with Ethereum nodes. Receipts for pending transactions are not available. If revert reasons are enabled, the receipt includes available revert reasons in the response. The eth\_getTransactionReceipt RPC Ethereum method is essential for obtaining details about transaction execution, such as gas usage, status, and logs.
+## Parameters
 
-### Supported Networks
+| Parameter | Type   | Required | Description              |
+| --------- | ------ | -------- | ------------------------ |
+| `txHash`  | string | Yes      | 32-byte transaction hash |
 
-The eth\_getTransactionReceipt RPC Ethereum method supports the following network types:
-
-* Mainnet
-* Testnet: Sepolia, Hoodi
-
-### Parameters
-
-* DATA: The 32-byte hash of the transaction.
-
-### Request
-
-URL
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To make a request, send a JSON object with the jsonrpc, method, and params fields. Below is an example of how to make a request using curl:
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "jsonrpc": "2.0",
     "method": "eth_getTransactionReceipt",
     "params": [
-        "0xcd718a69d478340dc28fdf6bf8056374a52dc95841b44083163ced8dfe29310c"
+        "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b"
     ],
     "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_getTransactionReceipt",
-"params": ["0xcd718a69d478340dc28fdf6bf8056374a52dc95841b44083163ced8dfe29310c"],
-"id": "getblock.io"}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_getTransactionReceipt',
+    params: [
+        "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b"
+    ],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_getTransactionReceipt',
+        'params': [
+        "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b"
+    ],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_getTransactionReceipt",
+            "params": [
+        "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b"
+    ],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response
-
-The server responds with a JSON object containing the transaction receipt details. Below is an example of a typical response:
+## Response
 
 ```json
 {
-    "id": "getblock.io",
     "jsonrpc": "2.0",
+    "id": "getblock.io",
     "result": {
-        "blockHash": "0xe6262c1924326d12b88aaa35a95a0c7cdd11f2d20ebae84618484120bd037c34",
-        "blockNumber": "0x107d7b0",
+        "transactionHash": "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b",
+        "blockHash": "0x9ec8e2f6b78d8f5f2ac3e5d61b0d38d4d5a8f0e7c8b5a2f9d3e6c1b7a4d0f2e5c",
+        "blockNumber": "0x1720340",
+        "from": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+        "to": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "cumulativeGasUsed": "0x33450",
+        "gasUsed": "0x5208",
         "contractAddress": null,
-        "cumulativeGasUsed": "0x19aac9a",
-        "effectiveGasPrice": "0xb9029a7ea",
-        "from": "0x901c7c311d39e0b26257219765e71e8db3107a81",
-        "gasUsed": "0x27fb4",
         "logs": [
             {
-                "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
-                "blockHash": "0xe6262c1924326d12b88aaa35a95a0c7cdd11f2d20ebae84618484120bd037c34",
-                "blockNumber": "0x107d7b0",
-                "data": "0x0000000000000000000000000000000000000000000000000000000103f1bfef",
-                "logIndex": "0x24e",
-                "removed": false,
+                "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
                 "topics": [
                     "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
-                    "0x000000000000000000000000a82f91562e1cef9dec93a4ad328d01ea7827910a",
-                    "0x000000000000000000000000901c7c311d39e0b26257219765e71e8db3107a81"
+                    "0x000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045",
+                    "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
                 ],
-                "transactionHash": "0xcd718a69d478340dc28fdf6bf8056374a52dc95841b44083163ced8dfe29310c",
-                "transactionIndex": "0xfc"
+                "data": "0x000000000000000000000000000000000000000000000000016345785d8a0000",
+                "blockNumber": "0x1720340",
+                "transactionHash": "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b",
+                "transactionIndex": "0x0",
+                "blockHash": "0x9ec8e2f6b78d8f5f2ac3e5d61b0d38d4d5a8f0e7c8b5a2f9d3e6c1b7a4d0f2e5c",
+                "logIndex": "0x0",
+                "removed": false
             }
         ],
-        "logsBloom": "0x00000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000010000000000800020000000000000200000000040000000000800104008000000000000000000000800000000001200000000000000000000000000000000000000000000000020000000020010000800000000000000000000000000000000000000000000000000000000000000120000020800000000000000100084000000000000000000000000000000000000000000000002000000000000001000000000400000000000000000000000000000000010000000000000000000000000000000000000000000000000000090000000",
+        "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
         "status": "0x1",
-        "to": "0xef1c6e67703c7bd7107eed8303fbe6ec2554bf6b",
-        "transactionHash": "0xcd718a69d478340dc28fdf6bf8056374a52dc95841b44083163ced8dfe29310c",
-        "transactionIndex": "0xfc",
-        "type": "0x2"
+        "type": "0x2",
+        "effectiveGasPrice": "0x9502f900",
+        "transactionIndex": "0x0",
+        "blobGasUsed": "0x0",
+        "blobGasPrice": "0x1"
     }
 }
 ```
 
-### Response Description
+## Response Parameters
 
-* blockHash: The hash of the block containing the transaction.
-* blockNumber: The number of the block containing the transaction.
-* contractAddress: The contract address created, if the transaction was a contract creation, otherwise null.
-* cumulativeGasUsed: The total amount of gas used when this transaction was executed in the block.
-* effectiveGasPrice: The actual price per unit of gas paid.
-* from: The address of the sender.
-* gasUsed: The amount of gas used by this specific transaction alone.
-* logs: An array of log objects generated by this transaction.
-* logsBloom: Bloom filter for light clients to quickly retrieve related logs.
-* status: The status of the transaction (0x1 indicates success, 0x0 indicates failure).
-* to: The address of the receiver.
-* transactionHash: The hash of the transaction.
-* transactionIndex: The index position of the transaction within the block.
-* type: The transaction type.
-* value: The value transferred in Wei.
+| Parameter                  | Type            | Description                                                                                                  |
+| -------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------ |
+| `jsonrpc`                  | string          | JSON-RPC protocol version ("2.0")                                                                            |
+| `id`                       | string          | Request identifier matching the request                                                                      |
+| `result.transactionHash`   | string          | The transaction hash                                                                                         |
+| `result.blockHash`         | string          | Hash of the containing block                                                                                 |
+| `result.blockNumber`       | string          | Block number of the containing block                                                                         |
+| `result.from`              | string          | Sender address                                                                                               |
+| `result.to`                | string          | Recipient address (`null` for contract creation)                                                             |
+| `result.cumulativeGasUsed` | string          | Total gas consumed in the block up to and including this transaction                                         |
+| `result.gasUsed`           | string          | Actual gas consumed by this transaction                                                                      |
+| `result.contractAddress`   | string          | Address of newly deployed contract (`null` for regular transactions)                                         |
+| `result.logs`              | array of object | Event logs emitted during execution                                                                          |
+| `result.logsBloom`         | string          | Bloom filter over this transaction's logs                                                                    |
+| `result.status`            | string          | `0x1` = success, `0x0` = reverted                                                                            |
+| `result.type`              | string          | Transaction type (`0x0` legacy, `0x1` EIP-2930, `0x2` EIP-1559, `0x3` EIP-4844 blob, `0x4` EIP-7702 SetCode) |
+| `result.effectiveGasPrice` | string          | Effective gas price paid                                                                                     |
+| `result.transactionIndex`  | string          | Position of this transaction within its block                                                                |
+| `result.blobGasUsed`       | string          | Blob gas consumed (EIP-4844 blob transactions only)                                                          |
+| `result.blobGasPrice`      | string          | Blob gas price paid (EIP-4844 blob transactions only)                                                        |
 
-### Use Case
+## Use Cases
 
-The eth\_getTransactionReceipt method is particularly useful for developers who need detailed information about a transaction, such as its status, gas usage, and generated logs. This is crucial for debugging, auditing, and understanding the effects of contract executions. By using the eth\_getTransactionReceipt RPC Ethereum method, developers can retrieve all necessary details about a transaction's execution. In case of an eth\_getTransactionReceipt error, developers should verify that the provided transaction hash is correct and corresponds to an existing transaction. An eth\_getTransactionReceipt example can help illustrate how to properly use this method.
+* **Post-Submit Confirmation**: Poll after `eth_sendRawTransaction` to detect when a transaction is mined and confirm success/revert
+* **Event Log Extraction**: Read `logs` to capture emitted events (ERC-20 Transfer, Uniswap Swap, etc.) for indexers and dApps
+* **Actual-Cost Calculation**: Compute the actual transaction cost as `gasUsed × effectiveGasPrice`
+* **Contract Deployment Address Discovery**: Read `contractAddress` after a factory deployment to get the new contract's address
 
-### Code Example
+## Error Handling
 
-You can also make requests to the eth\_getTransactionReceipt method programmatically using Python. Below is an example using the requests library:
+| Error Code | Message        | Description                                                                            |
+| ---------- | -------------- | -------------------------------------------------------------------------------------- |
+| -32602     | Invalid params | Transaction hash is malformed                                                          |
+| -32603     | Internal error | Node failed to look up the receipt (usually indicates the transaction isn't mined yet) |
+
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
 
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
 
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "eth_getTransactionReceipt",
-    "params": [
-        "0xcd718a69d478340dc28fdf6bf8056374a52dc95841b44083163ced8dfe29310c"
-    ],
-    "id": "getblock.io"
+const receipt = await provider.getTransactionReceipt('0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b');
+
+if (!receipt) {
+    console.log('Not mined yet');
+} else if (receipt.status === 1) {
+    console.log('Success');
+    console.log('Gas used:', receipt.gasUsed.toString());
+    console.log('Effective gas price:', ethers.formatUnits(receipt.gasPrice, 'gwei'), 'gwei');
+    console.log('Logs emitted:', receipt.logs.length);
+} else {
+    console.log('Reverted');
 }
-
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-const axios = require('axios');
+import { createPublicClient, http, formatGwei } from 'viem';
+import { mainnet } from 'viem/chains';
 
-// Replace <ACCESS_TOKEN> with your actual Access Token
-const url = 'https://go.getblock.io/<ACCESS_TOKEN>/';
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
 
-// Request payload
-const payload = {
-  jsonrpc: '2.0',
-  method: 'eth_getTransactionReceipt',
-  params: [
-    '0xcd718a69d478340dc28fdf6bf8056374a52dc95841b44083163ced8dfe29310c', // Transaction hash
-  ],
-  id: 'getblock.io',
-};
-
-// Axios POST request
-axios
-  .post(url, payload, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-  .then((response) => {
-    console.log('Transaction Receipt:', response.data.result);
-  })
-  .catch((error) => {
-    console.error('Error fetching transaction receipt:', error.message);
-  });
-
+const receipt = await client.getTransactionReceipt({ hash: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b' });
+console.log('Status:', receipt.status);
+console.log('Gas used:', receipt.gasUsed);
+console.log('Effective gas price:', formatGwei(receipt.effectiveGasPrice), 'gwei');
+console.log('Logs emitted:', receipt.logs.length);
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-This Python script sends a request to the **eth\_getTransactionReceipt** method and prints the returned transaction receipt information. Make sure to replace \<ACCESS-TOKEN> with your actual API token.
-
-The eth\_getTransactionReceipt method can also be used in Web3 libraries for Ethereum, providing an interface to access transaction receipt data for various use cases, including auditing, debugging, and verifying contract behavior.
-
-The Ethereum eth\_getTransactionReceipt method provides detailed insights into transaction execution, making it an essential tool for developers working with Ethereum's JSON RPC API and Core API Endpoints.

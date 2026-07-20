@@ -1,156 +1,192 @@
 ---
 description: >-
-  The web3_sha3 method is part of the Ethereum JSON RPC Core API and computes
-  the Keccak-256 hash of the provided input data, returning a
-  hexadecimal-encoded hash string.
+  Example code for the web3_sha3 JSON RPC method. Сomplete guide on how to use
+  web3_sha3 JSON RPC in GetBlock Web3 documentation.
 ---
 
 # web3\_sha3 - Ethereum
 
-{% hint style="success" %}
-The web3\_sha3 method computes the Keccak-256 hash of the given input data, returning a hexadecimal-encoded hash string.
-{% endhint %}
+This method returns the Keccak-256 (SHA3-256) hash of the given hex-encoded data. Commonly used to compute event signature topics, function selectors, and content-addressable identifiers off-chain in a way that's guaranteed to match on-chain behavior.
 
-The web3\_sha3 method is part of the Ethereum JSON RPC Core API, designed to return a SHA3 hash of the specified data. Note that the result value is a Keccak-256 hash, not the standardized SHA3-256, which is important for Ethereum-specific cryptographic operations.
+## Parameters
 
-### Supported Networks
+| Parameter | Type   | Required | Description                                 |
+| --------- | ------ | -------- | ------------------------------------------- |
+| `data`    | string | Yes      | Hex-encoded data to hash (with `0x` prefix) |
 
-The web3\_sha3 RPC Ethereum method is universally supported across all Ethereum networks, including:
-
-* Mainnet
-* Testnets: Sepolia, Hoodi
-
-### Parameters
-
-* DATA: Data to convert to a SHA3 hash.
-* parameters: None.
-
-### Request
-
-URL&#x20;
-
-```
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To make a request, send a JSON object with the jsonrpc, method, and params fields. Below is an example of how to make a request using curl:
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "jsonrpc": "2.0",
     "method": "web3_sha3",
     "params": [
-        "0x68656c6c6f20776f726c00"
+        "0x68656c6c6f20776f726c64"
     ],
     "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "web3_sha3",
-"params": ["0x68656c6c6f20776f726c00"],
-"id": "getblock.io"}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'web3_sha3',
+    params: [
+        "0x68656c6c6f20776f726c64"
+    ],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'web3_sha3',
+        'params': [
+        "0x68656c6c6f20776f726c64"
+    ],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "web3_sha3",
+            "params": [
+        "0x68656c6c6f20776f726c64"
+    ],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response
-
-The server responds with a JSON object containing the Keccak-256 hash of the input data. Below is an example of a typical response:
+## Response
 
 ```json
 {
-    "id": "getblock.io",
     "jsonrpc": "2.0",
-    "result": "0x5e39a0a66544c0668bde22d61c47a8710000ece931f13b84d3b2feb44ec96d3f"
+    "id": "getblock.io",
+    "result": "0x47173285a8d7341e5e972fc677286384f802f8ef42a5ec5f03bbfa254cb01fad"
 }
 ```
 
-### Response Description
+## Response Parameters
 
-* result: The Keccak-256 hash of the provided data, represented as a hexadecimal string.
+| Parameter | Type   | Description                                               |
+| --------- | ------ | --------------------------------------------------------- |
+| `jsonrpc` | string | JSON-RPC protocol version ("2.0")                         |
+| `id`      | string | Request identifier matching the request                   |
+| `result`  | string | Keccak-256 hash of the input data, hex-encoded (32 bytes) |
 
-### Use Case
+## Use Cases
 
-The web3\_sha3 method is crucial for developers working with Ethereum-based cryptographic operations, such as validating signatures or creating unique identifiers. It can be used to hash arbitrary data to ensure data integrity or to generate unique keys. In case of a web3\_sha3 error, developers should verify that the input data is properly formatted as a hexadecimal string.
+* **Event Signature Hashing**: Compute the `keccak256` hash of an event signature (e.g. `Transfer(address,address,uint256)`) to derive its topic0 for log filtering
+* **Function Selector Derivation**: Compute the 4-byte function selector from a canonical signature for ABI encoding
+* **ENS Name Hashing**: Hash ENS labels as part of computing an ENS namehash off-chain
+* **Content Addressing**: Generate deterministic hashes for use as identifiers in IPFS-adjacent workflows or Merkle tree construction
 
-An illustrative web3\_sha3 example is provided in this documentation to demonstrate the method's correct usage.
+## Error Handling
 
-## Code Example
+| Error Code | Message        | Description                              |
+| ---------- | -------------- | ---------------------------------------- |
+| -32602     | Invalid params | Input is not a valid hex-encoded string  |
+| -32603     | Internal error | Node hashing subsystem returned an error |
 
-You can also make requests to the web3\_sha3 method programmatically using Python. Below is an example using the requests library:
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
 
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
+// Ethers.js v6 exposes keccak256 directly — no RPC round-trip needed for
+// off-chain hashing. This is the recommended path.
+const hash = ethers.keccak256('0x68656c6c6f20776f726c64');
+console.log(hash);
 
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "web3_sha3",
-    "params": [
-        "0x68656c6c6f20776f726c00"
-    ],
-    "id": "getblock.io"
-}
-
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
-
+// For RPC-parity verification against the node:
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
+const nodeHash = await provider.send('web3_sha3', ['0x68656c6c6f20776f726c64']);
+console.log(nodeHash);
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-import axios from 'axios';
+import { createPublicClient, http, keccak256 } from 'viem';
+import { mainnet } from 'viem/chains';
 
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
+// Viem exposes keccak256 directly — no RPC round-trip needed.
+const hash = keccak256('0x68656c6c6f20776f726c64');
+console.log(hash);
 
-const data = {
-  jsonrpc: '2.0',
-  method: 'web3_sha3',
-  params: [
-    "0x68656c6c6f20776f726c00"
-  ],
-  id: 'getblock.io',
-};
+// For RPC-parity verification against the node:
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
 
-axios.post(url, data, {
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
-  .then(response => {
-    console.log('Response:', response.data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+const nodeHash = await client.request({
+    method: 'web3_sha3',
+    params: ['0x68656c6c6f20776f726c64'],
+});
+console.log(nodeHash);
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-This Python script sends a request to the web3\_sha3 method and prints the returned hash value. Replace \<ACCESS-TOKEN> with your actual API token. The Web3 web3\_sha3 method can also be utilized through Web3 libraries for Ethereum to integrate hashing capabilities directly into decentralized applications.
-
-The Ethereum web3\_sha3 method is an integral part of the Ethereum JSON RPC API, allowing developers to leverage Keccak-256 hashing in their projects. As a Core API Endpoint, it ensures secure and reliable hashing operations while maintaining compatibility across different Ethereum environments.

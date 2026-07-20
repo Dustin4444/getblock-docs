@@ -1,45 +1,27 @@
 ---
 description: >-
-  The debug_traceCall method is part of the Ethereum JSON RPC Core API and is
-  used for advanced debugging. This method returns a transaction trace.
+  Example code for the debug_traceCall JSON RPC method. Сomplete guide on how to
+  use debug_traceCall JSON RPC in GetBlock Web3 documentation.
 ---
 
 # debug\_traceCall - Ethereum
 
-{% hint style="success" %}
-The debug\_traceCall method is part of the Ethereum JSON RPC Core API and is designed for advanced debugging purposes
-{% endhint %}
+This method simulates a message call at a specific block and returns its execution trace — without submitting a transaction. Unlike `eth_call` (which returns only the final return data), `debug_traceCall` returns the complete internal-call graph, opcode-level operations, or pre-state depending on the tracer. Essential for wallet UX previews, MEV analysis, and pre-flight simulation of complex contract interactions.
 
-This method returns a transaction trace object, providing detailed insights into the transaction execution process. Developers can use this method to debug specific transaction calls in the context of a specified block.
+## Parameters
 
-### Supported Networks
+| Parameter        | Type   | Required | Description                                                           |
+| ---------------- | ------ | -------- | --------------------------------------------------------------------- |
+| `transaction`    | object | Yes      | Transaction call object — same shape as `eth_call` transaction object |
+| `blockParameter` | string | Yes      | Block number in hex or tag                                            |
+| `tracerOptions`  | object | No       | Trace configuration — same shape as in `debug_traceBlock`             |
 
-The debug\_traceCall RPC Ethereum method supports all Ethereum network types, including:
-
-* Mainnet
-* Testnets: Sepolia, Hoodi
-
-### Parameters
-
-The debug\_traceCall method accepts the following parameters:
-
-* Object: (None) The transaction call object, specifying details such as the recipient address and value.
-* DATA: (None) The block number in hex format, tags (latest, earliest, pending), or the block hash.
-* DATA: (None) The type of tracer, such as callTracer or other supported tracer types.
-
-### Request Example
-
-URL
-
-```
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To make a request, send a JSON object with the jsonrpc, method, and params fields. Below is an example of how to make a request using curl:
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -47,9 +29,11 @@ curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
     "method": "debug_traceCall",
     "params": [
         {
-            "to": "0xd46e8dd67c5d32be8058bb8eb970870f07244567"
+            "from": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+            "to": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "data": "0x70a08231000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
         },
-        "finalized",
+        "latest",
         {
             "tracer": "callTracer"
         }
@@ -57,131 +41,198 @@ curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
     "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/ 
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "debug_traceCall",
-"params": [{"to": "0xd46e8dd67c5d32be8058bb8eb970870f07244567"}, "finalized", {"tracer": "callTracer"}],
-"id": "getblock.io"}
-```
-{% endtab %}
-{% endtabs %}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
 
-### Response Example
-
-The server responds with a JSON object. Below is an example response for the debug\_traceCall method:
-
-```json
-{
-    "result": "null",
-    "id": "getblock.io",
-    "status_code": 405,
-    "message": "Method not allowed"
-}
-```
-
-### Response Description
-
-* result: null if the method is not allowed or unavailable.
-* status\_code: The HTTP status code for the request.
-* message: A descriptive message explaining the response, e.g., "Method not allowed."
-
-#### Returns
-
-If successful, the method provides a detailed trace of the transaction call, including:
-
-* block: The block details where the transaction is executed.
-* transaction: The transaction trace object, containing opcode-level execution details.
-* parameters: Detailed information about the transaction’s inputs and outputs.
-* value: The value transferred or modified during the transaction execution.
-
-### Use Case
-
-The debug\_traceCall method is an essential tool for developers requiring granular debugging of Ethereum transactions. It is particularly useful for analyzing contract interactions, identifying gas inefficiencies, and diagnosing transaction failures. If a debug\_traceCall error occurs, ensure the provided transaction object, block number, or hash is correct. The debug\_traceCall example demonstrates how to construct a valid request.
-
-### Example Code
-
-Here is an example of how to call the debug\_traceCall method programmatically using Python:
-
-{% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
-
-
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
-
-
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "debug_traceCall",
-    "params": [
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'debug_traceCall',
+    params: [
         {
-            "to": "0xd46e8dd67c5d32be8058bb8eb970870f07244567"
+            "from": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+            "to": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "data": "0x70a08231000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
         },
-        "finalized",
+        "latest",
         {
             "tracer": "callTracer"
         }
     ],
-    "id": "getblock.io"
-}
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
 
-
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-
-# Parse the JSON response
-response_data = response.json()
-
-
-# Print the result
-print(json.dumps(response_data, indent=4))Pyth
+console.log(response.data.result);
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
-```javascript
-import axios from 'axios';
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
 
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/'; // Замените <ACCESS-TOKEN> на ваш токен доступа
-const headers = {
-    'Content-Type': 'application/json'
-};
-const data = {
-    jsonrpc: "2.0",
-    method: "debug_traceCall",
-    params: [
-        {
-            to: "0xd46e8dd67c5d32be8058bb8eb970870f07244567"
-        },
-        "finalized",
-        {
-            tracer: "callTracer"
-        }
-    ],
-    id: "getblock.io"
-};
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'debug_traceCall',
+        'params': [
+            {
+                "from": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+                "to": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                "data": "0x70a08231000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
+            },
+            "latest",
+            {
+                "tracer": "callTracer"
+            }
+        ],
+        'id': 'getblock.io'
+    }
+)
 
-axios.post(url, data, { headers })
-    .then(response => {
-        console.log(response.data);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-
+print(response.json())
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "debug_traceCall",
+            "params": [
+                {
+                    "from": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+                    "to": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                    "data": "0x70a08231000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
+                },
+                "latest",
+                {
+                    "tracer": "callTracer"
+                }
+            ],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-This Python script demonstrates how to interact with the debug\_traceCall method programmatically. Replace \<ACCESS-TOKEN> with your actual API key. The Web3 debug\_traceCall method is also accessible through Web3 libraries for Ethereum, enabling seamless debugging workflows for decentralized application development.
+## Response
+
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": {
+        "type": "CALL",
+        "from": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+        "to": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "value": "0x0",
+        "gas": "0x186a0",
+        "gasUsed": "0x8ba0",
+        "input": "0x70a08231000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "output": "0x0000000000000000000000000000000000000000000000000de0b6b3a7640000",
+        "calls": []
+    }
+}
+```
+
+## Response Parameters
+
+| Parameter | Type            | Description                                                                               |
+| --------- | --------------- | ----------------------------------------------------------------------------------------- |
+| `jsonrpc` | string          | JSON-RPC protocol version ("2.0")                                                         |
+| `id`      | string          | Request identifier matching the request                                                   |
+| `result`  | object or array | Trace result — shape depends on the tracer used (`callTracer` returns a call tree object) |
+
+## Use Cases
+
+* **Wallet UX Preview**: Show users a complete internal-call graph before they sign — every contract interaction, every value transfer
+* **MEV Simulation**: Trace hypothetical transactions against current state to identify sandwich or backrun opportunities
+* **Debugging Reverts**: Trace a reverting call to identify the exact contract, function, and opcode where revert occurred
+* **Gas Attribution**: Break down gas cost across internal calls to identify optimization targets
+
+## Error Handling
+
+| Error Code | Message            | Description                                                                       |
+| ---------- | ------------------ | --------------------------------------------------------------------------------- |
+| `-32601`   | Method not found   | `debug` module not enabled — Dedicated Node tier required                         |
+| `-32602`   | Invalid params     | Transaction object or tracer options are malformed                                |
+| `3`        | Execution reverted | The traced call reverted — the trace still returns useful revert-path information |
+| `-32603`   | Internal error     | Node failed to execute the trace                                                  |
+
+## Web3 Integration
+
+{% tabs %}
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
+
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
+
+const trace = await provider.send('debug_traceCall', [
+    { from: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', to: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', data: '0x70a08231000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045' },
+    'latest',
+    { tracer: 'callTracer' }
+]);
+console.log('Top-level call type:', trace.type);
+console.log('Gas used:', trace.gasUsed);
+console.log('Internal calls:', trace.calls?.length ?? 0);
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
+```javascript
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
+
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
+
+const trace = await client.request({
+    method: 'debug_traceCall',
+    params: [
+        { from: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', to: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', data: '0x70a08231000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045' },
+        'latest',
+        { tracer: 'callTracer' },
+    ],
+});
+console.log('Top-level call type:', trace.type);
+```
+{% endcode %}
+{% endtab %}
+{% endtabs %}

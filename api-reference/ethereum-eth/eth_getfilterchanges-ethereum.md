@@ -1,90 +1,134 @@
 ---
 description: >-
-  Poll a specific filter for changes since the last check using
-  eth_getFilterChanges. Vital for real-time monitoring of logs, transactions,
-  and blocks in dApps and Ethereum applications.
+  Example code for the eth_getFilterChanges JSON RPC method. Сomplete guide on
+  how to use eth_getFilterChanges JSON RPC in GetBlock Web3 documentation.
 ---
 
 # eth\_getFilterChanges - Ethereum
 
-{% hint style="success" %}
-The eth\_getFilterChanges method is part of the JSON-RPC Ethereum API, designed to poll a specific filter and retrieve an array of changes since the last poll
-{% endhint %}
+This method returns entries added to a filter since the last time it was polled. For log filters, returns matching log objects; for block filters, returns block hashes; for pending transaction filters, returns transaction hashes. Repeatedly polling this method drives a filter-based subscription loop.
 
-This core API endpoint is vital for tracking updates to logs, pending transactions, or new blocks in real-time. If the filter is invalid or expired, the method returns an eth\_getFilterChanges error.
+## Parameters
 
-As a critical feature in Ethereum eth\_getFilterChanges, this method is commonly used in decentralized applications (dApps) to monitor and react to on-chain events efficiently.The eth\_getFilterChanges endpoints allows developers to integrate real-time blockchain monitoring into their applications seamlessly.
+| Parameter  | Type   | Required | Description                                                                                                       |
+| ---------- | ------ | -------- | ----------------------------------------------------------------------------------------------------------------- |
+| `filterId` | string | Yes      | Hex-encoded filter ID from a previous `eth_newFilter`, `eth_newBlockFilter`, or `eth_newPendingTransactionFilter` |
 
-### Supported Networks
-
-The eth\_getFilterChanges RPC Ethereum method is supported on the following network types
-
-* Mainnet
-* Testnet: Sepolia, Hoodi
-
-### Parameters
-
-Filter ID (DATA):
-
-A unique identifier for the filter being polled. This identifier must be obtained through prior methods like eth\_newFilter, eth\_newPendingTransactionFilter, or eth\_newBlockFilter.
-
-### Request Example
-
-URL (API Endpoint)
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-Here is an eth\_getFilterChanges example of how to use the method in a JSON-RPC request
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "jsonrpc": "2.0",
     "method": "eth_getFilterChanges",
     "params": [
-        "0xf8bf5598d9e04fbe84523d42640b9b0e"
+        "0x16"
     ],
     "id": "getblock.io"
 }'
 ```
 {% endtab %}
 
-{% tab title="wss" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_getFilterChanges",
-"params": ["0xf8bf5598d9e04fbe84523d42640b9b0e"],
-"id": "getblock.io"}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_getFilterChanges',
+    params: [
+        "0x16"
+    ],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_getFilterChanges',
+        'params': [
+        "0x16"
+    ],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_getFilterChanges",
+            "params": [
+        "0x16"
+    ],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response Example
-
-When the filter returns changes, they are provided as an array of data, such as logs or pending transactions
+## Response
 
 ```json
 {
-    "id": "getblock.io",
     "jsonrpc": "2.0",
+    "id": "getblock.io",
     "result": [
         {
-            "address": "0xa50a51c09a5c451c52bb714527e1974b686d8e77",
+            "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
             "topics": [
-                "0x5c2c447c5d5caff32446f5a9c1df2ffdf501b43b3f4e1b9f989d2d17d17e489e"
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045",
+                "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
             ],
-            "data": "0x",
-            "blockNumber": "0x5b8d80",
-            "transactionHash": "0xb16d2cfc99a453b09c8e6b61b582f1b6ac14b36f7e8fbe5433e7a1a1fd3e3c34",
-            "transactionIndex": "0x1",
-            "blockHash": "0x72a097d3c95f2ef340c29e2da5f14a5fd5078c741c54b6f372d7e455f65a26f3",
+            "data": "0x000000000000000000000000000000000000000000000000016345785d8a0000",
+            "blockNumber": "0x1720340",
+            "transactionHash": "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b",
+            "transactionIndex": "0x0",
+            "blockHash": "0x9ec8e2f6b78d8f5f2ac3e5d61b0d38d4d5a8f0e7c8b5a2f9d3e6c1b7a4d0f2e5c",
             "logIndex": "0x0",
             "removed": false
         }
@@ -92,106 +136,61 @@ When the filter returns changes, they are provided as an array of data, such as 
 }
 ```
 
-If the filter is not found or has expired
+## Response Parameters
 
-```
-{
-    "error": {
-        "code": -32000,
-        "message": "filter not found"
-    },
-    "id": "getblock.io",
-    "jsonrpc": "2.0"
-}
-```
+| Parameter | Type   | Description                                                                                                                                       |
+| --------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `jsonrpc` | string | JSON-RPC protocol version ("2.0")                                                                                                                 |
+| `id`      | string | Request identifier matching the request                                                                                                           |
+| `result`  | array  | New entries since the last poll — log objects for log filters, block hashes for block filters, transaction hashes for pending transaction filters |
 
-### Use Case
+## Use Cases
 
-Tracking Log Events:\
-The eth\_getFilterChanges API method enables developers to monitor log updates for specific smart contracts. This is particularly valuable for applications that need to stay updated on events triggered by smart contracts.
+* **Polling-Based Event Subscriptions**: Poll every few seconds to receive new matching logs since the last poll
+* **Live Block Notifications**: Poll a block filter to receive new block hashes without WSS
+* **Backfill After Reconnect**: After a reconnect or downtime, poll to receive all events buffered since the last successful poll
 
-Monitoring Pending Transactions:\
-By polling a pending transaction filter, you can track newly added transactions to the mempool in real-time, improving insights into transaction flow.
+## Error Handling
 
-Listening for New Blocks:\
-Using block filters with eth\_getFilterChanges RPC Ethereum, developers can identify new blocks as they are mined, ensuring accurate synchronization with the blockchain.
+| Error Code | Message        | Description                                      |
+| ---------- | -------------- | ------------------------------------------------ |
+| -32602     | Invalid params | Filter ID is malformed or the filter has expired |
+| -32603     | Internal error | Node failed to read filter state                 |
 
-### Code Example
-
-Here’s how you can implement eth\_getFilterChanges using different programming languages
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
 
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {
-    'Content-Type': 'application/json'
-}
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
 
-payload = {
-    "jsonrpc": "2.0",
-    "method": "eth_getFilterChanges",
-    "params": [
-        "0xf8bf5598d9e04fbe84523d42640b9b0e"
-    ],
-    "id": "getblock.io"
-}
-
-response = requests.post(url, headers=headers, data=json.dumps(payload))
-
-if response.status_code == 200:
-    print(response.json())
-else:
-    print(f"Error: {response.status_code}", response.text)
-
+setInterval(async () => {
+    const changes = await provider.send('eth_getFilterChanges', ['0x16']);
+    changes.forEach(log => console.log('New log:', log.transactionHash));
+}, 5000);
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-const axios = require('axios');
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
 
-// Replace <ACCESS-TOKEN> with your actual API key
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
 
-// Request payload
-const requestBody = {
-  jsonrpc: '2.0',
-  method: 'eth_getFilterChanges',
-  params: ['0xf8bf5598d9e04fbe84523d42640b9b0e'], // Filter ID
-  id: 'getblock.io',
-};
-
-// Axios POST request
-axios
-  .post(url, requestBody, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-  .then((response) => {
-    console.log('Filter Changes Response:', response.data.result);
-  })
-  .catch((error) => {
-    console.error('Error fetching filter changes:', error.message);
-  });
+setInterval(async () => {
+    const changes = await client.getFilterChanges({ filter });
+    changes.forEach(log => console.log('New log:', log.transactionHash));
+}, 5000);
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-This eth\_getFilterChanges example demonstrates how to use the method :
-
-Setup:Replace \<ACCESS-TOKEN> with your GetBlock API key.Use FILTER\_ID from a filter creation method such as eth\_newFilter.
-
-Request:The method sends a POST request to the JSON RPC endpoint, specifying the eth\_getFilterChanges method and the filter ID as parameters.
-
-Response Handling:If no changes occur, the method returns an empty array.Logs an error, such as "filter not found", if the filter has expired or is invalid.
-
-Value Handling: The value of the filter changes is extracted from the response and logged.
-
-Usage:The Web3 eth\_getFilterChanges method is essential for applications requiring real-time updates on Ethereum network activity, including logs, transactions, and new blocks.
-
-\\

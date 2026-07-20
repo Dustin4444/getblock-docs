@@ -1,57 +1,34 @@
 ---
 description: >-
-  The eth_newFilter method creates a filter object based on specified options to
-  notify the client when the state changes, such as new logs. It is part of the
-  Ethereum JSON RPC API
+  Example code for the eth_newFilter JSON RPC method. Сomplete guide on how to
+  use eth_newFilter JSON RPC in GetBlock Web3 documentation.
 ---
 
-# eth\_newFilter-Ethereum
+# eth\_newFilter - Ethereum
 
-{% hint style="success" %}
-Creates a filter object, based on filter options, to notify when thestate changes (logs)
-{% endhint %}
+This method creates a log filter that matches events emitted by contracts based on address, topic, and block-range criteria. It returns a filter ID that subsequent `eth_getFilterChanges` or `eth_getFilterLogs` calls use to fetch matching logs. Filters are stateful — they persist on the node until explicitly uninstalled or expired.
 
-The eth\_newFilter method is part of the Ethereum JSON RPC API and is used to create a filter object based on specified filter options. This method notifies the client when the state changes (logs). To check if the state has changed, the eth\_getFilterChanges method can be used.
+## Parameters
 
-### Supported Networks
+| Parameter | Type   | Required | Description                 |
+| --------- | ------ | -------- | --------------------------- |
+| `filter`  | object | Yes      | Filter criteria (see below) |
 
-The eth\_newFilter RPC Ethereum method is supported on the following network types:
+### Filter Object
 
-* Mainnet
-* Testnet: Sepolia, Hoodi
+| Field       | Type                      | Required | Description                                                                                               |
+| ----------- | ------------------------- | -------- | --------------------------------------------------------------------------------------------------------- |
+| `fromBlock` | string                    | No       | Starting block — hex number or `latest`, `earliest`, `pending`, `finalized`, `safe`. Defaults to `latest` |
+| `toBlock`   | string                    | No       | Ending block — hex number or tag. Defaults to `latest`                                                    |
+| `address`   | string or array of string | No       | Contract address(es) to filter logs from                                                                  |
+| `topics`    | array                     | No       | Topic filters — up to 4 topics; each can be a single value, array (OR), or `null` (any)                   |
 
-### Parameters
-
-The method accepts a filter object with the following keys and their values:
-
-* address (optional): A contract address or a list of addresses from which logs should originate.
-* fromBlock (optional, default is latest): A hexadecimal block number or one of the strings latest, earliest, or pending.
-* toBlock (optional, default is latest): A hexadecimal block number or one of the strings latest, earliest, or pending.
-* topics (optional): An array of 32-byte DATA topics. Topics are order-dependent.
-
-**Specifying Topic Filters**
-
-Topics are order-dependent. A transaction log with topics A, B will match the following topic filters:
-
-* \[]: Matches anything.
-* \[A]: Matches A in the first position, and anything after.
-* \[null, B]: Matches anything in the first position AND B in the second position, and anything after.
-* \[A, B]: Matches A in the first position AND B in the second position, and anything after.
-* \[\[A, B], \[A, B]]: Matches (A OR B) in the first position AND (A OR B) in the second position, and anything after.
-
-### Request
-
-URL
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To interact with the Ethereum eth\_newFilter endpoint using JSON-RPC, use the following examples:
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -59,135 +36,204 @@ curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
     "method": "eth_newFilter",
     "params": [
         {
+            "fromBlock": "0x1720340",
+            "toBlock": "latest",
+            "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
             "topics": [
-                "0xb7407a6d74c6472bf99c4c9abe0860dc439469421c42c060639733b2309b05c7"
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
             ]
         }
     ],
     "id": "getblock.io"
 }'
-
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_newFilter",
-"params": [{"topics": ["0xb7407a6d74c6472bf99c4c9abe0860dc439469421c42c060639733b2309b05c7"]}],
-"id": "getblock.io"}
-```
-{% endtab %}
-{% endtabs %}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
 
-### Response
-
-The response contains the ID of the newly created filter, which can be used to query changes.
-
-```json
-{
-    "id": "getblock.io",
-    "jsonrpc": "2.0",
-    "result": "0x73d728c1f165d1886b2fd41cf7478a07"
-}
-```
-
-### Response Description
-
-* result: A string containing the filter ID in hexadecimal format. This ID is used with methods such as eth\_getFilterChanges or eth\_uninstallFilter to manage and query the filter.
-
-### Use Case
-
-The eth\_newFilter RPC Ethereum method is commonly used in decentralized applications (DApps) and monitoring tools to:
-
-* Track specific events or transactions in real time.
-* Monitor logs emitted by a smart contract.
-* Create dynamic notifications based on blockchain state changes.
-
-For instance, a Web3 application may call the Ethereumeth\_newFilter method to track specific events emitted by a smart contract and update the UI or trigger custom workflows when those events occur.
-
-### Code Example
-
-Here is an eth\_newFilter example of how to query the method using Python and JavaScript:
-
-{% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
-
-# Define the API URL and headers
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
-
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "eth_newFilter",
-    "params": [
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_newFilter',
+    params: [
         {
+            "fromBlock": "0x1720340",
+            "toBlock": "latest",
+            "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
             "topics": [
-                "0xb7407a6d74c6472bf99c4c9abe0860dc439469421c42c060639733b2309b05c7"
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
             ]
         }
     ],
-    "id": "getblock.io"
-}
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
 
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
+console.log(response.data.result);
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
-```javascript
-import axios from 'axios';
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
 
-// Define the API URL and headers
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
-const headers = { 'Content-Type': 'application/json' };
-
-// Prepare the request data
-const data = {
-  jsonrpc: '2.0',
-  method: 'eth_newFilter',
-  params: [
-    {
-      topics: [
-        '0xb7407a6d74c6472bf99c4c9abe0860dc439469421c42c060639733b2309b05c7'
-      ]
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_newFilter',
+        'params': [
+        {
+            "fromBlock": "0x1720340",
+            "toBlock": "latest",
+            "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+            ]
+        }
+    ],
+        'id': 'getblock.io'
     }
-  ],
-  id: 'getblock.io'
-};
+)
 
-// Send the POST request
-axios.post(url, data, { headers })
-  .then(response => {
-    // Print the result
-    console.log('Filter ID:', response.data.result);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+print(response.json())
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_newFilter",
+            "params": [
+        {
+            "fromBlock": "0x1720340",
+            "toBlock": "latest",
+            "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+            ]
+        }
+    ],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-#### Common Errors
+## Response
 
-When using the eth\_newFilter RPC Ethereum method, the following issues may occur:
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": "0x16"
+}
+```
 
-* Invalid URL or ACCESS-TOKEN: Ensure that the URL and token are correct and active.
-* Incorrect Parameters: Verify that the filter object is formatted correctly.
-* eth\_newFilter error: This error may occur if the node does not support filtering or if the request is malformed.
+## Response Parameters
 
-By integrating the Web3 eth\_newFilter method into your application, you can efficiently monitor blockchain logs and events. Use this core API method to create filters and track specific transactions or state changes in real time, enhancing the responsiveness of your DApp or monitoring tools.
+| Parameter | Type   | Description                                                                   |
+| --------- | ------ | ----------------------------------------------------------------------------- |
+| `jsonrpc` | string | JSON-RPC protocol version ("2.0")                                             |
+| `id`      | string | Request identifier matching the request                                       |
+| `result`  | string | Hex-encoded filter ID — pass to `eth_getFilterChanges` or `eth_getFilterLogs` |
+
+## Use Cases
+
+* **ERC-20 Transfer Monitoring**: Filter for Transfer events emitted by a token contract to build a wallet activity feed
+* **DEX Trade Indexing**: Filter for Swap events on Uniswap V3 pools to feed an indexer
+* **Governance Vote Tracking**: Filter for governance events (`VoteCast`, `ProposalCreated`) across DAO contracts
+* **Multi-Contract Aggregation**: Pass an array of addresses to filter events from multiple contracts in a single filter
+
+## Error Handling
+
+| Error Code | Message        | Description                                          |
+| ---------- | -------------- | ---------------------------------------------------- |
+| -32602     | Invalid params | Filter object is malformed or block range is invalid |
+| -32603     | Internal error | Node failed to create the filter                     |
+
+## Web3 Integration
+
+{% tabs %}
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" overflow="wrap" %}
+```javascript
+import { ethers } from 'ethers';
+
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
+
+const filter = {
+    address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    topics: ['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'],
+};
+provider.on(filter, (log) => {
+    console.log('Transfer log:', log);
+});
+
+const filterId = await provider.send('eth_newFilter', [{
+    fromBlock: 'latest',
+    address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    topics: ['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'],
+}]);
+console.log('Filter ID:', filterId);
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
+```javascript
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
+
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
+
+const filter = await client.createEventFilter({
+    address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    event: {
+        type: 'event',
+        name: 'Transfer',
+        inputs: [
+            { indexed: true, name: 'from', type: 'address' },
+            { indexed: true, name: 'to', type: 'address' },
+            { indexed: false, name: 'value', type: 'uint256' },
+        ],
+    },
+});
+console.log('Filter ID:', filter.id);
+```
+{% endcode %}
+{% endtab %}
+{% endtabs %}

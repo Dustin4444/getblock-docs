@@ -1,44 +1,23 @@
 ---
 description: >-
-  The web3_clientVersion method is part of the Ethereum JSON RPC Core API and
-  retrieves the current version of the Ethereum client. It helps developers
-  ensure compatibility.
+  Example code for the web3_clientVersion JSON RPC method. Сomplete guide on how
+  to use web3_clientVersion JSON RPC in GetBlock Web3 documentation.
 ---
 
 # web3\_clientVersion - Ethereum
 
-{% hint style="success" %}
-The web3\_clientVersion method retrieves the current version of the Ethereum client, providing developers with essential information for compatibility and debugging.
-{% endhint %}
+This method returns the current client version of the Ethereum execution node handling the request. Useful for detecting which client implementation (Geth, Nethermind, Besu, Reth, Erigon) is serving the endpoint and its version.
 
-The web3\_clientVersion method is part of the Ethereum JSON RPC Core API and is used to retrieve the current version of the Ethereum client. This method holds significant **value** for developers as it allows them to verify client and version information, ensuring compatibility with required features and functionalities. As part of the Core API Endpoints, it provides transparency about the client environment and includes detailed client version data. This simplifies monitoring, debugging, and integration with Ethereum nodes, offering quick and accurate client version verification and streamlining the development process.
+## Parameters
 
-### Supported Networks
+This method takes no parameters.
 
-The web3\_clientVersion RPC Ethereum method is supported across all Ethereum network types, including:
-
-* Mainnet
-* Testnets: Sepolia, Hoodi
-
-### Parameters
-
-{% hint style="info" %}
-This method does not require any parameters.
-{% endhint %}
-
-### Request
-
-URL
-
-```
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To make a request, send a JSON object with the jsonrpc, method, and params fields. Below is an example of how to make a request using curl:
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -48,106 +27,142 @@ curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
     "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "web3_clientVersion",
-"params": [],
-"id": "getblock.io"}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'web3_clientVersion',
+    params: [],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'web3_clientVersion',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "web3_clientVersion",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response
-
-The server responds with a JSON object containing the version of the Ethereum client. Below is an example of a typical response:
+## Response
 
 ```json
 {
-    "id": "getblock.io",
     "jsonrpc": "2.0",
-    "result": "Geth/v1.11.6-stable-ea9e62ca/linux-amd64/go1.20.3"
+    "id": "getblock.io",
+    "result": "Geth/v1.14.11-stable-f3c696fa/linux-amd64/go1.23.3"
 }
 ```
 
-### Response Description
+## Response Parameters
 
-* result: A string indicating the version of the Ethereum client, including details such as the client name, version, operating system, and compiler version.
+| Parameter | Type   | Description                                                                       |
+| --------- | ------ | --------------------------------------------------------------------------------- |
+| `jsonrpc` | string | JSON-RPC protocol version ("2.0")                                                 |
+| `id`      | string | Request identifier matching the request                                           |
+| `result`  | string | Client version identifier — format: `Client/vX.Y.Z-metadata/OS-arch/lang-version` |
 
-### Use Case
+## Use Cases
 
-The web3\_clientVersion method is particularly useful for:
+* **Client Detection**: Identify the underlying execution client to route client-specific extension calls (`debug_*`, `trace_*` availability varies by client)
+* **Compatibility Checks**: Verify the node runs a version that supports a specific EIP or fork (e.g. Fusaka post-Dec 2025)
+* **Node Fingerprinting**: Diagnose behavior differences across a multi-client fleet in incident response
+* **Client Diversity Monitoring**: Track client-implementation distribution across endpoint fleets for decentralization audits
 
-* Debugging: Identifying the client version to diagnose compatibility issues.
-* Monitoring: Verifying that the client is running the expected version.
-* Integration: Ensuring that the node supports the required features for application development.
+## Error Handling
 
-In case of a web3\_clientVersion error, developers should check the node configuration and ensure that the node supports the JSON RPC API. A web3\_clientVersion example is included to demonstrate proper usage.
+| Error Code | Message        | Description                                                                |
+| ---------- | -------------- | -------------------------------------------------------------------------- |
+| -32603     | Internal error | Node failed to return its client version string (transient upstream error) |
 
-## Code Example
-
-You can also make requests to the web3\_clientVersion method programmatically using Python. Below is an example using the requests library:
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
 
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
 
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "web3_clientVersion",
-    "params": [],
-    "id": "getblock.io"
-}
-
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
-
+const clientVersion = await provider.send('web3_clientVersion', []);
+console.log(clientVersion);
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-import axios from 'axios';
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
 
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
 
-const data = {
-  jsonrpc: '2.0',
-  method: 'web3_clientVersion',
-  params: [],
-  id: 'getblock.io',
-};
-
-axios.post(url, data, {
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
-  .then(response => {
-    console.log('Response:', response.data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+const clientVersion = await client.request({ method: 'web3_clientVersion' });
+console.log(clientVersion);
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-This Python script sends a request to the web3\_clientVersion method and prints the returned client version. Replace with your actual API token. The Web3 web3\_clientVersion method is also accessible through Web3 libraries for Ethereum, enabling developers to query client information efficiently.

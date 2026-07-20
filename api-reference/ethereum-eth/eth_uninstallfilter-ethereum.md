@@ -1,150 +1,178 @@
 ---
 description: >-
-  The eth_uninstallFilter method is part of the Ethereum JSON-RPC Core API and
-  is used to uninstall a filter with a specified filter ID. It is crucial for
-  managing filters that are no longer required.
+  Example code for the eth_uninstallFilter JSON RPC method. Сomplete guide on
+  how to use eth_uninstallFilter JSON RPC in GetBlock Web3 documentation.
 ---
 
 # eth\_uninstallFilter - Ethereum
 
-{% hint style="success" %}
-This method uninstalls a filter with the specified filter ID
-{% endhint %}
+This method removes a previously created filter and frees its server-side state. Nodes automatically expire filters that haven't been polled recently (typically after \~5 minutes of inactivity), but explicit uninstall is polite server citizenship and required for long-lived clients that create many filters.
 
-The eth\_uninstallFilter method is part of the Ethereum JSON RPC Core API, used to interact with Ethereum nodes. The eth\_uninstallFilter RPC Ethereum method is crucial for managing filters that are no longer required. Filters are automatically timed out if they are not queried using eth\_getFilterChanges or eth\_getFilterLogs for 10 minutes.
+## Parameters
 
-### Supported Networks
+| Parameter  | Type   | Required | Description                                                                                                              |
+| ---------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `filterId` | string | Yes      | Hex-encoded filter ID returned by a previous `eth_newFilter`, `eth_newBlockFilter`, or `eth_newPendingTransactionFilter` |
 
-The eth\_uninstallFilter RPC Ethereum method supports the following network types:
-
-* Mainnet
-* Testnet: Sepolia, Hoodi
-
-### Parameters
-
-* DATA: The filter ID to uninstall.
-* parameters: Additional context or metadata related to the request, if applicable.
-
-### Request
-
-URL
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To make a request, send a JSON object with the jsonrpc, method, and params fields. Below is an example of how to make a request using curl:
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "jsonrpc": "2.0",
     "method": "eth_uninstallFilter",
     "params": [
-        "0xb"
+        "0x16"
     ],
     "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_uninstallFilter",
-"params": ["0xb"],
-"id": "getblock.io"}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_uninstallFilter',
+    params: [
+        "0x16"
+    ],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_uninstallFilter',
+        'params': [
+        "0x16"
+    ],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_uninstallFilter",
+            "params": [
+        "0x16"
+    ],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response
-
-The server responds with a JSON object indicating whether the filter was successfully uninstalled. Below is an example of a typical response:
+## Response
 
 ```json
 {
-    "id": "getblock.io",
     "jsonrpc": "2.0",
-    "result": false
+    "id": "getblock.io",
+    "result": true
 }
 ```
 
-**Response Description**
+## Response Parameters
 
-* result: A boolean value indicating whether the filter was successfully uninstalled. false typically means that the filter ID provided does not exist or has already been removed.
+| Parameter | Type    | Description                                                                                                                             |
+| --------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `jsonrpc` | string  | JSON-RPC protocol version ("2.0")                                                                                                       |
+| `id`      | string  | Request identifier matching the request                                                                                                 |
+| `result`  | boolean | `true` if the filter was found and removed, `false` if the filter ID didn't correspond to an active filter (already expired or invalid) |
 
-### Use Case
+## Use Cases
 
-The eth\_uninstallFilter method is particularly useful for applications that manage Ethereum logs or events using filters. Once a filter is no longer needed, calling this method ensures optimal resource usage by uninstalling unnecessary filters. In case of an eth\_uninstallFilter error, developers should verify that the filter ID provided is valid and that the filter has not already timed out. An eth\_uninstallFilter example is provided in this documentation to illustrate proper usage.
+* **Filter Cleanup**: Free server-side filter state when a client is done using it
+* **Server-Citizenship**: Prevent unbounded filter growth on shared endpoints
+* **Reset Filter State**: Uninstall and re-create a filter to reset its polling window
 
-### Code Example
+## Error Handling
 
-You can also make requests to the eth\_uninstallFilter method programmatically using Python. Below is an example using the requests library:
+| Error Code | Message        | Description                           |
+| ---------- | -------------- | ------------------------------------- |
+| -32602     | Invalid params | Filter ID is malformed                |
+| -32603     | Internal error | Node failed while removing the filter |
+
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
 
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
+const provider = new ethers.JsonRpcProvider('https://go.getblock.io/<ACCESS-TOKEN>/');
 
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "eth_uninstallFilter",
-    "params": [
-        "0xb"
-    ],
-    "id": "getblock.io"
-}
-
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
-
+const removed = await provider.send('eth_uninstallFilter', ['0x16']);
+console.log('Filter removed:', removed);
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-import axios from 'axios'; 
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/';
-const data = {
-  jsonrpc: '2.0',
-  method: 'eth_uninstallFilter',
-  params: ['0xb'],
-  id: 'getblock.io',
-};
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
 
-axios.post(url, data, {
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
-  .then(response => {
-    console.log('Response:', response.data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+const client = createPublicClient({
+    chain: mainnet,
+    transport: http('https://go.getblock.io/<ACCESS-TOKEN>/'),
+});
+
+const removed = await client.uninstallFilter({ filter });
+console.log('Filter removed:', removed);
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-This Python script sends a request to the eth\_uninstallFilter method and prints the result indicating whether the filter was successfully uninstalled. Make sure to replace \<ACCESS-TOKEN> with your actual API token. The Web3 eth\_uninstallFilter method can also be used in Web3 libraries for Ethereum to manage filters programmatically.
-
-The Ethereum eth\_uninstallFilter method provides developers with an efficient way to clean up unused filters. This is particularly important for applications that frequently interact with Ethereum filters and events, ensuring optimal use of resources within the Ethereum JSON RPC API and Core API Endpoints. Transaction management is also essential for optimizing resource usage and API performance.

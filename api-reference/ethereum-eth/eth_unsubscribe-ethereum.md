@@ -1,159 +1,190 @@
 ---
 description: >-
-  The eth_unsubscribe method is part of the Ethereum JSON-RPC Core API and is
-  used to cancel a specified subscription by its ID. It helps developers manage
-  active subscriptions, optimizing resource.
+  Example code for the eth_unsubscribe JSON RPC method. Сomplete guide on how to
+  use eth_unsubscribe JSON RPC in GetBlock Web3 documentation.
 ---
 
 # eth\_unsubscribe - Ethereum
 
-{% hint style="success" %}
-This method cancels a specified subscription by its ID
-{% endhint %}
+This method cancels a previously-created **WebSocket subscription**. The server immediately stops pushing notifications for that subscription ID. Required for well-behaved clients: subscriptions persist for the lifetime of the WebSocket connection unless explicitly unsubscribed.
 
-The eth\_unsubscribe method is part of the Ethereum JSON RPC Core API, used to interact with Ethereum nodes. The eth\_unsubscribe RPC Ethereum method is particularly useful for managing active subscriptions and ensuring resource efficiency by removing unnecessary subscriptions.The method provides value to developers by optimizing resource usage.
+## Parameters
 
-### Supported Networks
+| Parameter        | Type   | Required | Description                                             |
+| ---------------- | ------ | -------- | ------------------------------------------------------- |
+| `subscriptionId` | string | Yes      | Hex-encoded subscription ID returned by `eth_subscribe` |
 
-The eth\_unsubscribe RPC Ethereum method supports the following network types:
-
-* Mainnet
-* Testnet: Sepolia, Hoodi
-
-### Parameters
-
-* DATA: A hex string representing the subscription ID that was previously generated with the eth\_subscribe method.
-* parameters: Additional input data used to specify the subscription ID for cancellation.
-
-### Request
-
-URL
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-To make a request, send a JSON object with the jsonrpc, method, and params fields. Below is an example of how to make a request using curl:
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
 curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "jsonrpc": "2.0",
     "method": "eth_unsubscribe",
     "params": [
-        "0xe5af64ddfd365b4632988c5935cfedb7"
+        "0x9cef478923ff08bf67fde6c64013158d"
     ],
     "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="ws" %}
-```json
-wscat -c wss://go.getblock.io/<ACCESS-TOKEN>/
-# wait for connection and send the request body 
-{"jsonrpc": "2.0",
-"method": "eth_unsubscribe",
-"params": ["0xe5af64ddfd365b4632988c5935cfedb7"],
-"id": "getblock.io"}
+{% tab title="Axios" %}
+{% code title="example.js" %}
+```javascript
+const axios = require('axios');
+
+const response = await axios.post('https://go.getblock.io/<ACCESS-TOKEN>/', {
+    jsonrpc: '2.0',
+    method: 'eth_unsubscribe',
+    params: [
+        "0x9cef478923ff08bf67fde6c64013158d"
+    ],
+    id: 'getblock.io'
+}, {
+    headers: { 'Content-Type': 'application/json' }
+});
+
+console.log(response.data.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'eth_unsubscribe',
+        'params': [
+        "0x9cef478923ff08bf67fde6c64013158d"
+    ],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json())
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+    
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "eth_unsubscribe",
+            "params": [
+        "0x9cef478923ff08bf67fde6c64013158d"
+    ],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+    
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Response
-
-The server responds with a JSON object indicating the success or failure of the unsubscription. Below is an example response:
+## Response
 
 ```json
 {
-    "error": {
-        "code": -32000,
-        "message": "subscription not found"
-    },
+    "jsonrpc": "2.0",
     "id": "getblock.io",
-    "jsonrpc": "2.0"
+    "result": true
 }
 ```
 
-**Response Description**
+## Response Parameters
 
-* result: Returns true if the subscription was successfully canceled or false otherwise.
-* error: Provides an error message, such as "subscription not found," if the subscription ID is invalid or does not exist.Each response helps track block states or errors that might occur during the cancellation process.
+| Parameter | Type    | Description                                                                             |
+| --------- | ------- | --------------------------------------------------------------------------------------- |
+| `jsonrpc` | string  | JSON-RPC protocol version ("2.0")                                                       |
+| `id`      | string  | Request identifier matching the request                                                 |
+| `result`  | boolean | `true` if the subscription was found and cancelled, `false` if the ID wasn't recognized |
 
-### Use Case
+## Use Cases
 
-The eth\_unsubscribe method is essential for developers who need to manage active subscriptions created using the eth\_subscribe method. By unsubscribing from unneeded events, developers can optimize resource usage and maintain efficient connections with the Ethereum node. In case of an eth\_unsubscribe error, ensure that the subscription ID provided in the parameters matches an existing subscription.
+* **Subscription Cleanup**: Cancel subscriptions when they're no longer needed to reduce server load
+* **Dynamic Filter Refresh**: Unsubscribe and resubscribe with updated filter criteria
+* **Connection Teardown**: Explicit cleanup before closing the WebSocket connection
 
-An eth\_unsubscribe example demonstrates how to properly use this method to cancel subscriptions effectively.This approach ensures fewer unnecessary transactions being sent to the node, improving overall efficiency.
+## Error Handling
 
-### Code Example
+| Error Code | Message        | Description                            |
+| ---------- | -------------- | -------------------------------------- |
+| -32602     | Invalid params | Subscription ID is malformed           |
+| -32603     | Internal error | Node failed to cancel the subscription |
 
-You can also make requests to the eth\_unsubscribe method programmatically using Python. Below is an example using the requests library:
+## Web3 Integration
 
 {% tabs %}
-{% tab title="Python" %}
-```python
-import requests
-import json
+{% tab title="Ethers.js" %}
+{% code title="ethers-example.js" %}
+```javascript
+import { ethers } from 'ethers';
 
-# Define the API URL and access token
-url = 'https://go.getblock.io/<ACCESS-TOKEN>/'
-headers = {'Content-Type': 'application/json'}
+const provider = new ethers.WebSocketProvider('wss://go.getblock.io/<ACCESS-TOKEN>/');
 
-# Prepare the request data
-data = {
-    "jsonrpc": "2.0",
-    "method": "eth_unsubscribe",
-    "params": [
-        "0xe5af64ddfd365b4632988c5935cfedb7"
-    ],
-    "id": "getblock.io"
-}
+// High-level: remove listeners
+const handler = (blockNumber) => console.log('New block:', blockNumber);
+provider.on('block', handler);
+// Later:
+provider.off('block', handler);
 
-# Send the POST request
-response = requests.post(url, headers=headers, data=json.dumps(data))
-
-# Parse the JSON response
-response_data = response.json()
-
-# Print the result
-print(json.dumps(response_data, indent=4))
-
+// Raw eth_unsubscribe:
+const cancelled = await provider.send('eth_unsubscribe', ['0x9cef478923ff08bf67fde6c64013158d']);
+console.log('Cancelled:', cancelled);
 ```
+{% endcode %}
 {% endtab %}
 
-{% tab title="JavaScript" %}
+{% tab title="Viem" %}
+{% code title="viem-example.js" %}
 ```javascript
-import axios from 'axios'; 
+import { createPublicClient, webSocket } from 'viem';
+import { mainnet } from 'viem/chains';
 
-const url = 'https://go.getblock.io/<ACCESS-TOKEN>/'; 
+const client = createPublicClient({
+    chain: mainnet,
+    transport: webSocket('wss://go.getblock.io/<ACCESS-TOKEN>/'),
+});
 
-const data = {
-  jsonrpc: '2.0',
-  method: 'eth_unsubscribe',
-  params: ['0xe5af64ddfd365b4632988c5935cfedb7'],
-  id: 'getblock.io',
-};
+// watchBlocks / watchEvent return an unwatch function
+const unwatch = client.watchBlocks({
+    onBlock: (block) => console.log('New block:', block.number),
+});
 
-axios.post(url, data, {
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
-  .then(response => {
-    console.log('Response:', response.data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-
+// Later, cancel the subscription:
+unwatch();
 ```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
-
-This Python script sends a request to the eth\_unsubscribe method and prints the returned status of the unsubscription. Make sure to replace \<ACCESS-TOKEN> with your actual API token. The Web3 eth\_unsubscribe method can also be used in Web3 libraries for Ethereum, providing an interface to manage subscriptions in decentralized applications.
-
-The Ethereum eth\_unsubscribe method provides a reliable way to cancel subscriptions, making it a critical part of the Ethereum JSON RPC API and Core API Endpoints.
