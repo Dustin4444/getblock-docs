@@ -15,7 +15,7 @@ Before deploying, you'll need:
 * A wallet with ETH on the target network for gas. See [Add Network to Your Wallet](deploy-smart-contract-on-ethereum.md#add-network-to-your-wallet) below.
 * A GetBlock access token — sign up at [Dashboard](https://account.getblock.io/) and create an Ethereum endpoint in the dashboard. Every code sample below uses `<ACCESS-TOKEN>` as the placeholder.
 * **Node.js 20 or newer** installed (for Hardhat).
-* A funded deployer address. For testnets, use the [faucets](deploy-smart-contract-on-ethereum.md#testnet-faucets) listed at the bottom of this page.
+* A funded deployer address. For testnets, use the [faucet page](https://getblock.io/faucet/)
 
 ### Network Details
 
@@ -267,18 +267,3 @@ After verification, view your contract at the corresponding block explorer:
 {% endstepper %}
 {% endtab %}
 {% endtabs %}
-
-### Testnet Faucets
-
-Testnet ETH is required to pay gas on Sepolia and Hoodi. Faucets refill deployer addresses with small amounts of ETH periodically:
-
-#### Sepolia
-
-* [Google Cloud Web3 Faucet](https://cloud.google.com/application/web3/faucet/ethereum/sepolia) — 0.05 ETH per day per Google account
-* [Alchemy Sepolia Faucet](https://www.alchemy.com/faucets/ethereum-sepolia) — requires Alchemy account
-* [PK910 PoW Faucet](https://sepolia-faucet.pk910.de) — mine in-browser for testnet ETH
-
-#### Hoodi
-
-* [Hoodi Ethpandaops Faucet](https://hoodi-faucet.ethpandaops.io) — 0.1 ETH per request
-* [PK910 Hoodi PoW Faucet](https://hoodi-faucet.pk910.de) — mine in-browser
