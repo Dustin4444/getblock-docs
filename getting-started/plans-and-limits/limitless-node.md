@@ -24,7 +24,7 @@ Every Limitless Node includes:
 * **Unlimited requests** within your RPS tier, no CU-based billing
 * **No concurrent connection limits** for parallel workloads
 * **No restrictions on RPC method usage**. All standard and heavy RPC methods are supported
-* **Full node** and **archive node** configurations available for supported chains
+* **Full node** and **archive node** configurations for supported chains
 * **Isolated capacity** and **dedicated routing** for a single network
 * **Multi-region geo-routing** across Europe, the USA, and Asia to minimize latency through geographic proximity
 * One instance can have **multiple** [**access tokens**](../authentication-with-access-tokens.md)**,** each a separate credential that can be regenerated or removed independently of the others
@@ -37,16 +37,56 @@ Limitless Node is a standalone product. You don't need an existing Shared or Ded
 
 ***
 
+### Supported chains
+
+One Limitless Node subscription corresponds to one blockchain network. The service is currently available on 11 high-demand blockchains:
+
+<table data-view="cards"><thead><tr><th></th></tr></thead><tbody><tr><td><img src="../../.gitbook/assets/Crypto Symbol=Ethereum.svg" alt="" data-size="line"> Ethereum</td></tr><tr><td><img src="../../.gitbook/assets/Logo=Solana (1).svg" alt="" data-size="line"> Solana</td></tr><tr><td><img src="../../.gitbook/assets/btc-logo.svg" alt="" data-size="line"> Bitcoin </td></tr><tr><td><img src="../../.gitbook/assets/base-logo.svg" alt="" data-size="line"> Base</td></tr><tr><td><img src="../../.gitbook/assets/bsc.svg" alt="" data-size="line"> BNB Smart Chain</td></tr><tr><td><img src="../../.gitbook/assets/Logo=Tron (1).svg" alt="" data-size="line"> Tron </td></tr><tr><td><img src="../../.gitbook/assets/pol-logo.svg" alt="" data-size="line"> Polygon</td></tr><tr><td><img src="../../.gitbook/assets/Logo=Avax (1).svg" alt="" data-size="line"> Avalanche  </td></tr><tr><td><img src="../../.gitbook/assets/arb-logomark (1).svg" alt="" data-size="line"> Arbitrum </td></tr><tr><td><img src="../../.gitbook/assets/Logo=OP (1).svg" alt="" data-size="line"> Optimism</td></tr><tr><td><img src="../../.gitbook/assets/sui-logomark.svg" alt="" data-size="line"> Sui</td></tr></tbody></table>
+
+{% hint style="info" %}
+Additional networks may be added over time. If you need a chain that isn't listed yet, a custom RPS ceiling, or multi-region redundancy,[ contact our team](https://getblock.io/contact/).
+{% endhint %}
+
+***
+
 ### RPS tiers and pricing
 
 Pick the tier that matches your current traffic. Within your RPS cap, requests are unlimited. There is no monthly request quota and no CU metering.
 
-| RPS (requests-per-second) Tier | Price (monthly) | Requests  | Best For                |
-| ------------------------------ | --------------- | --------- | ----------------------- |
-| 25 RPS                         | $150/mo         | Unlimited | Testing & prototypes    |
-| 50 RPS                         | $300/mo         | Unlimited | Production dApps        |
-| 150 RPS                        | $500/mo         | Unlimited | Indexers & trading bots |
-| 300 RPS                        | $1,000/mo       | Unlimited | Enterprise workloads    |
+#### EVM Chains, Bitcoin, TRON, Sui - Full and Archive Nodes
+
+{% tabs %}
+{% tab title="Full Node" %}
+| RPS Tier | Price (monthly) | Requests  |
+| -------- | --------------- | --------- |
+| 25 RPS   | $150/mo         | Unlimited |
+| 50 RPS   | $300/mo         | Unlimited |
+| 150 RPS  | $500/mo         | Unlimited |
+| 300 RPS  | $1,000/mo       | Unlimited |
+
+Supported networks: Arbitrum, Avalanche, Base, Bitcoin, BNB Smart Chain, Ethereum, Optimism, Polygon, Sui, TRON
+{% endtab %}
+
+{% tab title="Archive Node" %}
+| RPS Tier | Price (monthly) | Requests  |
+| -------- | --------------- | --------- |
+| 15 RPS   | $150/mo         | Unlimited |
+| 30 RPS   | $300/mo         | Unlimited |
+| 50 RPS   | $500/mo         | Unlimited |
+| 100 RPS  | $1,000/mo       | Unlimited |
+
+Supported Networks: Arbitrum, Base, BNB Smart Chain, Ethereum, Optimism, Polygon, Sui, TRON
+{% endtab %}
+{% endtabs %}
+
+#### Solana  - Full Node&#x20;
+
+| RPS Tier | Price (monthly) | Request   |
+| -------- | --------------- | --------- |
+| 5 RPS    | $150/mo         | Unlimited |
+| 15 RPS   | $450/mo         | Unlimited |
+| 30 RPS   | $900/mo         | Unlimited |
+| 50 RPS   | $1,500/mo       | Unlimited |
 
 Prices shown are for monthly billing. Annual billing saves 20%. You can move between tiers at any time with no lock-in.
 
@@ -56,35 +96,23 @@ Requests above your RPS limit are rate-limited and return a standard rate-limit 
 
 ***
 
-#### Supported chains
-
-One Limitless Node subscription corresponds to one blockchain network. The service is currently available on 10 high-demand blockchains:
-
-| <img src="../../.gitbook/assets/Crypto Symbol=Ethereum.svg" alt="" data-size="line"> Ethereum  | <img src="../../.gitbook/assets/Logo=Solana (1).svg" alt="" data-size="line"> Solana  |
-| ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| <img src="../../.gitbook/assets/btc-logo.svg" alt="" data-size="line"> Bitcoin                 | <img src="../../.gitbook/assets/Logo=Tron (1).svg" alt="" data-size="line"> TRON      |
-| <img src="../../.gitbook/assets/base-logo.svg" alt="" data-size="line"> Base                   | <img src="../../.gitbook/assets/pol-logo.svg" alt="" data-size="line"> Polygon        |
-| <img src="../../.gitbook/assets/arb-logomark (1).svg" alt="" data-size="line"> Arbitrum        | <img src="../../.gitbook/assets/Logo=Avax (1).svg" alt="" data-size="line"> Avalanche |
-| <img src="../../.gitbook/assets/Logo=OP (1).svg" alt="" data-size="line"> Optimism             | <img src="../../.gitbook/assets/sui-logomark.svg" alt="" data-size="line"> Sui        |
-
-{% hint style="info" %}
-Additional networks may be added over time. If you need a chain that isn't listed yet, a custom RPS ceiling, or multi-region redundancy,[ contact our team](https://getblock.io/contact/).
-{% endhint %}
-
-***
-
 ### Deploy a Limitless Node
 
-For now, our team provisions every Limitless Node individually so your instance is configured to your workload from day one. Self-serve setup from the dashboard is coming soon.&#x20;
+You can configure and launch a Limitless Node from your GetBlock **Dashboard** → **Limitless Nodes.**
 
-To get started:
+1. In your account, open Limitless Nodes and click Create new node.
+2. Configure the node:
+   1. The blockchain network
+   2. Mode - Full or Archiv&#x65;_\*_&#x20;
+   3. Node location&#x20;
+   4. API interface (all supported interfaces included by default)
+3. Select an RPS plan
+4. Choose a billing term: 1, 6, or 12 months
+5. Complete checkout
 
-1. Contact our team through a contact from on our website or your account.&#x20;
-2. Specify the requirements: blockchain network, desired RPS tier, node mode (full or archive), and preferred hosting region.
-3. We finalize your configuration and provision a dedicated Limitless Node.
-4. Receive your RPC endpoint, generate [access token(s)](https://docs.getblock.io/getting-started/authentication-with-access-tokens). Connect your application and start sending requests.
+_\*Not every network offers an archive tier. Check availability in your dashboard first._
 
-Our team can also recommend the right tier based on your workload. <a href="https://getblock.io/contact/" class="button primary">Get a free consultation.</a>&#x20;
+If you need a chain that isn't listed, [contact our team](https://getblock.io/contact/) directly.  We can also recommend a tier based on your workload.
 
 ***
 
