@@ -3,6 +3,7 @@ description: >-
   Example code for the GetStartBlockHeimdallSpanID grpc method. Сomplete guide
   on how to use GetStartBlockHeimdallSpanID grpc in GetBlock.io Web3
   documentation.
+hidden: true
 ---
 
 # GetStartBlockHeimdallSpanID - Polygon gRPC
