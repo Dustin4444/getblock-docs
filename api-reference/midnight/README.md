@@ -70,8 +70,6 @@ All Midnight JSON-RPC methods are called by sending a `POST` request to the base
 | Mainnet    | ✅        | ✅   | ✅                  | ❌             | ❌                    |
 | testnet-02 | ✅        | ✅   | ✅                  | ✅             | ✅                    |
 
-Midnight mainnet has not yet been launched. This documentation targets **testnet-02**, the current stable development network.
-
 ## Quickstart
 
 In this section, you will learn how to make your first call with either:
