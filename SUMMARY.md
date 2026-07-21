@@ -29,6 +29,12 @@
 * [Connect to GetBlock with MetaMask](getting-started/connect-to-getblock-with-metamask.md)
 * [Connect Brave Wallet to GetBlock](getting-started/connect-brave-wallet-to-getblock.md)
 
+## ADD-ONS
+
+* [Yellowstone gRPC API](add-ons/yellowstone-grpc-api/README.md)
+  * [Overview](add-ons/yellowstone-grpc-api/overview.md)
+  * [Quickstart guide](add-ons/yellowstone-grpc-api/quickstart-guide.md)
+
 ## BSC Advanced Tooling
 
 * [BSC Accelerated Dedicated Node](bsc-advanced-tooling/bsc-chain-accelerated-dedicated-node/README.md)
@@ -38,6 +44,36 @@
   * [Sending Transactions to Private Mempool (Priority Fee)](bsc-advanced-tooling/bsc-accelerated-dedicated-node/sending-transactions-to-private-mempool-priority-fee/README.md)
     * [How to Use Multicall3](bsc-advanced-tooling/bsc-accelerated-dedicated-node/sending-transactions-to-private-mempool-priority-fee/how-to-use-multicall3.md)
     * [How to use Bundle](bsc-advanced-tooling/bsc-accelerated-dedicated-node/sending-transactions-to-private-mempool-priority-fee/how-to-use-bundle.md)
+
+## Crypto AML
+
+* [Overview](crypto-aml/overview.md)
+* [How risk scoring works](crypto-aml/how-risk-scoring-works.md)
+* [Run a check in the dashboard](crypto-aml/run-a-check-in-the-dashboard.md)
+* [Run check via API](crypto-aml/run-check-via-api.md)
+
+## Crypto Address Audit
+
+* [Crypto Address Audit: Risk & Compliance APIs](crypto-address-audit/overview.md)
+* [Wallet Audit](crypto-address-audit/wallet-audit.md)
+* [Wallet Risk](crypto-address-audit/wallet-risk.md)
+* [Rug Pull Checker](crypto-address-audit/rug-pull-checker.md)
+* [API Reference](crypto-address-audit/api-reference.md)
+  * [Wallet Audit Endpoint](crypto-address-audit/api-reference/wallet-audit-endpoint.md)
+  * [Wallet Risk Endpoint](crypto-address-audit/api-reference/wallet-risk-endpoint.md)
+  * [Rug Pull Checker Endpoint](crypto-address-audit/api-reference/rug-pull-checker-endpoint.md)
+
+## Extra Services for Dedicated Nodes
+
+* [Overview](extra-services-for-dedicated-nodes/overview.md)
+* [Advanced Analytics](extra-services-for-dedicated-nodes/advanced-analytics.md)
+* [Automatic RPC failover](extra-services-for-dedicated-nodes/automatic-rpc-failover.md)
+* [Custom Endpoint URL](extra-services-for-dedicated-nodes/custom-endpoint-url.md)
+* [Dedicated Ingress Proxy](extra-services-for-dedicated-nodes/dedicated-ingress-proxy.md)
+* [IP Allowlist](extra-services-for-dedicated-nodes/ip-allowlist.md)
+* [Nonstandard Client Support](extra-services-for-dedicated-nodes/nonstandard-client-support.md)
+* [Unified Multichain Endpoint](extra-services-for-dedicated-nodes/unified-multichain-endpoint.md)
+* [Zero-hop Node Access](extra-services-for-dedicated-nodes/zero-hop-node-access.md)
 
 ## Flashblocks
 
@@ -69,13 +105,6 @@
 * [TradeFirst](solana-advanced-data-tools/tradefirst.md)
 * [Solana Indexed Archive](solana-advanced-data-tools/solana-indexed-archive.md)
 
-## Crypto AML
-
-* [Overview](crypto-aml/overview.md)
-* [How risk scoring works](crypto-aml/how-risk-scoring-works.md)
-* [Run a check in the dashboard](crypto-aml/run-a-check-in-the-dashboard.md)
-* [Run check via API](crypto-aml/run-check-via-api.md)
-
 ## Tron Energy
 
 * [Overview](tron-energy/introduction.md)
@@ -88,23 +117,6 @@
   * [address-activate - TRON energy](tron-energy/api-reference/address-activate-tron-energy.md)
   * [orders/{order\_id} - TRON energy](tron-energy/api-reference/orders-order_id-tron-energy.md)
   * [Copy of price-estimate](tron-energy/api-reference/copy-of-price-estimate.md)
-
-## Crypto Address Audit
-
-* [Crypto Address Audit: Risk & Compliance APIs](crypto-address-audit/overview.md)
-* [Wallet Audit](crypto-address-audit/wallet-audit.md)
-* [Wallet Risk](crypto-address-audit/wallet-risk.md)
-* [Rug Pull Checker](crypto-address-audit/rug-pull-checker.md)
-* [API Reference](crypto-address-audit/api-reference.md)
-  * [Wallet Audit Endpoint](crypto-address-audit/api-reference/wallet-audit-endpoint.md)
-  * [Wallet Risk Endpoint](crypto-address-audit/api-reference/wallet-risk-endpoint.md)
-  * [Rug Pull Checker Endpoint](crypto-address-audit/api-reference/rug-pull-checker-endpoint.md)
-
-## ADD-ONS
-
-* [Yellowstone gRPC API](add-ons/yellowstone-grpc-api/README.md)
-  * [Overview](add-ons/yellowstone-grpc-api/overview.md)
-  * [Quickstart guide](add-ons/yellowstone-grpc-api/quickstart-guide.md)
 
 ## RPC ENDPOINT
 
