@@ -9,7 +9,7 @@ These tools help ensure optimal use of GetBlock’s services and keep you inform
 
 ### Dashboard
 
-<figure><img src="../.gitbook/assets/Pro_dashboard_stats_2026.svg" alt="How to track your GetBlock blockchain node usage statistics"><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/pro_stats_widget_jul_2026.webp" alt="How to track your GetBlock blockchain node usage statistics"><figcaption></figcaption></figure>
 
 The Dashboard provides a quick snapshot of key metrics:
 

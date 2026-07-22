@@ -14,9 +14,9 @@ With the "**Top Up**" feature, users can add more **Compute Units** to their acc
 
 ### Add Compute Units: Paid plan users
 
-<figure><img src="../../.gitbook/assets/TopUp_Starter-new.png" alt="topping up GetBlock CU balance"><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/TopUp_Starter_upd.png" alt="topping up GetBlock CU balance"><figcaption></figcaption></figure>
 
-**Starter, Pro & Enterprise** users can refill their CU balance or switch to another plan for increased limits:
+**Starter, Growth, Advanced, Scale, Pro, Premium & Enterprise** users can refill their CU balance or switch to another plan for increased limits:
 
 1. Click the "**Top Up**" button on the **Dashboard**.
 2. Select the **number of CUs** you’d like to add or choose the recommended plan (if prompted) based on your usage needs.
@@ -32,7 +32,7 @@ Your account balance will be updated immediately upon successful payment.
 
 Free plan users **cannot top up their Compute Units directly**. Instead, you have the option to upgrade to one of our monthly paid plans, providing significantly higher limits and extra features.
 
-<figure><img src="../../.gitbook/assets/Free_upgrade_top_up.svg" alt="Switching from free GetBlock free plan to higher limit plans"><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/free-plan-top-up-logic-flow.webp" alt="Switching from free GetBlock plan to higher limit plans"><figcaption></figcaption></figure>
 
 ***
 

@@ -14,7 +14,7 @@ Switching RPC providers sounds harder than it is. In most cases, it's literally 
 | Reason                   | Details                                                      |
 | ------------------------ | ------------------------------------------------------------ |
 | **More chains**          | GetBlock supports 130+ blockchains vs Alchemy's \~70         |
-| **Lower cost at scale**  | GetBlock Pro ($499/mo, 600M CU) vs comparable Alchemy tiers  |
+| **Lower cost at scale**  | GetBlock Pro ($499/mo, 1B CU) vs comparable Alchemy tiers    |
 | **Geographic control**   | Choose your endpoint region (Frankfurt, New York, Singapore) |
 | **Archive on all plans** | Including the free tier — Alchemy requires paid plans        |
 | **Solana HFT tools**     | StreamFirst, LandFirst, TradeFirst — no Alchemy equivalent   |

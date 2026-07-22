@@ -47,12 +47,12 @@ GetBlock Product Demo
 
 | Services                 | Description                                                                                                                               |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Plug-and-Play access** | <p></p><p>Our ready-to-use blockchain nodes and APIs help you get started immediately.</p>                                                |
+| **Plug-and-Play access** | Our ready-to-use blockchain nodes and APIs help you get started immediately.                                                              |
 | **99.9% uptime**         | Reliable 24/7 connection to multiple blockchain networks.                                                                                 |
 | **Multi-chain support**  | Connect to Bitcoin, Ethereum, BNB Chain, Polygon, Solana, TON, and 100+ other networks. (And we support new protocols before anyone else) |
 | **Flexible plans**       | From free access to enterprise-grade solutions, we’ve got options for every stage of your project.                                        |
 | **Custom solutions**     | Need something unique? We can build tailored solutions for your specific blockchain needs.                                                |
-| **24/7 Expert support**  | <p></p><p>Our team is here to help with integrations, troubleshooting, and scaling.</p>                                                   |
+| **24/7 Expert support**  | Our team is here to help with integrations, troubleshooting, and scaling.                                                                 |
 
 ## Discover GetBlock
 
@@ -62,7 +62,7 @@ GetBlock Product Demo
 
 Get started with our most in-demand blockchain networks.
 
-| [<img src=".gitbook/assets/Crypto Symbol=Ethereum.svg" alt="" data-size="line">](/broken/pages/EINEAVRwW1xIqF8t6BZb) [**Ethereum**](/broken/pages/EINEAVRwW1xIqF8t6BZb)          | [<img src=".gitbook/assets/Logo=Tron (1).svg" alt="" data-size="line">](api-reference/tron-trx/) [**Tron**](api-reference/tron-trx/)                  | [<img src=".gitbook/assets/arb-logomark (1).svg" alt="" data-size="line">](api-reference/arbitrum-arb/) [**Arbitrum**](api-reference/arbitrum-arb/) |
+| [<img src=".gitbook/assets/Crypto Symbol=Ethereum.svg" alt="" data-size="line">](api-reference/ethereum-eth/) [**Ethereum**](api-reference/ethereum-eth/)                        | [<img src=".gitbook/assets/Logo=Tron (1).svg" alt="" data-size="line">](api-reference/tron-trx/) [**Tron**](api-reference/tron-trx/)                  | [<img src=".gitbook/assets/arb-logomark (1).svg" alt="" data-size="line">](api-reference/arbitrum-arb/) [**Arbitrum**](api-reference/arbitrum-arb/) |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [<img src=".gitbook/assets/Logo=BNB Smart Chain (1).svg" alt="" data-size="line">](api-reference/bnb-smart-chain-bsc/) [**BNB Smart Chain**](api-reference/bnb-smart-chain-bsc/) | [<img src=".gitbook/assets/Logo=Solana (1).svg" alt="" data-size="line">](api-reference/solana-sol/) [**Solana**](api-reference/solana-sol/)          | [<img src=".gitbook/assets/Logo=OP (1).svg" alt="" data-size="line">](api-reference/optimism-op/) [**Optimism**](api-reference/optimism-op/)        |
 | [<img src=".gitbook/assets/pol-logo.svg" alt="" data-size="line">](api-reference/polygon-matic/) [**Polygon**](api-reference/polygon-matic/)                                     | [<img src=".gitbook/assets/Logo=Avax (1).svg" alt="" data-size="line">](api-reference/avalanche-avax/) [**Avalanche**](api-reference/avalanche-avax/) | [<img src=".gitbook/assets/base-logo.svg" alt="" data-size="line">](api-reference/base/) [**Base**](api-reference/base/)                            |
