@@ -16,6 +16,7 @@ To get started, follow these steps:
 3. Choose the blockchain name and type: Select the blockchain network you want to interact with, set up testnet/mainnet, and choose the interface you’re going to use.
 4. Send your first request:
 
+{% code overflow="wrap" %}
 ```python
 import requests
 url = "https://go.getblock.io/<ACCESS-TOKEN>/"
@@ -24,12 +25,13 @@ payload = { "jsonrpc": "2.0", "method": "eth_blockNumber", "params": [], "id": "
 response = requests.post(url, headers=headers, json=payload)
 print(response.json())
 ```
+{% endcode %}
 
 ### Key Features of GetBlock
 
-GetBlock is offering one of the most comprehensive APIs toolkits in the segment supporting hundreds of dApps with fast and reliable connection to blockchain nodes.
+GetBlock offers one of the most comprehensive API toolkits in the segment, supporting hundreds of dApps with fast, reliable connections to blockchain nodes.
 
-#### 100+ blockchains in store
+#### 130+ blockchains in store
 
 * Seamless connection to full and archive nodes
 * Shared and dedicated nodes: Tailored for your dApp’s needs.
@@ -91,6 +93,7 @@ python -m pip install requests
 
 Example:
 
+{% code overflow="wrap" %}
 ```python
 import requests
 url = "https://go.getblock.io/<ACCESS-TOKEN>/"
@@ -99,6 +102,7 @@ payload = { "jsonrpc": "2.0", "method": "eth_blockNumber", "params": [], "id": "
 response = requests.post(url, headers=headers, json=payload)
 print(response.json())
 ```
+{% endcode %}
 
 #### JavaScript
 
@@ -148,7 +152,7 @@ We provide APIs for a wide range of networks, including:
 
 [Ethereum Classic (ETC)](https://getblock.io/docs/etc/json-rpc/etc_eth_accounts/)
 
-[Ethereum (ETH)](https://getblock.io/docs/eth/json-rpc/eth_eth_accounts/)
+[Ethereum (ETH)](ethereum-eth/)
 
 [Fantom (FTM)](https://getblock.io/docs/ftm/json-rpc/ftm_dag_getevent/)
 
@@ -190,4 +194,4 @@ We provide APIs for a wide range of networks, including:
 
 [Monero (XMR)](https://getblock.io/docs/xmr/json-rpc/get_alternate_chains/)
 
-[ZCash (ZEC)](https://getblock.io/docs/zec/json-rpc/zec_createrawtransaction/)
+[ZCash (ZEC)](zcash-zec/)
