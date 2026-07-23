@@ -1,198 +1,168 @@
 ---
 description: >-
-  The getSignatureStatuses JSON-RPC method retrieves the status of one or more
-  transaction signatures in the Solana blockchain.
+  Example code for the getSignatureStatuses JSON-RPC method. Complete guide on
+  how to use the getSignatureStatuses JSON-RPC method in the GetBlock Web3
+  documentation.
 ---
 
-# getSignatureStatuses – Solana
+# getSignatureStatuses - Solana
 
-{% hint style="success" %}
-The getSignatureStatuses RPC Solana method checks the status of a list of transaction signatures (txid).
-{% endhint %}
+This method returns the processing status of up to 256 transaction signatures. Signatures outside the node's recent status cache return null unless searchTransactionHistory is enabled.
 
-By default, it only searches **the recent status cache**, which includes all active slots plus `MAX_RECENT_BLOCKHASHES` rooted slots. However, enabling the **searchTransactionHistory** parameter allows a deeper search in the node's ledger.
+## Parameters
 
-This method is valuable for applications that need to verify whether a block contains a given transaction and determine its confirmation level using Solana’s Core API.
+| Parameter  | Type   | Required | Description                                              |
+| ---------- | ------ | -------- | -------------------------------------------------------- |
+| signatures | array  | Yes      | Array of up to 256 base58-encoded transaction signatures |
+| config     | object | No       | Configuration object controlling history search          |
 
-### Supported Networks
+### Config Object
 
-This method is available on the following API endpoints:
+| Field                    | Type    | Required | Description                                                             |
+| ------------------------ | ------- | -------- | ----------------------------------------------------------------------- |
+| searchTransactionHistory | boolean | No       | Search the node's ledger for signatures outside the recent status cache |
 
-* Mainnet
-
-### Parameters
-
-#### Required Parameters
-
-* **`array`** (required): An array of transaction signatures, provided as base-58 encoded strings.
-  * Maximum: 256 signatures.
-
-#### Optional Parameters
-
-* **`object`** (optional): A configuration object containing:
-  * **searchTransactionHistory** (`bool`, optional): If `true`, searches the node's ledger for signatures not found in the recent status cache.
-
-### Result
-
-The response returns an array of RpcResponse objects, each containing:
-
-* `null`: If the transaction is unknown.
-* `object`:
-  * `slot` (`u64`): The slot in which the transaction was processed.
-  * `confirmations` (`usize`|`null`): The number of blocks since the transaction was confirmed.
-    * `null` if finalized by the supermajority.
-  * `err` (`object`|`null`): If the transaction failed, contains an error object. Otherwise, null.
-  * `confirmationStatus` (`string`|`null`): The transaction’s cluster confirmation status.
-    * Possible value: `processed`, `confirmed`, `finalized`.
-  * DEPRECATED: `status` (`object`):
-    * { `"Ok": null` } if the transaction was successful.
-    * { `"Err": <ERR>` } if the transaction failed with an error.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
     "method": "getSignatureStatuses",
-    "params": [
-      [
-        "5VERv8NMvzbJMEkV8xnrLkEaWRtSz9CosKDYjCJjBRnbJLgp8uirBgmQpjKhoR4tjF3ZpRzrFmBV6UjKdiSZkQUW"
-      ],
-      {
-        "searchTransactionHistory": true
-      }
-    ]
+    "params": [["5wHu1qwD4kLwYqPmy1uDCgpiJ1qGpVYU3n5aHT6bSWUE1JzcbQCPSDLDPGrFyqmLLzQjLNPTPtRZbNbUJQNMkaWq"], {"searchTransactionHistory": true}],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns transaction status details.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": {
-    "context": {
-      "slot": 82
-    },
-    "value": [
-      {
-        "slot": 48,
-        "confirmations": null,
-        "err": null,
-        "status": {
-          "Ok": null
-        },
-        "confirmationStatus": "finalized"
-      },
-      null
-    ]
-  },
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getSignatureStatuses error scenarios:
-
-* Invalid transaction signature: If the provided signature is not a valid txid.
-* Network errors: Connectivity issues with the Solana JSON-RPC API endpoints.
-* Malformed request: Incorrectly structured JSON requests.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32602,
-    "message": "Invalid transaction signature format"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getSignatureStatuses** method is useful for:
-
-* **dApp developers**: Monitoring transaction confirmations and finality;
-* **Web3 analytics tools**: Tracking transaction status trends;
-* **Validators and node operators**: Checking the status of processed transactions;
-* **Blockchain explorers**: Displaying transaction history and confirmations.
-
-### Code getSignatureStatuses Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getSignatureStatuses",
-  params: [
-    [
-      "5VERv8NMvzbJMEkV8xnrLkEaWRtSz9CosKDYjCJjBRnbJLgp8uirBgmQpjKhoR4tjF3ZpRzrFmBV6UjKdiSZkQUW"
-    ],
-    { searchTransactionHistory: true }
-  ]
-};
+const { value } = await connection.getSignatureStatuses(
+  ['5wHu1qwD4kLwYqPmy1uDCgpiJ1qGpVYU3n5aHT6bSWUE1JzcbQCPSDLDPGrFyqmLLzQjLNPTPtRZbNbUJQNMkaWq'],
+  { searchTransactionHistory: true }
+);
 
-const fetchSignatureStatuses = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result?.value) {
-      const statuses = response.data.result.value;
-      statuses.forEach((status, index) => {
-        if (status) {
-          console.log(`Signature ${index + 1}:`);
-          console.log(`  Slot: ${status.slot}`);
-          console.log(`  Confirmations: ${status.confirmations}`);
-          console.log(`  Status: ${status.confirmationStatus}`);
-          console.log(`  Err: ${status.err || "No error"}`);
-        } else {
-          console.log(`Signature ${index + 1}: Not found`);
-        }
-      });
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getSignatureStatuses error:", error.response?.data || error.message);
-  }
-};
-
-fetchSignatureStatuses();
-
+console.log(value[0]);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getSignatureStatuses',
+        'params': [["5wHu1qwD4kLwYqPmy1uDCgpiJ1qGpVYU3n5aHT6bSWUE1JzcbQCPSDLDPGrFyqmLLzQjLNPTPtRZbNbUJQNMkaWq"], {"searchTransactionHistory": true}],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getSignatureStatuses",
+            "params": [["5wHu1qwD4kLwYqPmy1uDCgpiJ1qGpVYU3n5aHT6bSWUE1JzcbQCPSDLDPGrFyqmLLzQjLNPTPtRZbNbUJQNMkaWq"], {"searchTransactionHistory": true}],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **getSignatureStatuses** into Solana’s Core API, developers can verify transaction statuses in real time, track block confirmations, and ensure efficient request handling. This JSON-RPC method is essential for decentralized applications, validators, and blockchain explorers that require up-to-date transaction insights.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": {
+        "context": {
+            "slot": 397234561
+        },
+        "value": [
+            {
+                "confirmationStatus": "finalized",
+                "confirmations": null,
+                "err": null,
+                "slot": 397234561,
+                "status": {
+                    "Ok": null
+                }
+            }
+        ]
+    }
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                                                   |
+| --------- | ------ | ----------------------------------------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                                             |
+| id        | string | Request identifier matching the request                                       |
+| result    | object | RPC response object where value is an array of status objects or null entries |
+
+### Status Entry
+
+| Field              | Type   | Description                                             |
+| ------------------ | ------ | ------------------------------------------------------- |
+| slot               | number | Slot the transaction was processed in                   |
+| confirmations      | number | null                                                    |
+| err                | object | null                                                    |
+| confirmationStatus | string | Confirmation status: processed, confirmed, or finalized |
+
+## Use Cases
+
+* **Send Confirmation**: Poll a signature after sendTransaction until it reaches finalized
+* **Batch Settlement**: Check up to 256 payout signatures in a single request
+* **Retry Decisions**: Distinguish dropped transactions from failed ones before rebroadcasting
+* **Error Surfacing**: Read the err object to report an InstructionError back to a user
+
+## Error Handling
+
+| Error Code | Message                                             | Description                                                         |
+| ---------- | --------------------------------------------------- | ------------------------------------------------------------------- |
+| -32602     | Invalid params                                      | More than 256 signatures supplied, or a signature of invalid length |
+| -32011     | Transaction history is not available from this node | searchTransactionHistory requested on a node without a full index   |
+| -32603     | Internal error                                      | Node failed to read the signature status cache                      |

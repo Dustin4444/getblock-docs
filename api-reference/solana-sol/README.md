@@ -1,295 +1,336 @@
 ---
 description: >-
   GetBlock Solana RPC API documentation: JSON-RPC reference, WebSocket
-  subscriptions, and connection guides for mainnet & devnet endpoints
+  subscriptions, and connection guides for mainnet, devnet & alpenglow endpoints
 ---
 
-# Solana (SOL)
+# Solana(SOL)
 
-GetBlock provides RPC endpoints that implement the Solana JSON-RPC API standard. These methods are core functionalities for interacting with Solana nodes, enabling seamless integration with the Solana blockchain.
+Solana is a high-throughput Layer 1 blockchain launched in 2020 by Solana Labs, built around a single global state machine rather than sharding or rollups. It pairs Proof of History, a verifiable delay function that orders transactions before consensus, with Proof of Stake for validator selection, and executes non-conflicting transactions concurrently through the Sealevel runtime. The design targets sub-second confirmation for payments, order-book trading, and consumer applications that cannot tolerate multi-second block times.
 
-### Overview of Solana Network Methods
+### Key Features
 
-The Solana network offers a comprehensive suite of methods that enable developers to interact seamlessly with its blockchain infrastructure. This overview provides an in-depth examination of these methods, categorizing them into key functional areas for better understanding and implementation.
+* **Proof of History**: A cryptographic clock orders transactions before consensus is reached
+* **400ms Slot Time**: Slots are scheduled roughly every 400 milliseconds, four per leader
+* **Parallel Execution**: The Sealevel runtime executes transactions concurrently when account access sets do not overlap
+* **Local Fee Markets**: Prioritization fees are priced per account, so congestion on one program does not raise fees network-wide
+* **SPL Token Standard**: Fungible and non-fungible tokens are handled by the on-chain Token and Token-2022 programs
+* **Token Extensions**: Token-2022 adds transfer fees, confidential transfers, and metadata without custom programs
+* **Versioned Transactions**: Address lookup tables allow transactions to reference more accounts than the legacy format permits
+* **Stake-Weighted QoS**: Transaction forwarding capacity is allocated in proportion to validator stake
 
-What you can expect to find in this documentation:
+{% hint style="info" %}
+_TECHNICAL DISCLAIMER: AUTHORITATIVE JSON-RPC API SPECIFICATION._
 
-* Compatibility with the Solana mainnet and testnets
-* Purpose, functionality, and use cases of each Solana method
-* Required input parameters
-* Sample requests and responses
-* Code examples in multiple programming languages (Python, JavaScript)
+_GetBlock's RPC API reference documentation is provided exclusively for informational purposes and to optimize the developer experience. The canonical and normative specification for Solana JSON-RPC methods is solely maintained and published through the official Solana documentation at_ [_solana.com/docs_](https://solana.com/docs)_. This resource constitutes the sole authoritative reference implementation of the JSON-RPC 2.0 protocol interface across Solana validator clients._
+{% endhint %}
 
-What you can do with this API:
+### Network Information
 
-* Query real-time blockchain data
-* Manage and monitor accounts and balances
-* Interact with smart contracts
-* Submit and track transactions
-* Monitor network activity in real-time
+| Property        | Value                                         |
+| --------------- | --------------------------------------------- |
+| Network Name    | Solana Mainnet Beta                           |
+| Genesis Hash    | 5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d  |
+| Native Currency | SOL (1 SOL = 1,000,000,000 lamports)          |
+| Slot Time       | \~400 milliseconds                            |
+| Slots per Epoch | 432,000                                       |
+| Consensus       | Proof of History + Tower BFT (Proof of Stake) |
+| Runtime         | Sealevel (parallel execution)                 |
+| Address Format  | Base58-encoded Ed25519 public keys            |
+| Token Programs  | SPL Token and Token-2022                      |
 
-To effectively use the Solana methods listed above, you'll need a reliable tool to send requests to the network. One such tool is Axios, a lightweight and widely used HTTP client. With Axios, you can easily interact with Solana's JSON-RPC API to execute transactions, retrieve blockchain data, and much more.
+### Base URL
 
-### Quickstart with Axios
+{% tabs %}
+{% tab title="Frankfurt, Germany" %}
+```bash
+https://go.getblock.io
+```
+{% endtab %}
 
-Axios is a powerful HTTP client that streamlines communication with APIs, including Solana's JSON-RPC interface. By using Axios, developers can effortlessly send requests and process responses, making blockchain integration straightforward and efficient. Below, we provide a detailed guide to help you get started:
+{% tab title="New York, USA" %}
+```bash
+https://shared.us-east-1.getblock.io
+```
+{% endtab %}
 
-1. Set Up Your Project
+{% tab title="Singapore, Singapore" %}
+```bash
+https://shared.ap-southeast-1.getblock.io/
+```
+{% endtab %}
+{% endtabs %}
 
-Choose a package manager and initialize your project:
+### Supported Networks
+
+| Network   | JSON RPC | WSS | MEV-protected(JSON-RPC) | Frankfurt, Germany | New York, USA | Singapore, Singapore |
+| --------- | -------- | --- | ----------------------- | ------------------ | ------------- | -------------------- |
+| Mainnet   | ✅        | ✅   | ✅                       | ✅                  | ✅             | ✅                    |
+| Devnet    | ✅        | ✅   | ❌                       | ✅                  | ❌             | ❌                    |
+| Alpenglow | ✅        | ✅   | ❌                       | ✅                  | ❌             | ❌                    |
+
+### Quickstart
+
+In this section, you will learn how to make your first call with either:
+
+* Axios
+* Python
+
+Before you begin, you must have already installed [`npm`](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) or [`yarn`](https://classic.yarnpkg.com/lang/en/docs/install) on your local machine (for the Axios example) or Python and pip (for the Python example).
+
+{% tabs %}
+{% tab title="Javascript(Axios)" %}
+{% stepper %}
+{% step %}
+### Setup project
+
+Create and initialize a new project:
 
 ```bash
 mkdir solana-api-quickstart
 cd solana-api-quickstart
 npm init --yes
 ```
+{% endstep %}
 
-Or, using Yarn:
-
-```bash
-mkdir solana-api-quickstart
-cd solana-api-quickstart
-yarn init -y
-```
-
-2. Install Axios
-
-Install Axios to make API requests:
+{% step %}
+### Install Axios
 
 ```bash
 npm install axios
 ```
+{% endstep %}
 
-Or, using Yarn:
+{% step %}
+### Create file
 
-```bash
-yarn add axios
-```
+Create a new file named `index.js`. This is where you will make your first call.
+{% endstep %}
 
-3. Make Your First Request
+{% step %}
+### Set ES module type
 
-Set up a new file named `index.js` and insert the code snippet provided below:
+Set the ES module `"type": "module"` in your `package.json`.
+{% endstep %}
 
+{% step %}
+### Add code
+
+Add the following code to `index.js`:
+
+{% code title="index.js" %}
 ```javascript
-import axios from "axios";
+import axios from 'axios';
 
-const url = `https://go.getblock.io/<ACCESS-TOKEN>/`;
-const payload = {
-  jsonrpc: '2.0',
-  id: 1,
-  method: 'getBalance',
-  params: ['<ACCOUNT-PUBKEY>']
+const data = JSON.stringify({
+    "jsonrpc": "2.0",
+    "method": "getSlot",
+    "params": [],
+    "id": "getblock.io"
+});
+
+const config = {
+    method: 'post',
+    url: 'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    data: data
 };
 
-axios.post(url, payload)
-  .then(response => {
-    console.log('Account balance:', response.data.result.value);
-  })
-  .catch(error => {
-    console.error(error);
-  });
+axios(config)
+    .then(response => console.log(JSON.stringify(response.data)))
+    .catch(error => console.log(error));
 ```
+{% endcode %}
 
-Replace `<ACCESS-TOKEN>` with your actual API key from GetBlock, and `<ACCOUNT-PUBKEY>` with the public key of the account you wish to query.
+Replace `<ACCESS-TOKEN>` with your actual access token from GetBlock.
+{% endstep %}
 
-4. Run Your Script
-
-Execute your script with:
+{% step %}
+### Run the script
 
 ```bash
 node index.js
 ```
 
-You should see the account balance logged to your console.
+Expected output (example):
 
-### Quickstart with Python and requests
+```json
+{
+    "jsonrpc": "2.0",
+    "result": 434717885,
+    "id": "getblock.io"
+}
+```
+{% endstep %}
+{% endstepper %}
+{% endtab %}
 
-requests is a powerful and easy-to-use HTTP library for Python that simplifies API interactions, including Solana’s JSON-RPC API. With requests, developers can send requests, handle responses, and easily integrate blockchain functionality into their projects. Here’s a step-by-step guide to get started:
-
-1. Set Up Your Project
-
-Create a new directory for your project and navigate into it:
+{% tab title="Python(Request)" %}
+{% stepper %}
+{% step %}
+### Set up the project folder
 
 ```bash
 mkdir solana-api-quickstart
 cd solana-api-quickstart
 ```
+{% endstep %}
 
-Set up a virtual environment to isolate dependencies:
+{% step %}
+### Create and activate a virtual environment
 
 ```bash
 python -m venv venv
-source venv/bin/activate  # On Windows, use venv\Scripts\activate
-```
+source venv/bin/activate
 
-Install the requests library:
+# On Windows, use venv\Scripts\activate
+```
+{% endstep %}
+
+{% step %}
+### Install requests
 
 ```bash
 pip install requests
 ```
+{% endstep %}
 
-2. Write Your First Script
+{% step %}
+### Create the script
 
-Create a new file called `main.py` and insert the following code:
+Create a file called `main.py` with the following code (replace `<ACCESS-TOKEN>` with your GetBlock access token):
 
 ```python
 import requests
+import json
 
-# Replace <ACCESS-TOKEN> with your actual API key from GetBlock
 url = "https://go.getblock.io/<ACCESS-TOKEN>/"
 
-# Create a JSON-RPC payload
-payload = {
+payload = json.dumps({
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "getBalance",
-    "params": ["<ACCOUNT-PUBKEY>"]
-}
+    "method": "getSlot",
+    "params": [],
+    "id": "getblock.io"
+})
 
 headers = {
-    "Content-Type": "application/json"
+    'Content-Type': 'application/json'
 }
 
-try:
-    # Send the POST request
-    response = requests.post(url, json=payload, headers=headers)
-    response.raise_for_status()  # Check for HTTP errors
-    data = response.json()
-
-    # Print the account balance
-    balance = data["result"]["value"]
-    print(f"Account balance: {balance}")
-except requests.exceptions.RequestException as e:
-    print(f"An error occurred: {e}")
-except KeyError:
-    print("Unexpected response format:", response.text)
+response = requests.post(url, headers=headers, data=payload)
+print(response.text)
 ```
+{% endstep %}
 
-Replace \<ACCESS-TOKEN> with your actual API key from GetBlock, and \<ACCOUNT-PUBKEY> with the public key of the account you wish to query.
-
-3. Run Your Script
-
-Execute the script with:
+{% step %}
+### Run the script
 
 ```bash
 python main.py
 ```
+{% endstep %}
+{% endstepper %}
+{% endtab %}
+{% endtabs %}
 
-You should see the account balance retrieved from the Solana network printed to your console.
+### Available API Methods
 
-***
+GetBlock provides access to standard Solana JSON-RPC methods for the Solana network.
 
-### **Network & Node Info**
+#### Account Methods
 
-* getClusterNodes
-* getHealth
-* getVersion
-* getIdentity
-* getGenesisHash
+| Method                            | Description                                        |
+| --------------------------------- | -------------------------------------------------- |
+| getAccountInfo                    | Returns all information associated with an account |
+| getBalance                        | Returns the lamport balance of an account          |
+| getMultipleAccounts               | Returns account information for a list of Pubkeys  |
+| getProgramAccounts                | Returns all accounts owned by a program            |
+| getLargestAccounts                | Returns the 20 largest accounts by lamport balance |
+| getMinimumBalanceForRentExemption | Returns the minimum balance for rent exemption     |
 
-***
+#### Token Methods
 
-### **Block & Slot Info**
+| Method                     | Description                                         |
+| -------------------------- | --------------------------------------------------- |
+| getTokenAccountBalance     | Returns the token balance of an SPL Token account   |
+| getTokenAccountsByOwner    | Returns all SPL Token accounts held by an owner     |
+| getTokenAccountsByDelegate | Returns all SPL Token accounts by approved delegate |
+| getTokenLargestAccounts    | Returns the 20 largest accounts for a token mint    |
+| getTokenSupply             | Returns the total supply of an SPL Token mint       |
 
-* getBlock
-* getBlockCommitment
-* getBlockHeight
-* getBlockProduction
-* getBlocks
-* getBlocksWithLimit
-* getBlockTime
-* getFirstAvailableBlock
-* getHighestSnapshotSlot
-* getSlot
-* getSlotLeader
-* getSlotLeaders
-* minimumLedgerSlot
+#### Transaction Methods
 
-***
+| Method                      | Description                                             |
+| --------------------------- | ------------------------------------------------------- |
+| sendTransaction             | Submits a signed transaction to the cluster             |
+| simulateTransaction         | Simulates a transaction without broadcasting it         |
+| getTransaction              | Returns transaction details for a confirmed signature   |
+| getSignatureStatuses        | Returns the status of a list of signatures              |
+| getSignaturesForAddress     | Returns signatures referencing an address               |
+| getTransactionCount         | Returns the transaction count since genesis             |
+| getFeeForMessage            | Returns the fee for a compiled transaction message      |
+| getLatestBlockhash          | Returns the latest blockhash and its expiry height      |
+| isBlockhashValid            | Reports whether a blockhash is still valid              |
+| getRecentPrioritizationFees | Returns recent prioritization fee samples               |
+| requestAirdrop              | Requests lamports from the faucet on Devnet and Testnet |
 
-### **Account Management**
+#### Block Methods
 
-* getAccountInfo
-* getMultipleAccounts
-* getProgramAccounts
-* getTokenAccountBalance
-* getTokenAccountsByDelegate
-* getTokenAccountsByOwner
-* getTokenLargestAccounts
-* getTokenSupply
-* getMinimumBalanceForRentExemption
-* requestAirdrop
-* getBalance
+| Method                      | Description                                       |
+| --------------------------- | ------------------------------------------------- |
+| getBlock                    | Returns identity and transaction data for a block |
+| getBlocks                   | Returns confirmed block slots in a range          |
+| getBlocksWithLimit          | Returns a limited list of confirmed block slots   |
+| getBlockHeight              | Returns the current block height                  |
+| getBlockTime                | Returns the estimated production time of a block  |
+| getBlockCommitment          | Returns stake-weighted commitment for a block     |
+| getBlockProduction          | Returns leader slot and block production counts   |
+| getFirstAvailableBlock      | Returns the lowest non-purged confirmed block     |
+| getRecentPerformanceSamples | Returns recent throughput samples                 |
+| minimumLedgerSlot           | Returns the lowest slot in the node's ledger      |
 
-***
+#### Cluster Methods
 
-### **Transactions**
+| Method                 | Description                                   |
+| ---------------------- | --------------------------------------------- |
+| getSlot                | Returns the current slot                      |
+| getSlotLeader          | Returns the current slot leader               |
+| getSlotLeaders         | Returns slot leaders for a slot range         |
+| getLeaderSchedule      | Returns the leader schedule for an epoch      |
+| getEpochInfo           | Returns information about the current epoch   |
+| getEpochSchedule       | Returns the cluster epoch schedule parameters |
+| getClusterNodes        | Returns nodes discovered through gossip       |
+| getVoteAccounts        | Returns current and delinquent vote accounts  |
+| getHealth              | Returns the health status of the node         |
+| getVersion             | Returns the node software version             |
+| getIdentity            | Returns the identity Pubkey of the node       |
+| getGenesisHash         | Returns the genesis hash of the cluster       |
+| getHighestSnapshotSlot | Returns the highest snapshot slots            |
+| getMaxRetransmitSlot   | Returns the highest retransmit-stage slot     |
+| getMaxShredInsertSlot  | Returns the highest shred-insert slot         |
 
-* sendTransaction
-* simulateTransaction
-* getTransaction
-* getTransactionCount
-* getSignatureStatuses
-* getSignaturesForAddress
-* getFeeForMessage
-* getLatestBlockhash
-* isBlockhashValid
+#### Economics Methods
 
-***
+| Method                    | Description                                       |
+| ------------------------- | ------------------------------------------------- |
+| getSupply                 | Returns total and circulating SOL supply          |
+| getInflationRate          | Returns inflation rates for the current epoch     |
+| getInflationGovernor      | Returns the cluster inflation governor            |
+| getInflationReward        | Returns inflation rewards for a list of addresses |
+| getStakeMinimumDelegation | Returns the minimum stake delegation              |
 
-### **Epoch & Stake**
+### Support
 
-* getEpochInfo
-* getEpochSchedule
-* getInflationGovernor
-* getInflationRate
-* getInflationReward
-* getLeaderSchedule
-* getStakeMinimumDelegation
+For technical support and questions:
 
-***
+* Support: [support@getblock.io](mailto:support@getblock.io)
 
-### **Performance & Supply**
+### See Also
 
-* getRecentPerformanceSamples
-* getRecentPrioritizationFees
-* getSupply
-
-***
-
-### **Governance / Validators**
-
-* getVoteAccounts
-
-***
-
-### **Subscriptions (WebSocket Only)**
-
-* accountSubscribe
-* accountUnsubscribe
-* blockSubscribe
-* blockUnsubscribe
-* logsSubscribe
-* logsUnsubscribe
-* programSubscribe
-* programUnsubscribe
-* rootSubscribe
-* rootUnsubscribe
-* signatureSubscribe
-* signatureUnsubscribe
-* slotSubscribe
-* slotUnsubscribe
-* slotsUpdatesSubscribe
-* slotsUpdatesUnsubscribe
-* voteSubscribe
-* voteUnsubscr
-
-***
-
-### Conclusion
-
-Solana’s JSON-RPC API offers a fast and efficient way to interact with the network—whether you're managing accounts, sending transactions, or tracking real-time data.
-
-Grouped by functionality, the methods cover everything needed to build scalable Web3 applications with ease. With HTTP and WebSocket support, and tools like Axios and requests, integration is simple for developers of all levels.
-
-Start building today and explore Solana’s full capabilities.
+* [Solana Developer Documentation](https://solana.com/docs)
+* [Solana JSON-RPC Specification](https://solana.com/docs/rpc/http)
+* [Solana Block Explorer](https://explorer.solana.com/)
+* [SPL Token Program Documentation](https://spl.solana.com/token)
+* [Anchor Framework Documentation](https://www.anchor-lang.com/)

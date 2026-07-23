@@ -1,177 +1,156 @@
 ---
 description: >-
-  The getTokenSupply JSON-RPC method retrieves the total supply of a specific
-  SPL Token type.
+  Example code for the getTokenSupply JSON-RPC method. Complete guide on how to
+  use the getTokenSupply JSON-RPC method in the GetBlock Web3 documentation.
 ---
 
-# getTokenSupply – Solana
+# getTokenSupply - Solana
 
-{% hint style="success" %}
-The **getTokenSupply** RPC Solana method returns the total supply of an SPL Token for a given token Mint address.
-{% endhint %}
+This method returns the total circulating supply of an SPL Token mint, together with the mint's decimal precision.
 
-The response includes both the raw token supply and the formatted supply using mint-prescribed decimals. This method helps developers monitor token metrics via Solana’s Core API.
+## Parameters
 
-### Supported Networks
+| Parameter | Type   | Required | Description                                 |
+| --------- | ------ | -------- | ------------------------------------------- |
+| mint      | string | Yes      | Base58-encoded Pubkey of the SPL Token mint |
+| config    | object | No       | Configuration object controlling commitment |
 
-This method is available on the following API endpoints:
+### Config Object
 
-* Mainnet
+| Field      | Type   | Required | Description                                                                 |
+| ---------- | ------ | -------- | --------------------------------------------------------------------------- |
+| commitment | string | No       | Commitment level: processed, confirmed, or finalized. Defaults to finalized |
 
-### Parameters
-
-#### Required Parameters
-
-* **`string`** (required): The Pubkey of the token Mint to query, provided as a base-58 encoded string.
-
-#### Optional Parameters
-
-* **`object`** (optional): A configuration object containing:
-  * **commitment** (`string`): Defines the level of finality for the request.
-
-### Result
-
-The response returns an RpcResponse object containing:
-
-* **`context`** (`object`): Provides contextual information about the slot.
-  * `slot` (`u64`): The slot number when the token supply was retrieved.
-* **`value`** (`object`):
-  * `amount` (`string`): The raw total supply (without decimals) as a string.
-  * `decimals` (`u8`): The number of decimal places for the token.
-  * `uiAmount` (`number`|`null`): The formatted token supply with decimals applied (Deprecated).
-  * `uiAmountString` (`string`): The formatted token supply as a string.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
     "method": "getTokenSupply",
-    "params": [
-      "3wyAj7Rt1TWVPZVteFJPLa26JmLvdb1CAKEFZm3NY75E"
-    ]
+    "params": ["EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", {"commitment": "finalized"}],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns the total token supply.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": {
-    "context": {
-      "slot": 1114
-    },
-    "value": {
-      "amount": "100000",
-      "decimals": 2,
-      "uiAmount": 1000,
-      "uiAmountString": "1000"
-    }
-  },
-  "id": 1
-}
-```
-
-In this response:
-
-* `amount`: The raw supply as a string.
-* `decimals`: The number of decimal places.
-* `uiAmountString`: The formatted supply as a string.
-
-### Error Handling
-
-Common getTokenSupply error scenarios:
-
-* Invalid Mint Pubkey: If the provided Pubkey is invalid.
-* Network issues: Connectivity problems with the Solana JSON-RPC API endpoints.
-* Invalid request parameters: Incorrect parameter structure or data types.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32602,
-    "message": "Invalid token Mint Pubkey"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getTokenSupply** method is useful for:
-
-* **Token analytics**: Tracking token supply changes;
-* **DeFi applications**: Monitoring liquidity pool supply;
-* **Web3 analytics tools**: Displaying token metrics to users;
-* **Wallet applications**: Providing token supply information for users.
-
-### Code getTokenSupply Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection, PublicKey } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'finalized');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getTokenSupply",
-  params: [
-    "3wyAj7Rt1TWVPZVteFJPLa26JmLvdb1CAKEFZm3NY75E"
-  ]
-};
+const { value } = await connection.getTokenSupply(
+  new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
+);
 
-const fetchTokenSupply = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
+console.log(value.uiAmountString);
+```
+{% endtab %}
 
-    if (response.status === 200 && response.data.result?.value) {
-      const supply = response.data.result.value;
-      console.log("Token Supply Information:");
-      console.log(`  Total Supply: ${supply.amount}`);
-      console.log(`  Decimals: ${supply.decimals}`);
-      console.log(`  UI Amount: ${supply.uiAmount}`);
-      console.log(`  UI Amount String: ${supply.uiAmountString}`);
-    } else {
-      console.error("Unexpected response:", response.data);
+{% tab title="Request" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getTokenSupply',
+        'params': ["EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", {"commitment": "finalized"}],
+        'id': 'getblock.io'
     }
-  } catch (error) {
-    console.error("getTokenSupply error:", error.response?.data || error.message);
-  }
-};
+)
 
-fetchTokenSupply();
+print(response.json()['result'])
+```
+{% endtab %}
 
+{% tab title="Rust" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getTokenSupply",
+            "params": ["EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", {"commitment": "finalized"}],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
 ```
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **getTokenSupply** into Solana’s Core API, developers can efficiently track token supply, analyze token metrics, and provide real-time token data for Web3 applications. This JSON-RPC method is crucial for applications that require accurate supply information for tokens on the Solana network.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": {
+        "context": {
+            "apiVersion": "2.3.6",
+            "slot": 397234561
+        },
+        "value": {
+            "amount": "8721043118453221",
+            "decimals": 6,
+            "uiAmount": 8721043118.45322,
+            "uiAmountString": "8721043118.453221"
+        }
+    }
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                                                 |
+| --------- | ------ | --------------------------------------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                                           |
+| id        | string | Request identifier matching the request                                     |
+| result    | object | RPC response object where value holds the mint supply and decimal precision |
+
+### Value Object
+
+| Field          | Type   | Description                                        |
+| -------------- | ------ | -------------------------------------------------- |
+| amount         | string | Raw supply as a string, without decimal adjustment |
+| decimals       | number | Decimal precision defined on the mint              |
+| uiAmount       | number | null                                               |
+| uiAmountString | string | Supply adjusted for decimals, as a string          |
+
+## Use Cases
+
+* **Market Cap**: Multiply circulating supply by price to compute market capitalization
+* **Mint Monitoring**: Detect supply increases that indicate new minting activity
+* **Burn Verification**: Confirm supply decreased after a burn instruction
+* **Stablecoin Reporting**: Track issued supply of USDC and USDT on Solana
+
+## Error Handling
+
+| Error Code | Message           | Description                                 |
+| ---------- | ----------------- | ------------------------------------------- |
+| -32602     | Invalid params    | Pubkey is not an initialized SPL Token mint |
+| -32603     | Internal error    | Node failed to read the mint account        |
+| -32005     | Node is unhealthy | The node has fallen behind the cluster tip  |

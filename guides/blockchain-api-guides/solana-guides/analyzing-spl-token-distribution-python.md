@@ -12,7 +12,7 @@ On-chain analytics are a powerful way to understand token distribution and holde
 
 ### Quick notes before you start
 
-* [`getTokenLargestAccounts`](../../../api-reference/solana-sol/gettokenlargestaccounts-solana.md) returns **up to 20 largest accounts** for a mint. To analyze more, fetch token accounts and aggregate them (see “Beyond the top-20” below).&#x20;
+* [`getTokenLargestAccounts`](/broken/pages/Ap5udZ49XH23DD7Aeihe) returns **up to 20 largest accounts** for a mint. To analyze more, fetch token accounts and aggregate them (see “Beyond the top-20” below).
 * The RPC responses include `amount`, `decimals`, and `uiAmount`/`uiAmountString`. Compute UI amounts yourself from decimals for robustness.
 * Heavy queries can hit rate limits. Use GetBlock’s dedicated Solana node or an indexer for production analytics.
 * Test every script and query on devnet before running them against mainnet.
@@ -21,7 +21,7 @@ On-chain analytics are a powerful way to understand token distribution and holde
 
 ### Prerequisites
 
-* Python 3.8+&#x20;
+* Python 3.8+
 * Create a virtual environment and install packages:
 
 ```bash
@@ -37,7 +37,7 @@ pip install solana solders matplotlib pandas requests
 
 1. Create an account on GetBlock.io.
 2. In the dashboard, scroll down to “My endpoints” and get a Solana JSON-RPC access token.
-3. Copy the generated endpoint (the access token is embedded in the URL). Store it in an environment variable.&#x20;
+3. Copy the generated endpoint (the access token is embedded in the URL). Store it in an environment variable.
 
 _Example_:
 
@@ -102,7 +102,7 @@ def get_top_holders(mint_str, commitment="finalized"):
 
 ***
 
-### Step 3: Get total supply & decimals&#x20;
+### Step 3: Get total supply & decimals
 
 Use `get_token_supply` to retrieve canonical decimals and total supply. This helps compute the holder share of supply.
 
@@ -185,7 +185,7 @@ For a full distribution analysis, collect all token accounts and aggregate. Opti
 * Use [`getTokenAccountsByOwner`](https://docs.getblock.io/api-reference/solana-sol/gettokenaccountsbyowner-solana) for a given owner (not useful for all holders).
 * Use an indexer add-on to your Solana node from GetBlock (recommended for >1000 accounts) or third-party APIs that maintain token holder lists.
 
-**Example using `get_program_accounts`:**&#x20;
+**Example using `get_program_accounts`:**
 
 ```python
 from solana.rpc.types import MemcmpOpts
@@ -208,7 +208,7 @@ Decoding raw account data requires parsing the SPL Token account binary layout. 
 
 ***
 
-### Performance, rate limits, and caching recommendations&#x20;
+### Performance, rate limits, and caching recommendations
 
 * Cache decimals and token metadata – they rarely change.
 * For repeated analytics refreshes use incremental updates: fetch signatures for a mint and process only changed accounts, or subscribe to program logs for live dashboards.

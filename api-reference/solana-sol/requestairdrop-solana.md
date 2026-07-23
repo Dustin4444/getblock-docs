@@ -1,157 +1,146 @@
 ---
 description: >-
-  The requestAirdrop JSON-RPC method allows users to request an airdrop of
-  lamports to a specified Solana Pubkey.
+  Example code for the requestAirdrop JSON-RPC method. Complete guide on how to
+  use the requestAirdrop JSON-RPC method in the GetBlock Web3 documentation.
 ---
 
-# requestAirdrop – Solana
+# requestAirdrop - Solana
 
-{% hint style="success" %}
-The **requestAirdrop** RPC Solana method facilitates funding test accounts with lamports.
-{% endhint %}
+This method requests lamports from the cluster faucet and returns the resulting transaction signature. Airdrops are available on Devnet and Testnet only.
 
-This is essential for developers building and testing applications on Solana Devnet without requiring real funds. The airdrop is sent as a transaction to the provided account.
+## Parameters
 
-### Supported Networks
+| Parameter | Type   | Required | Description                                  |
+| --------- | ------ | -------- | -------------------------------------------- |
+| pubkey    | string | Yes      | Base58-encoded Pubkey of the account to fund |
+| lamports  | number | Yes      | Amount to request, in lamports               |
+| config    | object | No       | Configuration object controlling commitment  |
 
-This method is available on the following API endpoints:
+### Config Object
 
-* Mainnet
+| Field      | Type   | Required | Description                                                                 |
+| ---------- | ------ | -------- | --------------------------------------------------------------------------- |
+| commitment | string | No       | Commitment level: processed, confirmed, or finalized. Defaults to finalized |
 
-### Parameters
-
-#### Required Parameters
-
-* **`string`** (required): The Pubkey of the account to receive the airdrop. This should be a base-58 encoded string.
-* **`integer`** (required): The number of lamports to airdrop, provided as a u64 integer.
-
-#### Optional Parameters
-
-* **`object`** (optional): A configuration object containing:
-  * `commitment` (`string`): Defines the level of finality for the request.
-
-### Result
-
-The response returns a transaction signature of the airdrop.
-
-#### Result Format
-
-* `string`: The transaction signature as a base-58 encoded string.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
     "method": "requestAirdrop",
-    "params": [
-      "83astBRguLMdt2h5U1Tpdq5tjFoJ6noeGwaY3mDLVcri",
-      1000000000
-    ]
+    "params": ["JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4", 1000000000],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns the transaction signature of the airdrop.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": "5VERv8NMvzbJMEkV8xnrLkEaWRtSz9CosKDYjCJjBRnbJLgp8uirBgmQpjKhoR4tjF3ZpRzrFmBV6UjKdiSZkQUW",
-  "id": 1
-}
-```
-
-In this response:
-
-* `result`: The transaction signature confirming the airdrop.
-
-### Error Handling
-
-Common requestAirdrop error scenarios:
-
-* Invalid Pubkey: If the provided Pubkey is invalid or not base-58 encoded.
-* Network issues: Connectivity problems with the Solana JSON-RPC API endpoints.
-* Insufficient faucet funds: When the Solana faucet runs out of lamports.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32602,
-    "message": "Invalid Pubkey"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana requestAirdrop method is useful for:
-
-* **Development environments**: Funding test accounts on Devnet.
-* **Blockchain education**: Demonstrating transactions without using real funds.
-* **Web3 applications**: Simulating transaction activity.
-
-### Code requestAirdrop Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection, PublicKey, LAMPORTS_PER_SOL } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/";
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "requestAirdrop",
-  params: [
-    "83astBRguLMdt2h5U1Tpdq5tjFoJ6noeGwaY3mDLVcri",
-    1000000000
-  ]
-};
+const airdropSignature = await connection.requestAirdrop(
+  new PublicKey('JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4'),
+  LAMPORTS_PER_SOL
+);
 
-const requestAirdrop = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result) {
-      console.log("Airdrop Transaction Signature:", response.data.result);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("requestAirdrop error:", error.response?.data || error.message);
-  }
-};
-
-requestAirdrop();
+console.log(airdropSignature);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'requestAirdrop',
+        'params': ["JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4", 1000000000],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "requestAirdrop",
+            "params": ["JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4", 1000000000],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **requestAirdrop** into Solana’s Core API, developers can fund test accounts, simulate transactions, and build reliable dApps without relying on real funds. This JSON-RPC method is essential for blockchain development on Solana Devnet.
+{% code overflow="wrap" %}
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": "5wHu1qwD4kLwYqPmy1uDCgpiJ1qGpVYU3n5aHT6bSWUE1JzcbQCPSDLDPGrFyqmLLzQjLNPTPtRZbNbUJQNMkaWq"
+}
+```
+{% endcode %}
+
+## Response Parameters
+
+| Parameter | Type   | Description                                         |
+| --------- | ------ | --------------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                   |
+| id        | string | Request identifier matching the request             |
+| result    | string | Base58-encoded signature of the airdrop transaction |
+
+## Use Cases
+
+* **Test Funding**: Fund a fresh keypair before running an integration test suite
+* **CI Pipelines**: Top up a deployer account at the start of a Devnet workflow
+* **Workshop Setup**: Seed participant wallets during a live developer session
+* **Program Testing**: Fund PDAs and fee payers before invoking a deployed program
+
+## Error Handling
+
+| Error Code | Message          | Description                                                        |
+| ---------- | ---------------- | ------------------------------------------------------------------ |
+| -32602     | Invalid params   | Requested amount exceeds the faucet cap or the Pubkey is malformed |
+| -32603     | Internal error   | Faucet is unavailable or rate limiting the request                 |
+| -32601     | Method not found | Airdrops are disabled on Mainnet Beta                              |

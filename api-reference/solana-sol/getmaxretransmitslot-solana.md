@@ -1,135 +1,131 @@
 ---
 description: >-
-  The getMaxRetransmitSlot JSON-RPC method retrieves the maximum slot observed
-  from the retransmit stage in the Solana network.
+  Example code for the getMaxRetransmitSlot JSON-RPC method. Complete guide on
+  how to use the getMaxRetransmitSlot JSON-RPC method in the GetBlock Web3
+  documentation.
 ---
 
-# getMaxRetransmitSlot – Solana
+# getMaxRetransmitSlot - Solana
 
-{% hint style="success" %}
-The **getMaxRetransmitSlot** RPC Solana method provides insight into the highest slot number seen during the retransmit stage.
-{% endhint %}
+This method returns the highest slot the node has observed through the retransmit stage of the turbine block propagation protocol.
 
-The getMaxRetransmitSlot method returns **the highest slot that the node has retransmitted to the network**. It helps developers monitor node behavior, assess data propagation, and analyze the effectiveness of Solana’s block transmission process.
+## Parameters
 
-### Supported Networks
+This method does not accept any parameters.
 
-This method is available on the following API endpoints:
-
-* Mainnet
-
-### Parameters
-
-{% hint style="info" %}
-The getMaxRetransmitSlot request does not require any parameters.
-{% endhint %}
-
-### Result
-
-The response returns a single `u64` value, representing **the maximum slot seen from the retransmit stage**.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "getMaxRetransmitSlot"
+    "method": "getMaxRetransmitSlot",
+    "params": [],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns the highest slot number observed from the retransmit stage.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": 1234,
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getMaxRetransmitSlot error scenarios:
-
-* Network errors: Connectivity issues with the Solana JSON-RPC API endpoints.
-* Invalid request format: Sending a malformed JSON request.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32602,
-    "message": "Invalid request format"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getMaxRetransmitSlot** method is useful for:
-
-* **Validators and nodes**: Monitoring the slot retransmit stage for block propagation efficiency;
-* **Web3 analytics tools**: Tracking real-time slot dissemination;
-* **Blockchain infrastructure**: Understanding slot propagation trends to optimize network performance.
-
-### Code getMaxRetransmitSlot Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getMaxRetransmitSlot"
-};
+const { result } = await connection._rpcRequest('getMaxRetransmitSlot', []);
 
-const fetchMaxRetransmitSlot = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result !== undefined) {
-      console.log("Max Retransmit Slot:", response.data.result);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getMaxRetransmitSlot error:", error.response?.data || error.message);
-  }
-};
-
-fetchMaxRetransmitSlot();
-
+console.log(result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getMaxRetransmitSlot',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getMaxRetransmitSlot",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **getMaxRetransmitSlot** into Solana’s Core API, developers can track network slot propagation, monitor block dissemination, and improve transaction confirmation strategies. The JSON-RPC request structure allows seamless retrieval of retransmit slot data, ensuring efficient blockchain operations for dApps, validators, and infrastructure providers.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": 397234561
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                      |
+| --------- | ------ | ------------------------------------------------ |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                |
+| id        | string | Request identifier matching the request          |
+| result    | number | Highest slot seen by the node's retransmit stage |
+
+## Use Cases
+
+* **Propagation Lag**: Compare against getSlot to measure shred propagation delay
+* **Node Diagnostics**: Detect turbine ingestion problems on a dedicated node
+* **Peering Checks**: Confirm a node is receiving shreds from its upstream peers
+* **Latency Benchmarks**: Compare retransmit progress across regional endpoints
+
+## Error Handling
+
+| Error Code | Message           | Description                                     |
+| ---------- | ----------------- | ----------------------------------------------- |
+| -32603     | Internal error    | Node failed to read the requested cluster state |
+| -32005     | Node is unhealthy | The node has fallen behind the cluster tip      |

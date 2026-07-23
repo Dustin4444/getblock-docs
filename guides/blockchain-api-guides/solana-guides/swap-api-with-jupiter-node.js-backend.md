@@ -12,7 +12,7 @@ Build a simple backend endpoint that requests swap routes from Jupiter (quote â†
 
 ### Prerequisites and dependencies
 
-* Node.js (v16+)&#x20;
+* Node.js (v16+)
 * A GetBlock account with a Solana endpoint (create an account on GetBlock.io and [generate an access token](https://docs.getblock.io/guides/endpoint-setup/creating-node-endpoints))
 * A Jupiter API key if your usage or the Jupiter host requires it
 
@@ -30,7 +30,7 @@ Use a `@solana/web3.js` release compatible with VersionedTransaction, Transactio
 
 ***
 
-### Configuring environment variables&#x20;
+### Configuring environment variables
 
 Create a .env file with your GetBlock endpoint:
 
@@ -52,17 +52,17 @@ Reminder: Never commit .env to source control. Use a secrets manager.
 
 ***
 
-### High-level flow&#x20;
+### High-level flow
 
 Jupiterâ€™s Swap API returns a base64-encoded unsigned `VersionedTransaction`. Deserialize it, sign, optionally simulate, and send the raw serialized bytes.
 
 1. Validate request inputs (inputMint, outputMint, amount in user-facing units, allowed slippage).
 2. Convert `amount` to token smallest units (lamports for SOL, token decimals for SPL).
-3. Call Jupiter **`/quote`** to get routes. [Pick a route](https://dev.jup.ag/docs/swap-api/get-quote) that fits the slippage and cost requirements.[ ](https://dev.jup.ag/docs/swap-api/get-quote?utm_source=chatgpt.com)
+3. Call Jupiter **`/quote`** to get routes. [Pick a route](https://dev.jup.ag/docs/swap-api/get-quote) that fits the slippage and cost requirements.
 4. Call Jupiter **`/swap`** (POST) with the chosen quote & `userPublicKey` to receive an unsigned, base64 `swapTransaction`.
-5. Deserialize to `VersionedTransaction` and optionally fetch Address Lookup Table (ALT) accounts if you need to inspect or modify the message.[ ](https://dev.jup.ag/docs/swap-api/send-swap-transaction?utm_source=chatgpt.com)
-6. Run [`simulateTransaction`](../../../api-reference/solana-sol/simulatetransaction-solana.md) to detect likely failures.
-7. If the simulation looks good, sign with your KMS/custodial key or the user's signature, then send via your GetBlock Solana RPC API and confirm.&#x20;
+5. Deserialize to `VersionedTransaction` and optionally fetch Address Lookup Table (ALT) accounts if you need to inspect or modify the message.
+6. Run [`simulateTransaction`](/broken/pages/XiJSKF9XevuX9v30pHqa) to detect likely failures.
+7. If the simulation looks good, sign with your KMS/custodial key or the user's signature, then send via your GetBlock Solana RPC API and confirm.
 
 ***
 

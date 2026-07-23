@@ -1,12 +1,12 @@
 ---
 description: >-
-  Example code for the getEpochInfo JSON-RPC method. Complete guide on how to
-  use the getEpochInfo JSON-RPC method in the GetBlock Web3 documentation.
+  Example code for the getBlockHeight JSON-RPC method. Complete guide on how to
+  use getBlockHeight JSON-RPC in GetBlock Web3 documentation.
 ---
 
-# getEpochInfo - Solana
+# getBlockHeight - Solana
 
-This method returns the cluster's position within the current epoch, including the current slot, epoch number, and progress through the epoch's slot range.
+This method returns the current block height, which counts blocks actually produced and excludes skipped slots. Block height is the value transaction expiry is measured against.
 
 ## Parameters
 
@@ -31,7 +31,7 @@ curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "jsonrpc": "2.0",
-    "method": "getEpochInfo",
+    "method": "getBlockHeight",
     "params": [{"commitment": "finalized"}],
     "id": "getblock.io"
 }'
@@ -46,9 +46,9 @@ const { Connection } = require('@solana/web3.js');
 
 const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'finalized');
 
-const epochInfo = await connection.getEpochInfo();
+const blockHeight = await connection.getBlockHeight();
 
-console.log(epochInfo.epoch, epochInfo.slotIndex, epochInfo.slotsInEpoch);
+console.log(blockHeight);
 ```
 {% endcode %}
 {% endtab %}
@@ -63,7 +63,7 @@ response = requests.post(
     headers={'Content-Type': 'application/json'},
     json={
         'jsonrpc': '2.0',
-        'method': 'getEpochInfo',
+        'method': 'getBlockHeight',
         'params': [{"commitment": "finalized"}],
         'id': 'getblock.io'
     }
@@ -89,7 +89,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .header("Content-Type", "application/json")
         .json(&json!({
             "jsonrpc": "2.0",
-            "method": "getEpochInfo",
+            "method": "getBlockHeight",
             "params": [{"commitment": "finalized"}],
             "id": "getblock.io"
         }))
@@ -112,42 +112,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 {
     "jsonrpc": "2.0",
     "id": "getblock.io",
-    "result": {
-        "absoluteSlot": 397234561,
-        "blockHeight": 375812409,
-        "epoch": 861,
-        "slotIndex": 271361,
-        "slotsInEpoch": 432000,
-        "transactionCount": 412873094521
-    }
+    "result": 375812409
 }
 ```
 
 ## Response Parameters
 
-| Parameter | Type   | Description                                            |
-| --------- | ------ | ------------------------------------------------------ |
-| jsonrpc   | string | JSON-RPC protocol version ("2.0")                      |
-| id        | string | Request identifier matching the request                |
-| result    | object | Object describing the cluster's current epoch position |
-
-### Result Object
-
-| Field            | Type   | Description                                      |
-| ---------------- | ------ | ------------------------------------------------ |
-| absoluteSlot     | number | Current slot since genesis                       |
-| blockHeight      | number | Current block height, excluding skipped slots    |
-| epoch            | number | Current epoch number                             |
-| slotIndex        | number | Slot position relative to the start of the epoch |
-| slotsInEpoch     | number | Total slots in the current epoch                 |
-| transactionCount | number | null                                             |
+| Parameter | Type   | Description                                      |
+| --------- | ------ | ------------------------------------------------ |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                |
+| id        | string | Request identifier matching the request          |
+| result    | number | Current block height at the requested commitment |
 
 ## Use Cases
 
-* **Epoch Countdown**: Estimate time to epoch end from slotIndex and slot duration
-* **Reward Timing**: Schedule reward distribution jobs around epoch boundaries
-* **Stake Activation**: Predict when a delegation becomes fully active
-* **Dashboard Headers**: Display epoch progress on a validator or staking interface
+* **Expiry Tracking**: Compare against lastValidBlockHeight to know when to stop retrying
+* **Skip Rate Analysis**: Difference block height against slot to measure skipped slots
+* **Sync Monitoring**: Alert when an RPC node's block height lags the cluster
+* **Scheduling**: Trigger periodic jobs on block height intervals rather than wall clock
 
 ## Error Handling
 
@@ -155,5 +137,4 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 | ---------- | ----------------------------------------- | -------------------------------------------------- |
 | -32602     | Invalid params                            | Unrecognized commitment level in the config object |
 | -32016     | Minimum context slot has not been reached | The node has not yet processed minContextSlot      |
-| -32603     | Internal error                            | Node failed to read the requested cluster state    |
 | -32005     | Node is unhealthy                         | The node has fallen behind the cluster tip         |

@@ -1,150 +1,144 @@
 ---
 description: >-
-  The getInflationRate JSON-RPC method retrieves the specific inflation values
-  for the current epoch in the Solana blockchain.
+  Example code for the getInflationRate JSON-RPC method. Complete guide on how
+  to use getInflationRate JSON-RPC in GetBlock Web3 documentation.
 ---
 
-# getInflationRate – Solana
+# getInflationRate - Solana
 
-{% hint style="success" %}
-The **getInflationRate** RPC Solana method provides real-time inflation data for the current epoch, including the total inflation percentage, the amount allocated to validators, and the portion allocated to the foundation.
-{% endhint %}
+This method returns the inflation rates in effect for the current epoch, split between validator and foundation allocations.
 
-The getInflationRate method returns **the current inflation rate parameters** of the Solana network. It provides information on the expected annual inflation rate, staking rewards distribution, and total token supply adjustments, helping users and validators understand the network’s monetary policy.
+## Parameters
 
-### Supported Networks
+This method does not accept any parameters.
 
-This method is accessible through Solana API endpoints:
-
-* Mainnet
-
-### Parameters
-
-{% hint style="info" %}
-This method does not require any parameters.
-{% endhint %}
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "getInflationRate"
+    "method": "getInflationRate",
+    "params": [],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful getInflationRate example response returns the **inflation rate breakdown** for the current epoch.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": {
-    "epoch": 100,
-    "foundation": 0.001,
-    "total": 0.149,
-    "validator": 0.148
-  },
-  "id": 1
-}
-```
-
-#### In this response:
-
-* `epoch` (`u64`): The epoch number for which the inflation rates are being reported.
-* `foundation` (`f64`): The fraction of the total inflation allocated to the Solana Foundation. Typically expressed as a decimal (e.g., `0.001` = 0.1%).
-* `total` (`f64`): The overall inflation rate for the network, expressed as a decimal (e.g., `0.149` = 14.9%).
-* `validator` (`f64`): The fraction of the total inflation allocated to validators, also expressed as a decimal (e.g., `0.148` = 14.8%).
-
-### Error Handling
-
-Common getInflationRate error scenarios:
-
-* Network connectivity issues: The request fails due to API unavailability.
-* Node synchronization issues: If the node is out of sync, it may return outdated inflation values.
-* Invalid response format: An unexpected JSON structure may indicate an internal API error.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32000,
-    "message": "Inflation rate data unavailable"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getInflationRate** method is essential for:
-
-* **Validators**: Monitoring expected staking rewards from inflation;
-* **Blockchain explorers**: Displaying real-time inflation data for each epoch;
-* **Web3 applications**: Adjusting economic models based on inflation distribution;
-* **Analytics platforms**: Tracking inflation trends and network sustainability.
-
-### Code Example – Web3 getInflationRate Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getInflationRate"
-};
+const rate = await connection.getInflationRate();
 
-const fetchInflationRate = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result) {
-      const rate = response.data.result;
-      console.log(`Inflation Rate:`);
-      console.log(`Total: ${rate.total}`);
-      console.log(`Validator: ${rate.validator}`);
-      console.log(`Foundation: ${rate.foundation}`);
-      console.log(`Epoch: ${rate.epoch}`);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getInflationRate error:", error.response?.data || error.message);
-  }
-};
-
-fetchInflationRate();
-
+console.log(rate.total, rate.validator, rate.epoch);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getInflationRate',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getInflationRate",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-Integrate the **getInflationRate** API with Solana’s Core API to retrieve real-time inflation rate data dynamically. By leveraging JSON-RPC parameters and endpoints, developers can ensure accurate tracking of staking rewards, inflation changes, and the impact of network economics on the Solana ecosystem.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": {
+        "epoch": 861,
+        "foundation": 0.0,
+        "total": 0.0432,
+        "validator": 0.0432
+    }
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                                        |
+| --------- | ------ | ------------------------------------------------------------------ |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                                  |
+| id        | string | Request identifier matching the request                            |
+| result    | object | Object holding the effective inflation rates for the current epoch |
+
+### Result Object
+
+| Field      | Type   | Description                                                   |
+| ---------- | ------ | ------------------------------------------------------------- |
+| total      | number | Total annual inflation rate for the epoch                     |
+| validator  | number | Portion of inflation distributed to validators and delegators |
+| foundation | number | Portion of inflation allocated to the foundation              |
+| epoch      | number | Epoch the rates apply to                                      |
+
+## Use Cases
+
+* **APY Display**: Show current nominal staking yield in a staking interface
+* **Reward Forecasting**: Estimate next-epoch rewards for a delegated stake position
+* **Rate Tracking**: Record inflation drift across epochs as the schedule tapers
+* **Dashboard Metrics**: Publish current issuance rate on a network status page
+
+## Error Handling
+
+| Error Code | Message           | Description                                             |
+| ---------- | ----------------- | ------------------------------------------------------- |
+| -32603     | Internal error    | Node failed to compute the inflation rate for the epoch |
+| -32005     | Node is unhealthy | The node has fallen behind the cluster tip              |

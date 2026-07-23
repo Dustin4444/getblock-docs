@@ -1,140 +1,141 @@
 ---
 description: >-
-  The getSlotLeader JSON-RPC method retrieves the current slot leader in the
-  Solana blockchain. A slot leader is the validator responsible for producing
-  blocks in the current slot.
+  Example code for the getSlotLeader JSON-RPC method. Complete guide on how to
+  use the getSlotLeader JSON-RPC method in the GetBlock Web3 documentation.
 ---
 
-# getSlotLeader – Solana
+# getSlotLeader - Solana
 
-{% hint style="info" %}
-The **getSlotLeader** RPC Solana method returns the node identity Pubkey of the validator currently leading the network’s block production.
-{% endhint %}
+This method returns the identity Pubkey of the validator scheduled to produce the block for the current slot at the requested commitment.
 
-Knowing the slot leader helps developers **track block production**, **identify high-performing validators**, and **optimize network performance** using Solana’s Core API.
+## Parameters
 
-This method supports an optional parameters object to customize the query with different commitment levels and minimum evaluation slots.
+| Parameter | Type   | Required | Description                                 |
+| --------- | ------ | -------- | ------------------------------------------- |
+| config    | object | No       | Configuration object controlling commitment |
 
-### Supported Networks
+### Config Object
 
-This method is available on the following API endpoints:
+| Field          | Type   | Required | Description                                                                 |
+| -------------- | ------ | -------- | --------------------------------------------------------------------------- |
+| commitment     | string | No       | Commitment level: processed, confirmed, or finalized. Defaults to finalized |
+| minContextSlot | number | No       | Minimum slot the request can be evaluated at                                |
 
-* Mainnet
-
-### Parameters
-
-#### Optional Parameters
-
-* **`object`** (optional): A configuration object containing:
-  * **commitment** (`string`, optional): Defines the level of finality for the query.
-  * **minContextSlot** (`number`, optional): The minimum slot at which the request can be evaluated.
-
-### Result
-
-The response returns a `string` representing the node identity Pubkey of **the current slot leader**, encoded in base-58.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "getSlotLeader"
+    "method": "getSlotLeader",
+    "params": [{"commitment": "processed"}],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns the node identity Pubkey of the current slot leader.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": "ENvAW7JScgYq6o4zKZwewtkzzJgDzuJAFxYasvmEQdpS",
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getSlotLeader error scenarios:
-
-* Invalid parameters: If the provided parameters are incorrectly formatted.
-* Network errors: Connectivity issues with the Solana JSON-RPC API endpoints.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32602,
-    "message": "Invalid parameter format"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana getSlotLeader method is useful for:
-
-* **Validators and node operators**: Identifying the current slot leader to monitor network leadership distribution;
-* **Blockchain explorers**: Displaying the current slot leader for real-time network analysis;
-* **dApp developers**: Tracking validator performance for strategic transaction planning.
-
-### Code getSlotLeader Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'processed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getSlotLeader"
-};
+const leader = await connection.getSlotLeader();
 
-const fetchSlotLeader = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result) {
-      console.log("Current Slot Leader:", response.data.result);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getSlotLeader error:", error.response?.data || error.message);
-  }
-};
-
-fetchSlotLeader();
-
+console.log(leader);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getSlotLeader',
+        'params': [{"commitment": "processed"}],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getSlotLeader",
+            "params": [{"commitment": "processed"}],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **getSlotLeader** into Solana’s Core API, developers can track block production leadership, analyze transaction distribution, and optimize request performance. This JSON-RPC method is essential for applications that rely on real-time validator information and network monitoring.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": "dv1ZAGvdsz5hHLwWXsVnM94hWf1pjbKVau1QVkaMJ92"
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                               |
+| --------- | ------ | --------------------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                         |
+| id        | string | Request identifier matching the request                   |
+| result    | string | Base58-encoded identity Pubkey of the current slot leader |
+
+## Use Cases
+
+* **Direct TPU Sends**: Route a transaction to the current leader instead of a random node
+* **MEV Research**: Attribute block contents to the identity that produced them
+* **Live Dashboards**: Display the active leader on a network monitoring page
+* **Latency Studies**: Correlate confirmation times with specific leaders
+
+## Error Handling
+
+| Error Code | Message                                   | Description                                        |
+| ---------- | ----------------------------------------- | -------------------------------------------------- |
+| -32602     | Invalid params                            | Unrecognized commitment level in the config object |
+| -32016     | Minimum context slot has not been reached | The node has not yet processed minContextSlot      |
+| -32603     | Internal error                            | Node failed to read the requested cluster state    |
+| -32005     | Node is unhealthy                         | The node has fallen behind the cluster tip         |

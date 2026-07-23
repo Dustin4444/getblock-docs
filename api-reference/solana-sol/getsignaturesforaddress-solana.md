@@ -1,186 +1,171 @@
 ---
 description: >-
-  The getSignaturesForAddress JSON-RPC method retrieves signatures for confirmed
-  transactions that involve a given account address in their accountKeys list.
+  Example code for the getSignaturesForAddress JSON-RPC method. Complete guide
+  on how to use the getSignaturesForAddress JSON-RPC method in the GetBlock Web3
+  documentation.
 ---
 
-# getSignaturesForAddress – Solana
+# getSignaturesForAddress - Solana
 
-{% hint style="success" %}
-The **getSignaturesForAddress** RPC Solana method returns transaction signatures from the most recent confirmed block, moving backwards in time.
-{% endhint %}
+This method returns confirmed transaction signatures that reference a given address, ordered from newest to oldest. Results are paginated with the `before` and `until` cursors.
 
-The getSignaturesForAddress method retrieves a **list of transaction signatures associated with a specific account**. It provides historical transaction data, including relevant metadata, allowing developers to **track activity and analyze past transactions** on the Solana blockchain.
+## Parameters
 
-### Supported Networks
+| Parameter | Type   | Required | Description                                                |
+| --------- | ------ | -------- | ---------------------------------------------------------- |
+| address   | string | Yes      | Base58-encoded account Pubkey to search for                |
+| config    | object | No       | Configuration object controlling pagination and commitment |
 
-This method is available on the following API endpoints:
+### Config Object
 
-* Mainnet
+| Field          | Type   | Required | Description                                                                 |
+| -------------- | ------ | -------- | --------------------------------------------------------------------------- |
+| limit          | number | No       | Maximum signatures to return, between 1 and 1000. Defaults to 1000          |
+| before         | string | No       | Start searching backwards from this signature, exclusive                    |
+| until          | string | No       | Search until this signature is reached, exclusive                           |
+| commitment     | string | No       | Commitment level: processed, confirmed, or finalized. Defaults to finalized |
+| minContextSlot | number | No       | Minimum slot the request can be evaluated at                                |
 
-### Parameters
-
-#### Required Parameters
-
-* **`string`** (required): The account address, provided as a base-58 encoded string.
-
-#### Optional Parameters
-
-* **`object`** (optional): A configuration object containing:
-  * **commitment** (`string`, optional): Defines the level of finality for the query.
-  * **minContextSlot** (`number`, optional): The minimum slot at which the request can be evaluated.
-  * **limit** (`number`, optional, default: `1000`): The maximum number of transaction signatures to return.
-    * Must be between 1 and 1,000.
-  * **before** (`string`, optional): Start searching backwards from this transaction signature.
-  * **until** (`string`, optional): Stop searching when this transaction signature is reached (if found before reaching the limit).
-
-### Result
-
-The response returns an ordered array (from newest to oldest) of transaction signatures, each containing:
-
-* `signature` (`string`): The transaction signature, base-58 encoded.
-* `slot` (`u64`): The slot containing the block with the transaction.
-* `err` (`object`|`null`): If the transaction failed, this field contains an error object; otherwise, it is null.
-* `memo` (`string`|`null`): Any memo associated with the transaction (if present).
-* `blockTime` (`i64`|`null`): The estimated Unix timestamp of the transaction’s processing time.
-  * `null` if unavailable.
-* `confirmationStatus` (`string`|`null`): The confirmation status of the transaction.
-  * Possible value: `processed`, `confirmed`, `finalized`.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
     "method": "getSignaturesForAddress",
-    "params": [
-      "Vote111111111111111111111111111111111111111",
-      {
-        "limit": 1
-      }
-    ]
+    "params": ["JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4", {"limit": 3}],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns an array of transaction signature details.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": [
-    {
-      "err": null,
-      "memo": null,
-      "signature": "5h6xBEauJ3PK6SWCZ1PGjBvj8vDdWG3KpwATGy1ARAXFSDwt8GFXM7W5Ncn16wmqokgpiKRLuS83KUxyZyv2sUYv",
-      "slot": 114,
-      "blockTime": null
-    }
-  ],
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getSignaturesForAddress error scenarios:
-
-* Invalid account address: If the provided address is not correctly formatted.
-* Network errors: Connectivity issues with the Solana JSON-RPC API endpoints.
-* Malformed request: Incorrectly structured JSON requests.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32602,
-    "message": "Invalid account address format"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getSignaturesForAddress** method is useful for:
-
-* **dApp developers**: Retrieving transaction history for user accounts;
-* **Web3 analytics tools**: Tracking transaction patterns and account activity;
-* **Blockchain explorers**: Displaying past transactions for a given account;
-* **Validators and node operators**: Monitoring transaction confirmations.
-
-### Code getSignaturesForAddress Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection, PublicKey } = require('@solana/web3.js');
 
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/";
-const headers = { "Content-Type": "application/json" };
+const signatures = await connection.getSignaturesForAddress(
+  new PublicKey('JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4'),
+  { limit: 3 }
+);
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getSignaturesForAddress",
-  params: [
-    "Vote111111111111111111111111111111111111111",
-    { limit: 1 }
-  ]
-};
-
-const fetchSignaturesForAddress = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && Array.isArray(response.data.result)) {
-      const signatures = response.data.result;
-      if (signatures.length > 0) {
-        signatures.forEach((signature, index) => {
-          console.log(`Signature ${index + 1}:`);
-          console.log(`  Signature: ${signature.signature}`);
-          console.log(`  Slot: ${signature.slot}`);
-          console.log(`  Block Time: ${signature.blockTime ? new Date(signature.blockTime * 1000) : "N/A"}`);
-          console.log(`  Err: ${signature.err ? JSON.stringify(signature.err) : "No error"}`);
-        });
-      } else {
-        console.log("No signatures found for the specified address.");
-      }
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getSignaturesForAddress error:", error.response?.data || error.message);
-  }
-};
-
-fetchSignaturesForAddress();
-
+console.log(signatures.map((s) => s.signature));
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getSignaturesForAddress',
+        'params': ["JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4", {"limit": 3}],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getSignaturesForAddress",
+            "params": ["JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4", {"limit": 3}],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **getSignaturesForAddress** into Solana’s Core API, developers can efficiently query transaction records linked to an address, retrieve block confirmations, and optimize request performance. This JSON-RPC method is a powerful tool for tracking transaction histories in decentralized applications and blockchain infrastructure.
+{% code overflow="wrap" %}
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": [
+        {
+            "blockTime": 1774267845,
+            "confirmationStatus": "finalized",
+            "err": null,
+            "memo": null,
+            "signature": "5wHu1qwD4kLwYqPmy1uDCgpiJ1qGpVYU3n5aHT6bSWUE1JzcbQCPSDLDPGrFyqmLLzQjLNPTPtRZbNbUJQNMkaWq",
+            "slot": 397234561
+        }
+    ]
+}
+```
+{% endcode %}
+
+## Response Parameters
+
+| Parameter | Type   | Description                                          |
+| --------- | ------ | ---------------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                    |
+| id        | string | Request identifier matching the request              |
+| result    | array  | Array of transaction signature objects, newest first |
+
+### Signature Entry
+
+| Field              | Type   | Description                                             |
+| ------------------ | ------ | ------------------------------------------------------- |
+| signature          | string | Base58-encoded transaction signature                    |
+| slot               | number | Slot containing the transaction                         |
+| err                | object | null                                                    |
+| memo               | string | null                                                    |
+| blockTime          | number | null                                                    |
+| confirmationStatus | string | Confirmation status: processed, confirmed, or finalized |
+
+## Use Cases
+
+* **Wallet History**: Build a paginated activity feed for a user address
+* **Program Monitoring**: Track recent interactions with a deployed program
+* **Backfilling**: Walk history with the `before` cursor to load an address archive
+* **Failure Analysis**: Filter for entries where `err` is non-null to find reverted attempts
+* **Memo Indexing**: Extract memo payloads for payment reconciliation
+
+## Error Handling
+
+| Error Code | Message                                             | Description                                                       |
+| ---------- | --------------------------------------------------- | ----------------------------------------------------------------- |
+| -32602     | Invalid params                                      | Limit outside 1 to 1000, or a malformed before or until signature |
+| -32011     | Transaction history is not available from this node | The node runs without a full transaction index                    |
+| -32603     | Internal error                                      | Node failed to read the address signature index                   |

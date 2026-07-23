@@ -1,137 +1,138 @@
 ---
 description: >-
-  The getIdentity JSON-RPC method retrieves the identity public key of the
-  current Solana node.
+  Example code for the getIdentity JSON-RPC method. Complete guide on how to use
+  getIdentity JSON-RPC in GetBlock Web3 documentation.
 ---
 
-# getIdentity – Solana
+# getIdentity - Solana
 
-{% hint style="success" %}
-The **getIdentity** RPC Solana method returns the identity pubkey of the node as a base-58 encoded string.
-{% endhint %}
+This method returns the identity Pubkey of the node serving the request. The identity keypair signs the node's gossip messages and, for validators, its blocks.
 
-The getIdentity method returns the **public key of the node making the request**. It is useful for identifying the RPC node in use, verifying network connections, and debugging interactions with different Solana validators.
+## Parameters
 
-### Supported Networks
+This method does not accept any parameters.
 
-This method is accessible through Solana API endpoints:
-
-* Mainnet
-
-### Parameters
-
-{% hint style="info" %}
-This method does not require any parameters.
-{% endhint %}
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "getIdentity"
+    "method": "getIdentity",
+    "params": [],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful getIdentity example response returns the **identity pubkey** **of the node** in base-58 format.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": {
-    "identity": "2r1F4iWqVcb8M1DbAjQuFpebkQHY9hcVU4WuW2DJBppN"
-  },
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getIdentity error scenarios:
-
-* Node misconfiguration: The node is not properly set up with an identity keypair.
-* Network connectivity issues: The request fails due to API unavailability.
-* `zend_auth::getinstance()->getidentity()` error: This error can occur in PHP-based authentication systems and should be resolved by checking user session state.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32000,
-    "message": "Node identity unavailable"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getIdentity** method is essential for:
-
-* **Validators**: Verifying their own identity and confirming their presence in the cluster;
-* **Blockchain explorers**: Displaying node identity data for transparency;
-* **Web3 applications**: Ensuring correct node authentication and connection;
-* **Network security**: Checking whether a node is authorized to participate in the cluster.
-
-**getIdentity** for network Solana ensures that nodes querying the blockchain are identified properly.
-
-### Code Example – Web3 getIdentity Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getIdentity"
-};
+const { result } = await connection._rpcRequest('getIdentity', []);
 
-const fetchNodeIdentity = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result?.identity) {
-      console.log("Node Identity:", response.data.result.identity);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getIdentity error:", error.response?.data || error.message);
-  }
-};
-
-fetchNodeIdentity();
-
+console.log(result.identity);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getIdentity',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getIdentity",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-Integrate the **getIdentity** API with Solana’s Core API to retrieve node identity information dynamically. By leveraging JSON-RPC parameters and endpoints, developers can ensure accurate authentication and network monitoring, supporting security and stability in blockchain infrastructure.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": {
+        "identity": "dv1ZAGvdsz5hHLwWXsVnM94hWf1pjbKVau1QVkaMJ92"
+    }
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                  |
+| --------- | ------ | -------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")            |
+| id        | string | Request identifier matching the request      |
+| result    | object | Object containing the node's identity Pubkey |
+
+### Result Object
+
+| Field    | Type   | Description                                           |
+| -------- | ------ | ----------------------------------------------------- |
+| identity | string | Base58-encoded identity Pubkey of the responding node |
+
+## Use Cases
+
+* **Endpoint Fingerprinting**: Identify which backend node served a request behind a load balancer
+* **Sticky Debugging**: Correlate inconsistent responses with a specific node identity
+* **Fleet Inventory**: Map dedicated node endpoints to their identity keys
+* **Support Diagnostics**: Attach node identity to bug reports about response discrepancies
+
+## Error Handling
+
+| Error Code | Message           | Description                                     |
+| ---------- | ----------------- | ----------------------------------------------- |
+| -32603     | Internal error    | Node failed to read the requested cluster state |
+| -32005     | Node is unhealthy | The node has fallen behind the cluster tip      |

@@ -1,146 +1,130 @@
 ---
 description: >-
-  The getHealth JSON-RPC method retrieves the current health status of a Solana
-  node.
+  Example code for the getHealth JSON-RPC method. Complete guide on how to use
+  the getHealth JSON-RPC method in the GetBlock Web3 documentation.
 ---
 
-# getHealth – Solana
+# getHealth - Solana
 
-{% hint style="success" %}
-The getHealth RPC Solana method checks if a node is within HEALTH\_CHECK\_SLOT\_DISTANCE slots of the latest confirmed cluster slot. If the node is healthy, it returns an "ok" response; otherwise, it returns a JSON-RPC error.
-{% endhint %}
+This method reports whether the node is caught up with the cluster tip. A healthy node returns the string `ok`; an unhealthy node returns a JSON-RPC error.
 
-This method is crucial for network monitoring, validator operations, and infrastructure management. If the node is behind, the error response may include additional details, such as the number of slots behind.
+## Parameters
 
-### Supported Networks
+This method does not accept any parameters.
 
-This method is accessible through Solana API endpoints:
-
-* Mainnet
-
-### Parameters
-
-{% hint style="info" %}
-This method does not require any parameters.
-{% endhint %}
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "getHealth"
+    "method": "getHealth",
+    "params": [],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful getHealth example response returns the health status of the node.
-
-#### Healthy Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": "ok",
-  "id": 1
-}
-Unhealthy Response (generic)
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32005,
-    "message": "Node is unhealthy",
-    "data": {}
-  },
-  "id": 1
-}
-```
-
-#### Unhealthy Response (with additional information)
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32005,
-    "message": "Node is behind by 42 slots",
-    "data": {
-      "numSlotsBehind": 42
-    }
-  },
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getHealth error scenarios:
-
-* Node out of sync: The node is lagging behind the latest cluster-confirmed slot.
-* Network connectivity issues: The request fails due to API unavailability.
-* Ambiguous method calls: In some cases, errors like the method getHealth() is ambiguous for the type player may occur in custom implementations, requiring method resolution.
-
-### Use Cases
-
-The Solana getHealth method is essential for:
-
-* Validators: Monitoring node synchronization and performance.
-* Blockchain explorers: Displaying node health status.
-* Web3 applications: Ensuring nodes are in sync before submitting transactions.
-* Infrastructure management: Detecting unhealthy nodes for maintenance and debugging.
-
-### Code Example – Web3 getHealth Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getHealth"
-};
+const health = await connection._rpcRequest('getHealth', []);
 
-const fetchNodeHealth = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result !== undefined) {
-      console.log("Node Health Status:", response.data.result);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getHealth error:", error.response?.data || error.message);
-  }
-};
-
-fetchNodeHealth();
-
+console.log(health.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getHealth',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getHealth",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-Integrate the getHealth API with Solana’s Core API to monitor node health dynamically. By leveraging JSON-RPC parameters and endpoints, developers can ensure real-time tracking of node synchronization, detect unhealthy nodes, and optimize blockchain infrastructure for dApps and validators.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": "ok"
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                                                          |
+| --------- | ------ | ------------------------------------------------------------------------------------ |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                                                    |
+| id        | string | Request identifier matching the request                                              |
+| result    | string | The string `ok` when the node is within the healthy slot distance of the cluster tip |
+
+## Use Cases
+
+* **Load Balancer Probes**: Drop an endpoint from rotation when it stops returning `ok`
+* **Failover Logic**: Switch to a backup provider before requests start returning stale data
+* **Uptime Monitoring**: Poll from an external checker to record node availability
+* **Deployment Gates**: Block a release pipeline while the target node is catching up
+
+## Error Handling
+
+| Error Code | Message           | Description                                                                  |
+| ---------- | ----------------- | ---------------------------------------------------------------------------- |
+| -32005     | Node is unhealthy | The node is behind the cluster tip by more than the configured slot distance |
+| -32603     | Internal error    | Node failed to evaluate its own health status                                |

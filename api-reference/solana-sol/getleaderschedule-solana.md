@@ -1,160 +1,153 @@
 ---
 description: >-
-  The getLeaderSchedule JSON-RPC method retrieves the leader schedule for a
-  specific epoch in the Solana blockchain.
+  Example code for the getLeaderSchedule JSON-RPC method. Complete guide on how
+  to use the getLeaderSchedule JSON-RPC method in the GetBlock Web3
+  documentation.
 ---
 
-# getLeaderSchedule – Solana
+# getLeaderSchedule - Solana
 
-{% hint style="success" %}
-The **getLeaderSchedule** RPC Solana method provides the leader schedule for an epoch, mapping validator identities to their assigned slots. If no epoch is specified, the Solana getLeaderSchedule API returns the schedule for the current epoch.
-{% endhint %}
+This method returns the leader schedule for an epoch, mapping each validator identity to the slot indices it is assigned to lead. Slot indices are relative to the first slot of the epoch.
 
-The getLeaderSchedule method retrieves **the leader schedule for a given epoch**, showing the order in which validators are assigned to produce blocks. It helps developers and validators analyze network consensus, optimize transaction processing strategies, and monitor validator performance in the Solana blockchain.
+## Parameters
 
-### Supported Networks
+| Parameter | Type   | Required | Description                                                     |
+| --------- | ------ | -------- | --------------------------------------------------------------- |
+| slot      | number | No       | Any slot within the target epoch. Defaults to the current epoch |
+| config    | object | No       | Configuration object controlling commitment and identity filter |
 
-Access this method via Solana API Endpoints:
+### Config Object
 
-* Mainnet
+| Field      | Type   | Required | Description                                                                 |
+| ---------- | ------ | -------- | --------------------------------------------------------------------------- |
+| commitment | string | No       | Commitment level: processed, confirmed, or finalized. Defaults to finalized |
+| identity   | string | No       | Return results for a single validator identity only                         |
 
-### Parameters
-
-#### Optional Parameters
-
-* **epoch** (`u64`, optional) – The epoch to retrieve the leader schedule for. If omitted, the current epoch is used.
-* **`object`** (optional):
-  * **commitment** (`string`, optional) – Commitment level of the request.
-  * **identity** (`string`, optional) – Validator identity (Base-58 encoded) to filter the response.
-
-### Result
-
-* `null` : the requested epoch is not found.
-* `object`: A dictionary (key-value pairs) where each **key** is a validator identity (Base-58 encoded string) and each **value** is an array of slot indices (relative to the first slot in the requested epoch).
-
-### getLeaderSchedule Example
-
-This example demonstrates how to retrieve the getLeaderSchedule RPC Solana for a specific validator.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
     "method": "getLeaderSchedule",
-    "params": [
-      null,
-      {
-        "identity": "4Qkev8aNZcqFNSRhQzwyLMFSsi94jHqE8WNVTJzTP99F"
-      }
-    ]
+    "params": [397234561, {"identity": "dv1ZAGvdsz5hHLwWXsVnM94hWf1pjbKVau1QVkaMJ92"}],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-#### Successful Response Example
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": {
-    "4Qkev8aNZcqFNSRhQzwyLMFSsi94jHqE8WNVTJzTP99F": [
-      0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-      21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38,
-      39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56,
-      57, 58, 59, 60, 61, 62, 63
-    ]
-  },
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getLeaderSchedule error scenarios:
-
-* Invalid epoch number: If the epoch does not exist or is out of range.
-* Network connectivity issues: The request fails due to API unavailability.
-* Malformed request parameters: Incorrectly formatted request values.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32000,
-    "message": "Epoch data unavailable"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getLeaderSchedule** method is essential for:
-
-* **Validators**: Predicting assigned slots for upcoming epochs;
-* **Blockchain explorers**: Displaying leader schedules in real-time;
-* **Web3 applications**: Ensuring efficient transaction scheduling;
-* **Analytics platforms**: Tracking validator slot performance.
-
-### Code getLeaderSchedule Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getLeaderSchedule",
-  params: [
-    null,
-    { "identity": "4Qkev8aNZcqFNSRhQzwyLMFSsi94jHqE8WNVTJzTP99F" }
-  ]
-};
+const schedule = await connection.getLeaderSchedule();
 
-const fetchLeaderSchedule = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result) {
-      console.log("Leader Schedule:", response.data.result);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getLeaderSchedule error:", error.response?.data || error.message);
-  }
-};
-
-fetchLeaderSchedule();
-
+console.log(Object.keys(schedule).length);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getLeaderSchedule',
+        'params': [397234561, {"identity": "dv1ZAGvdsz5hHLwWXsVnM94hWf1pjbKVau1QVkaMJ92"}],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getLeaderSchedule",
+            "params": [397234561, {"identity": "dv1ZAGvdsz5hHLwWXsVnM94hWf1pjbKVau1QVkaMJ92"}],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-Integrate the Web3 **getLeaderSchedule** API with Solana’s Core API to retrieve real-time leader schedules. By leveraging JSON-RPC parameters and endpoints, developers can optimize transaction execution and validator slot assignments, ensuring maximum efficiency in blockchain operations.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": {
+        "dv1ZAGvdsz5hHLwWXsVnM94hWf1pjbKVau1QVkaMJ92": [
+            16,
+            17,
+            18,
+            19,
+            2048,
+            2049,
+            2050,
+            2051
+        ]
+    }
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                             |
+| --------- | ------ | --------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")       |
+| id        | string | Request identifier matching the request |
+| result    | object | null                                    |
+
+## Use Cases
+
+* **Leader-Aware Sending**: Forward transactions to the upcoming leader's TPU to cut latency
+* **Slot Assignment**: Show a validator operator when its next leader slots occur
+* **Skip Attribution**: Match skipped slots to the identity that was scheduled to lead
+* **Stake Distribution**: Compare assigned slot counts as a proxy for stake weight
+
+## Error Handling
+
+| Error Code | Message           | Description                                               |
+| ---------- | ----------------- | --------------------------------------------------------- |
+| -32602     | Invalid params    | Slot is outside the range of epochs the node can schedule |
+| -32603     | Internal error    | Node failed to compute the leader schedule for the epoch  |
+| -32005     | Node is unhealthy | The node has fallen behind the cluster tip                |

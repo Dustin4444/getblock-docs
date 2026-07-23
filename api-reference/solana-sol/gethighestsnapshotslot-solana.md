@@ -1,137 +1,142 @@
 ---
 description: >-
-  The getHighestSnapshotSlot JSON-RPC method retrieves the highest slot
-  information that the node has snapshots for.
+  Example code for the getHighestSnapshotSlot JSON-RPC method. Complete guide on
+  how to use the getHighestSnapshotSlot JSON-RPC method in the GetBlock Web3
+  documentation.
 ---
 
-# getHighestSnapshotSlot – Solana
+# getHighestSnapshotSlot - Solana
 
-{% hint style="danger" %}
-This method is only available in solana-core v1.9 or newer. For solana-core v1.8 and below, use the getSnapshotSlot method instead.
-{% endhint %}
+This method returns the highest slot for which the node has a full snapshot, and the highest incremental snapshot slot built on top of it when one exists.
 
-The getHighestSnapshotSlot RPC Solana method returns the highest full snapshot slot and, if available, the highest incremental snapshot slot based on the full snapshot slot. This allows validators and nodes to determine the most recent snapshot they can use for ledger restoration and fast bootstrapping.
+## Parameters
 
-### Supported Networks
+This method does not accept any parameters.
 
-This method is accessible through Solana API endpoints:
-
-* Mainnet
-
-### Parameters
-
-{% hint style="info" %}
-This method does not require any parameters.
-{% endhint %}
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "getHighestSnapshotSlot"
+    "method": "getHighestSnapshotSlot",
+    "params": [],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful getHighestSnapshotSlot example response returns the highest snapshot slots available on the node.
-
-The response includes:
-
-* full (u64): The highest full snapshot slot available.
-* incremental (u64|null): The highest incremental snapshot slot based on the full snapshot slot.
-
-#### Example Response (when a snapshot exists)
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": {
-    "full": 100,
-    "incremental": 110
-  },
-  "id": 1
-}
-```
-
-#### Example Response (when no snapshot exists)
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": { "code": -32008, "message": "No snapshot" },
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getHighestSnapshotSlot error scenarios:
-
-* No snapshot available: The node does not currently have any snapshots.
-* Network connectivity issues: The request fails due to API unavailability.
-* Invalid node state: The node is not configured to store snapshots.
-
-### Use Cases
-
-The Solana getHighestSnapshotSlot method is essential for:
-
-* Validators: Checking the latest available snapshot slots for fast synchronization.
-* Blockchain explorers: Displaying snapshot data for node operators.
-* Web3 applications: Ensuring dApps interact with up-to-date nodes.
-* Infrastructure management: Monitoring snapshot availability for scaling node operations.
-
-### Code Example – Web3 getHighestSnapshotSlot Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getHighestSnapshotSlot"
-};
+const snapshot = await connection._rpcRequest('getHighestSnapshotSlot', []);
 
-const fetchHighestSnapshotSlot = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result) {
-      console.log("Highest Snapshot Slot:", response.data.result);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getHighestSnapshotSlot error:", error.response?.data || error.message);
-  }
-};
-
-fetchHighestSnapshotSlot();
+console.log(snapshot.result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getHighestSnapshotSlot',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getHighestSnapshotSlot",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-Integrate the getHighestSnapshotSlot API with Solana’s Core API to monitor snapshot availability dynamically. By leveraging JSON-RPC parameters and endpoints, developers can efficiently track snapshots, enabling optimized blockchain synchronization and reduced downtime for validators and nodes.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": {
+        "full": 397200000,
+        "incremental": 397233361
+    }
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                                    |
+| --------- | ------ | -------------------------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                              |
+| id        | string | Request identifier matching the request                        |
+| result    | object | Object holding the highest full and incremental snapshot slots |
+
+### Result Object
+
+| Field       | Type   | Description                       |
+| ----------- | ------ | --------------------------------- |
+| full        | number | Highest slot with a full snapshot |
+| incremental | number | null                              |
+
+## Use Cases
+
+* **Bootstrap Sources**: Pick a peer with a recent snapshot when starting a new validator
+* **Snapshot Freshness**: Alert when snapshot generation falls behind schedule
+* **Restart Planning**: Estimate catch-up time from the gap between snapshot and tip
+* **Infrastructure Audits**: Confirm incremental snapshots are enabled on a node
+
+## Error Handling
+
+| Error Code | Message           | Description                                     |
+| ---------- | ----------------- | ----------------------------------------------- |
+| -32008     | No snapshot       | The node has not yet generated a full snapshot  |
+| -32603     | Internal error    | Node failed to read the requested cluster state |
+| -32005     | Node is unhealthy | The node has fallen behind the cluster tip      |

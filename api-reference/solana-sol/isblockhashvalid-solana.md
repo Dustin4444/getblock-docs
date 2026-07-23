@@ -1,18 +1,19 @@
 ---
 description: >-
-  Example code for the getTransactionCount JSON-RPC method. Complete guide on
-  how to use the getTransactionCount JSON-RPC method in the GetBlock Web3
+  Example code for the isBlockhashValid JSON-RPC method. Complete guide on how
+  to use the isBlockhashValid JSON-RPC method in the GetBlock Web3
   documentation.
 ---
 
-# getTransactionCount - Solana
+# isBlockhashValid - Solana
 
-This method returns the total number of transactions the cluster has processed since genesis, at the requested commitment level.
+This method reports whether a blockhash is still recent enough to be accepted by the cluster. Blockhashes expire roughly 150 slots after they are produced.
 
 ## Parameters
 
 | Parameter | Type   | Required | Description                                 |
 | --------- | ------ | -------- | ------------------------------------------- |
+| blockhash | string | Yes      | Base58-encoded blockhash to check           |
 | config    | object | No       | Configuration object controlling commitment |
 
 ### Config Object
@@ -32,8 +33,8 @@ curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "jsonrpc": "2.0",
-    "method": "getTransactionCount",
-    "params": [{"commitment": "finalized"}],
+    "method": "isBlockhashValid",
+    "params": ["9zJqLXK9pMhQZ4tGqVvUcxrKpKQ3pMSJ1nZmVeXtBqTd", {"commitment": "processed"}],
     "id": "getblock.io"
 }'
 ```
@@ -45,11 +46,11 @@ curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
 ```javascript
 const { Connection } = require('@solana/web3.js');
 
-const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'finalized');
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'processed');
 
-const count = await connection.getTransactionCount();
+const isValid = await connection.isBlockhashValid('9zJqLXK9pMhQZ4tGqVvUcxrKpKQ3pMSJ1nZmVeXtBqTd');
 
-console.log(count);
+console.log(isValid);
 ```
 {% endcode %}
 {% endtab %}
@@ -64,8 +65,8 @@ response = requests.post(
     headers={'Content-Type': 'application/json'},
     json={
         'jsonrpc': '2.0',
-        'method': 'getTransactionCount',
-        'params': [{"commitment": "finalized"}],
+        'method': 'isBlockhashValid',
+        'params': ["9zJqLXK9pMhQZ4tGqVvUcxrKpKQ3pMSJ1nZmVeXtBqTd", {"commitment": "processed"}],
         'id': 'getblock.io'
     }
 )
@@ -90,8 +91,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .header("Content-Type", "application/json")
         .json(&json!({
             "jsonrpc": "2.0",
-            "method": "getTransactionCount",
-            "params": [{"commitment": "finalized"}],
+            "method": "isBlockhashValid",
+            "params": ["9zJqLXK9pMhQZ4tGqVvUcxrKpKQ3pMSJ1nZmVeXtBqTd", {"commitment": "processed"}],
             "id": "getblock.io"
         }))
         .send()
@@ -113,28 +114,33 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 {
     "jsonrpc": "2.0",
     "id": "getblock.io",
-    "result": 412873094521
+    "result": {
+        "context": {
+            "slot": 397234561
+        },
+        "value": true
+    }
 }
 ```
 
 ## Response Parameters
 
-| Parameter | Type   | Description                                |
-| --------- | ------ | ------------------------------------------ |
-| jsonrpc   | string | JSON-RPC protocol version ("2.0")          |
-| id        | string | Request identifier matching the request    |
-| result    | number | Cumulative transaction count since genesis |
+| Parameter | Type   | Description                                                               |
+| --------- | ------ | ------------------------------------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                                         |
+| id        | string | Request identifier matching the request                                   |
+| result    | object | RPC response object where value is true when the blockhash is still valid |
 
 ## Use Cases
 
-* **Network Metrics**: Chart cumulative throughput on a network status page
-* **Sampled TPS**: Difference two readings over a known interval to estimate throughput
-* **Node Comparison**: Check that two RPC nodes report consistent cluster state
-* **Milestone Tracking**: Detect when the cluster crosses a transaction count threshold
+* **Pre-Send Checks**: Avoid submitting a transaction built on an expired blockhash
+* **Retry Loops**: Stop rebroadcasting once the referenced blockhash expires
+* **Offline Signing**: Validate a blockhash after a delay between signing and submission
+* **Queue Draining**: Discard queued transactions whose blockhashes have lapsed
 
 ## Error Handling
 
-| Error Code | Message        | Description                                        |
-| ---------- | -------------- | -------------------------------------------------- |
-| -32602     | Invalid params | Unrecognized commitment level in the config object |
-| -32603     | Internal error | Node failed to read the bank transaction count     |
+| Error Code | Message        | Description                                           |
+| ---------- | -------------- | ----------------------------------------------------- |
+| -32602     | Invalid params | Blockhash is not valid base58 or has the wrong length |
+| -32603     | Internal error | Node failed to read the blockhash queue               |

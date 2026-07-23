@@ -1,189 +1,143 @@
 ---
 description: >-
-  The getRecentPerformanceSamples JSON-RPC method retrieves a list of recent
-  performance samples, ordered in reverse slot order.
+  Example code for the getRecentPerformanceSamples JSON-RPC method. Complete
+  guide on how to use the getRecentPerformanceSamples JSON-RPC method in the
+  GetBlock Web3 documentation.
 ---
 
-# getRecentPerformanceSamples – Solana
+# getRecentPerformanceSamples - Solana
 
-{% hint style="success" %}
-The getRecentPerformanceSamples RPC Solana method enables developers to access recent performance data related to block and transaction processing.
-{% endhint %}
+This method returns performance samples taken over recent 60-second windows, including transaction counts and slots elapsed. It is the standard source for calculating observed throughput.
 
-The getRecentPerformanceSamples method retrieves recent performance metrics of the Solana network, including transaction processing rates and slot progression. It helps developers analyze network performance trends, monitor congestion, and optimize application behavior based on real-time blockchain activity.
+## Parameters
 
-### Supported Networks
+| Parameter | Type   | Required | Description                                             |
+| --------- | ------ | -------- | ------------------------------------------------------- |
+| limit     | number | No       | Number of samples to return, up to 720. Defaults to 720 |
 
-This method is available on the following API endpoints:
-
-* Mainnet
-
-### Parameters
-
-#### Optional Parameters
-
-* **limit** (`usize`, optional): The number of recent performance samples to return.
-  * Maximum: 720
-
-### Result
-
-The response returns an array of `RpcPerfSample` objects, each containing:
-
-* `slot` (`u64`): The slot in which the sample was taken.
-* `numTransactions` (`u64`): The number of transactions processed during the sample period.
-* `numSlots` (`u64`): The number of slots completed during the sample period.
-* `samplePeriodSecs` (`u16`): The duration of the sample window in seconds (typically 60 seconds).
-* `numNonVoteTransactions` (`u64`): The number of non-vote transactions processed during the sample period. (Available in Solana v1.15 and later.)
-
-To calculate the number of vote transactions, use the formula:
-
-`numTransactions - numNonVoteTransactions`
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
     "method": "getRecentPerformanceSamples",
-    "params": [4]
+    "params": [2],
+    "id": "getblock.io"
 }'
 ```
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns an array of performance samples.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": [
-    {
-      "numSlots": 126,
-      "numTransactions": 126,
-      "numNonVoteTransactions": 1,
-      "samplePeriodSecs": 60,
-      "slot": 348125
-    },
-    {
-      "numSlots": 126,
-      "numTransactions": 126,
-      "numNonVoteTransactions": 1,
-      "samplePeriodSecs": 60,
-      "slot": 347999
-    },
-    {
-      "numSlots": 125,
-      "numTransactions": 125,
-      "numNonVoteTransactions": 0,
-      "samplePeriodSecs": 60,
-      "slot": 347873
-    },
-    {
-      "numSlots": 125,
-      "numTransactions": 125,
-      "numNonVoteTransactions": 0,
-      "samplePeriodSecs": 60,
-      "slot": 347748
-    }
-  ],
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getRecentPerformanceSamples error scenarios:
-
-* Invalid parameters: If an incorrect or out-of-range value is provided for limit.
-* Network errors: Connectivity issues with the Solana JSON-RPC API endpoints.
-* Malformed request: Incorrectly structured JSON requests.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32602,
-    "message": "Invalid limit parameter"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getRecentPerformanceSamples** method is useful for:
-
-* **Validators and node operators**: Monitoring transaction and slot processing performance;
-* **Blockchain explorers**: Displaying real-time network statistics;
-* **dApp developers**: Tracking performance trends to optimize transaction handling;
-* **Web3 analytics tools**: Analyzing historical network efficiency and congestion.
-
-### Code getRecentPerformanceSamples Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getRecentPerformanceSamples",
-  params: [4]
-};
+const samples = await connection.getRecentPerformanceSamples(2);
 
-const fetchRecentPerformanceSamples = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
+console.log(samples[0].numTransactions / samples[0].samplePeriodSecs);
+```
+{% endtab %}
 
-    if (response.status === 200 && Array.isArray(response.data.result)) {
-      const samples = response.data.result;
-      if (samples.length > 0) {
-        samples.forEach((sample, index) => {
-          console.log(`Sample ${index + 1}:`);
-          console.log(`  Slot: ${sample.slot}`);
-          console.log(`  Num Transactions: ${sample.numTransactions}`);
-          console.log(`  Num Slots: ${sample.numSlots}`);
-          console.log(`  Sample Period (seconds): ${sample.samplePeriodSecs}`);
-        });
-      } else {
-        console.log("No performance samples found.");
-      }
-    } else {
-      console.error("Unexpected response:", response.data);
+{% tab title="Request" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getRecentPerformanceSamples',
+        'params': [2],
+        'id': 'getblock.io'
     }
-  } catch (error) {
-    console.error("getRecentPerformanceSamples error:", error.response?.data || error.message);
-  }
-};
+)
 
-fetchRecentPerformanceSamples();
+print(response.json()['result'])
+```
+{% endtab %}
+
+{% tab title="Rust" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getRecentPerformanceSamples",
+            "params": [2],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
 ```
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **getRecentPerformanceSamples** into Solana’s Core API, developers can track block processing rates, monitor network congestion, and optimize transaction execution strategies. The JSON-RPC request provides real-time insights into Solana’s performance, making it a valuable tool for dApps, validators, and analytics platforms.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": [
+        {
+            "numNonVoteTransactions": 68412,
+            "numSlots": 149,
+            "numTransactions": 182934,
+            "samplePeriodSecs": 60,
+            "slot": 397234561
+        }
+    ]
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                            |
+| --------- | ------ | ------------------------------------------------------ |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                      |
+| id        | string | Request identifier matching the request                |
+| result    | array  | Array of performance sample objects, most recent first |
+
+### Sample Entry
+
+| Field                  | Type   | Description                                           |
+| ---------------------- | ------ | ----------------------------------------------------- |
+| slot                   | number | Slot the sample was taken at                          |
+| numTransactions        | number | Total transactions processed during the sample period |
+| numNonVoteTransactions | number | Transactions excluding validator vote transactions    |
+| numSlots               | number | Slots completed during the sample period              |
+| samplePeriodSecs       | number | Length of the sample window in seconds                |
+
+## Use Cases
+
+* **True TPS**: Divide numNonVoteTransactions by samplePeriodSecs to exclude vote traffic
+* **Congestion Signals**: Raise priority fees when recent samples show sustained load
+* **Status Pages**: Chart throughput and slot rate on a public network dashboard
+* **Capacity Planning**: Compare peak and baseline throughput across 12 hours of samples
+
+## Error Handling
+
+| Error Code | Message        | Description                                      |
+| ---------- | -------------- | ------------------------------------------------ |
+| -32602     | Invalid params | Limit exceeds 720 or is not a positive integer   |
+| -32603     | Internal error | Node failed to read the performance sample store |

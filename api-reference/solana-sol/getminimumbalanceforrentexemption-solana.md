@@ -1,143 +1,140 @@
 ---
 description: >-
-  The getMinimumBalanceForRentExemption JSON-RPC method retrieves the minimum
-  balance required to make an account rent-exempt in the Solana network.
+  Example code for the getMinimumBalanceForRentExemption JSON-RPC method.
+  Complete guide on how to use the getMinimumBalanceForRentExemption JSON-RPC
+  method in the GetBlock Web3 documentation.
 ---
 
-# getMinimumBalanceForRentExemption – Solana
+# getMinimumBalanceForRentExemption - Solana
 
-{% hint style="success" %}
-The **getMinimumBalanceForRentExemption** RPC Solana method calculates the minimum required balance for a given account size to avoid rent collection.
-{% endhint %}
+This method returns the minimum lamport balance an account must hold to be exempt from rent collection at a given data size. Accounts below this threshold are subject to rent and can be purged.
 
-The getMinimumBalanceForRentExemption method returns **the minimum SOL balance required to make an account rent-exempt** based on its data size. This ensures that the account remains active without needing periodic rent payments, making it essential for managing account storage on the Solana blockchain.
+## Parameters
 
-### Supported Networks
+| Parameter  | Type   | Required | Description                                 |
+| ---------- | ------ | -------- | ------------------------------------------- |
+| dataLength | number | Yes      | Account data length in bytes                |
+| config     | object | No       | Configuration object controlling commitment |
 
-This method is available on the following API endpoints:
+### Config Object
 
-* Mainnet
+| Field      | Type   | Required | Description                                                                 |
+| ---------- | ------ | -------- | --------------------------------------------------------------------------- |
+| commitment | string | No       | Commitment level: processed, confirmed, or finalized. Defaults to finalized |
 
-### Parameters
-
-#### Required Parameters
-
-* **`usize`** (optional): The length of the account’s data (in bytes).
-
-#### Optional Parameters
-
-* **`object`** (optional): A configuration object containing:
-  * **commitment** (`string`, optional): Specifies the level of finality.
-
-### Result
-
-The response returns a `u64` value, representing the **minimum number of lamports required for the account to remain rent-free**.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
     "method": "getMinimumBalanceForRentExemption",
-    "params": [50]
+    "params": [165],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns the minimum balance required for an account to remain rent-free.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": 500,
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getMinimumBalanceForRentExemption error scenarios:
-
-* Invalid account size: If an incorrect or negative value is provided.
-* Network errors: Connectivity issues with the Solana JSON-RPC API endpoints.
-* Malformed request: If the request format is incorrect.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32602,
-    "message": "Invalid account size"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getMinimumBalanceForRentExemption** method is useful for:
-
-* **dApp developers**: Ensuring that accounts have enough balance to avoid rent charges;
-* **Web3 analytics tools**: Estimating storage costs for Solana-based applications;
-* **Validators and infrastructure providers**: Monitoring rent-exempt accounts and optimizing network resources.
-
-### Code getMinimumBalanceForRentExemption Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getMinimumBalanceForRentExemption",
-  params: [50]
-};
+const lamports = await connection.getMinimumBalanceForRentExemption(165);
 
-const fetchMinimumBalanceForRentExemption = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result !== undefined) {
-      console.log("Minimum Rent-Exempt Balance (lamports):", response.data.result);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getMinimumBalanceForRentExemption error:", error.response?.data || error.message);
-  }
-};
-
-fetchMinimumBalanceForRentExemption();
-
+console.log(lamports);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getMinimumBalanceForRentExemption',
+        'params': [165],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getMinimumBalanceForRentExemption",
+            "params": [165],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **getMinimumBalanceForRentExemption** into Solana’s Core API, developers can manage account rent requirements efficiently, optimize block storage, and ensure smooth transaction execution. The JSON-RPC request allows easy retrieval of rent-exemption values, making it a key component in decentralized applications, wallets, and staking infrastructure.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": 2039280
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                                               |
+| --------- | ------ | ------------------------------------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                                         |
+| id        | string | Request identifier matching the request                                   |
+| result    | number | Minimum lamports required for rent exemption at the requested data length |
+
+## Use Cases
+
+* **Account Creation**: Fund a new SPL Token account with the exact rent-exempt minimum
+* **Cost Estimation**: Quote storage cost to users before a program allocates state
+* **PDA Sizing**: Compare rent cost across candidate account layouts
+* **Reclaim Logic**: Calculate lamports recoverable when closing an account
+
+## Error Handling
+
+| Error Code | Message        | Description                              |
+| ---------- | -------------- | ---------------------------------------- |
+| -32602     | Invalid params | dataLength is negative or not an integer |
+| -32603     | Internal error | Node failed to read the rent sysvar      |

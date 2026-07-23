@@ -1,226 +1,200 @@
 ---
 description: >-
-  The getTokenAccountsByOwner JSON-RPC method retrieves all SPL Token accounts
-  associated with a specified token owner.
+  Example code for the getTokenAccountsByOwner JSON-RPC method. Complete guide
+  on how to use the getTokenAccountsByOwner JSON-RPC method in the GetBlock Web3
+  documentation.
 ---
 
-# getTokenAccountsByOwner – Solana
+# getTokenAccountsByOwner - Solana
 
-{% hint style="success" %}
-The **getTokenAccountsByOwner** RPC Solana method allows developers to query SPL Token accounts by specifying an account Pubkey of the owner.
-{% endhint %}
+This method returns all SPL Token accounts held by an owner address. Results can be narrowed to a single mint or a single token program, and returned in parsed form.
 
-This method supports optional filtering by mint or programId and offers various encoding formats for flexibility when **working with token data** in Solana’s Core API.
+## Parameters
 
-### Supported Networks
+| Parameter | Type   | Required | Description                                              |
+| --------- | ------ | -------- | -------------------------------------------------------- |
+| owner     | string | Yes      | Base58-encoded Pubkey of the token account owner         |
+| filter    | object | Yes      | Filter object specifying either a mint or a programId    |
+| config    | object | No       | Configuration object controlling encoding and commitment |
 
-This method is available on the following API endpoints:
+### Filter Object
 
-* Mainnet
+| Field     | Type   | Required | Description                                              |
+| --------- | ------ | -------- | -------------------------------------------------------- |
+| mint      | string | No       | Restrict results to token accounts for this mint         |
+| programId | string | No       | Restrict results to accounts owned by this token program |
 
-### Parameters
+### Config Object
 
-#### Required Parameters
+| Field          | Type   | Required | Description                                                                 |
+| -------------- | ------ | -------- | --------------------------------------------------------------------------- |
+| encoding       | string | No       | Data encoding: base58, base64, base64+zstd, or jsonParsed                   |
+| commitment     | string | No       | Commitment level: processed, confirmed, or finalized. Defaults to finalized |
+| dataSlice      | object | No       | Byte range to return, with offset and length fields                         |
+| minContextSlot | number | No       | Minimum slot the request can be evaluated at                                |
 
-* **`string`** (required): The Pubkey of the token owner, provided as a base-58 encoded string.
-* **`object`** (required): A JSON object containing one of the following fields:
-  * `mint` (`string`): The Pubkey of a specific token Mint to filter accounts.
-  * `programId` (`string`): The Pubkey of the Token Program that owns the accounts.
-
-#### Optional Parameters
-
-* **`object`** (optional): A configuration object containing:
-  * **commitment** (`string`): The level of commitment for the request.
-  * **minContextSlot** (`number`): The minimum slot at which the request can be evaluated.
-  * **dataSlice** (`object`): Requests a slice of the account’s data.
-    * `length` (`usize`): Number of bytes to return.
-    * `offset` (`usize`): Byte offset from which to start reading.
-  * **encoding** (`string`): The encoding format for the account data.
-    * Supported values: `base58`, `base64`, `base64+zstd`, `jsonParsed`.
-
-### Result
-
-The response is an RpcResponse JSON object containing:
-
-* **`context`** (`object`): Provides contextual information about the slot.
-  * `apiVersion` (`string`): The version of the API.
-  * `slot` (`u64`): The slot number when the data was retrieved.
-* **`value`** (`array`): An array of JSON objects representing the token accounts.
-  * Each object includes:
-    * `pubkey` (`string`): The account Pubkey in base-58 encoding.
-    * `account` (`object`):
-      * `lamports` (`u64`): Number of lamports in the account.
-      * `owner` (`string`): The Pubkey of the program owning the account.
-      * `data` (`object`): Encoded account data or parsed JSON representation.
-      * `executable` (`bool`): Whether the account contains a program.
-      * `rentEpoch` (`u64`): The epoch at which the account will next owe rent.
-      * `space` (`u64`): The data size of the account.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
     "method": "getTokenAccountsByOwner",
-    "params": [
-      "A1TMhSGzQxMr1TboBKtgixKz1sS6REASMxPo1qsyTSJd",
-      {
-        "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-      },
-      {
-        "encoding": "jsonParsed"
-      }
-    ]
+    "params": ["JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4", {"programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"}, {"encoding": "jsonParsed"}],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns an array of SPL Token accounts associated with the specified owner.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": {
-    "context": { "apiVersion": "2.0.15", "slot": 341197933 },
-    "value": [
-      {
-        "account": {
-          "data": {
-            "parsed": {
-              "info": {
-                "isNative": false,
-                "mint": "2cHr7QS3xfuSV8wdxo3ztuF4xbiarF6Nrgx3qpx3HzXR",
-                "owner": "A1TMhSGzQxMr1TboBKtgixKz1sS6REASMxPo1qsyTSJd",
-                "state": "initialized",
-                "tokenAmount": {
-                  "amount": "420000000000000",
-                  "decimals": 6,
-                  "uiAmount": 420000000.0,
-                  "uiAmountString": "420000000"
-                }
-              },
-              "type": "account"
-            },
-            "program": "spl-token",
-            "space": 165
-          },
-          "executable": false,
-          "lamports": 2039280,
-          "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-          "rentEpoch": 18446744073709551615,
-          "space": 165
-        },
-        "pubkey": "BGocb4GEpbTFm8UFV2VsDSaBXHELPfAXrvd4vtt8QWrA"
-      }
-    ]
-  },
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getTokenAccountsByOwner error scenarios:
-
-* Invalid Pubkey: If the provided Pubkey is incorrectly formatted.
-* Network errors: Connectivity issues with the Solana JSON-RPC API endpoints.
-* Invalid encoding: If an unsupported encoding type is specified.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32602,
-    "message": "Invalid Token Account Pubkey"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getTokenAccountsByOwner** method is useful for:
-
-* **Wallet applications**: Displaying token balances for user accounts;
-* **Web3 analytics tools**: Tracking token balances across multiple accounts;
-* **DeFi applications**: Analyzing token holdings and transfers;
-* **Blockchain explorers**: Displaying token account information in real-time.
-
-### Code getTokenAccountsByOwner Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection, PublicKey } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/";
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getTokenAccountsByOwner",
-  params: [
-    "A1TMhSGzQxMr1TboBKtgixKz1sS6REASMxPo1qsyTSJd",
-    {
-      programId: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-    },
-    { encoding: "jsonParsed" }
-  ]
-};
+const { value } = await connection.getParsedTokenAccountsByOwner(
+  new PublicKey('JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4'),
+  { programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') }
+);
 
-const fetchTokenAccountsByOwner = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && Array.isArray(response.data.result?.value)) {
-      const accounts = response.data.result.value;
-      if (accounts.length > 0) {
-        accounts.forEach((account, index) => {
-          console.log(`Account ${index + 1}:`);
-          console.log(`  Pubkey: ${account.pubkey}`);
-          console.log(`  Mint: ${account.account.data.parsed.info.mint}`);
-          console.log(`  Owner: ${account.account.data.parsed.info.owner}`);
-          console.log(`  Token Amount: ${account.account.data.parsed.info.tokenAmount.uiAmount}`);
-          console.log(`  Decimals: ${account.account.data.parsed.info.tokenAmount.decimals}`);
-        });
-      } else {
-        console.log("No token accounts found for the specified owner.");
-      }
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getTokenAccountsByOwner error:", error.response?.data || error.message);
-  }
-};
-
-fetchTokenAccountsByOwner();
-
+console.log(value.length);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getTokenAccountsByOwner',
+        'params': ["JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4", {"programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"}, {"encoding": "jsonParsed"}],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getTokenAccountsByOwner",
+            "params": ["JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4", {"programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"}, {"encoding": "jsonParsed"}],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **getTokenAccountsByOwner** into Solana’s Core API, developers can efficiently track token accounts, monitor transaction activity, and manage account state. This JSON-RPC method is essential for applications that handle SPL Token balances and ownership records in Web3 environments.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": {
+        "context": {
+            "apiVersion": "2.3.6",
+            "slot": 397234561
+        },
+        "value": [
+            {
+                "account": {
+                    "data": {
+                        "parsed": {
+                            "info": {
+                                "isNative": false,
+                                "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                                "owner": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+                                "state": "initialized",
+                                "tokenAmount": {
+                                    "amount": "1250000000",
+                                    "decimals": 6,
+                                    "uiAmount": 1250.0,
+                                    "uiAmountString": "1250"
+                                }
+                            },
+                            "type": "account"
+                        },
+                        "program": "spl-token",
+                        "space": 165
+                    },
+                    "executable": false,
+                    "lamports": 2039280,
+                    "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+                    "rentEpoch": 18446744073709551615,
+                    "space": 165
+                },
+                "pubkey": "3emsAVdmGKERbHjmGfQ6oZ1e35dkf5z6TmFYcCQnpB2M"
+            }
+        ]
+    }
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                                                     |
+| --------- | ------ | ------------------------------------------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                                               |
+| id        | string | Request identifier matching the request                                         |
+| result    | object | RPC response object where value is an array of token accounts held by the owner |
+
+### Value Entry
+
+| Field   | Type   | Description                                                         |
+| ------- | ------ | ------------------------------------------------------------------- |
+| pubkey  | string | Base58 Pubkey of the token account                                  |
+| account | object | Account object containing the parsed or encoded token account state |
+
+## Use Cases
+
+* **Portfolio Rendering**: List every token a wallet holds in one request
+* **ATA Discovery**: Locate the associated token account for a mint and owner pair
+* **Token-2022 Support**: Query the Token-2022 program separately from the legacy program
+* **Balance Aggregation**: Sum holdings across multiple token accounts for the same mint
+* **Dust Cleanup**: Identify zero-balance accounts whose rent can be reclaimed
+
+## Error Handling
+
+| Error Code | Message                                   | Description                                                            |
+| ---------- | ----------------------------------------- | ---------------------------------------------------------------------- |
+| -32602     | Invalid params                            | Filter omits both mint and programId, or the owner Pubkey is malformed |
+| -32603     | Internal error                            | Node failed to scan token accounts for the owner                       |
+| -32016     | Minimum context slot has not been reached | The node has not yet processed minContextSlot                          |
+| -32005     | Node is unhealthy                         | The node has fallen behind the cluster tip                             |

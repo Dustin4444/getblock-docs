@@ -379,7 +379,7 @@ You can call these methods directly on the gRPC client without opening a streami
 Before you start streaming data with the Yellowstone Geyser plugin, consider these recommendations:
 
 * **Filtering is crucial**: Always narrow your subscription to only the `accounts` or `programs` you need. Excessive or empty filters can overwhelm clients and hit rate limits.
-* **Combine with JSON‑RPC**: Use gRPC for real‑time streaming. Continue to use GetBlock’s JSON‑RPC Solana endpoints for on‑demand calls like [`getBlock`](../../api-reference/solana-sol/sol_getblock.md), [`sendTransaction`](../../api-reference/solana-sol/sol_sendtransaction.md), or historical queries.
+* **Combine with JSON‑RPC**: Use gRPC for real‑time streaming. Continue to use GetBlock’s JSON‑RPC Solana endpoints for on‑demand calls like [`getBlock`](/broken/pages/qfijVOnnvj0tmM2T2mDt), [`sendTransaction`](/broken/pages/164SGSO9dftxQ39PHwbH), or historical queries.
 * **Keeping your stream alive**: gRPC streams may time out if idle. The Yellowstone plugin can handle keep-alive pings. In your `SubscribeRequest`, you can set `ping: true` to respond to server pings (or send a minimal ping message periodically) to keep the stream alive.
 * **Selecting the right commitment levels**: Choose **`processed`**, **`confirmed`**, or **`finalized`** in your `SubscribeRequest` to balance between lowest latency (`processed`) and highest certainty (`finalized`). For most real‑time use cases (dashboards, bots), use `processed` to see intra‑slot updates.
 

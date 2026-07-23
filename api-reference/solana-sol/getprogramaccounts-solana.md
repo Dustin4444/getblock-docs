@@ -1,217 +1,186 @@
 ---
 description: >-
-  The getProgramAccounts JSON-RPC method retrieves all accounts owned by the
-  specified program Pubkey in the Solana blockchain.
+  Example code for the getProgramAccounts JSON-RPC method. Complete guide on how
+  to use the getProgramAccounts JSON-RPC method in the GetBlock Web3
+  documentation.
 ---
 
-# getProgramAccounts – Solana
+# getProgramAccounts - Solana
 
-{% hint style="success" %}
-The **getProgramAccounts** RPC Solana method allows developers to query multiple accounts belonging to a specific program Pubkey.
-{% endhint %}
+This method returns all accounts owned by a program, with optional filters on data size and byte content. This is the primary method for indexing program state such as SPL Token accounts and Anchor PDAs.
 
-The getProgramAccounts method retrieves **all accounts associated with a specific program** on the Solana blockchain. It allows developers to efficiently query and filter on-chain data, making it essential for interacting with smart contracts, indexing program-related accounts, and analyzing decentralized application (dApp) states.
+## Parameters
 
-### Supported Networks
+| Parameter | Type   | Required | Description                                                        |
+| --------- | ------ | -------- | ------------------------------------------------------------------ |
+| programId | string | Yes      | Base58-encoded Pubkey of the owning program                        |
+| config    | object | No       | Configuration object controlling filters, encoding, and commitment |
 
-This method is available on the following API endpoints:
+### Config Object
 
-* Mainnet
+| Field          | Type    | Required | Description                                                                 |
+| -------------- | ------- | -------- | --------------------------------------------------------------------------- |
+| encoding       | string  | No       | Data encoding: base58, base64, base64+zstd, or jsonParsed                   |
+| commitment     | string  | No       | Commitment level: processed, confirmed, or finalized. Defaults to finalized |
+| dataSlice      | object  | No       | Byte range to return, with offset and length fields                         |
+| filters        | array   | No       | Up to 4 filter objects, each a dataSize or memcmp filter                    |
+| withContext    | boolean | No       | Wrap the result in an RpcResponse context object                            |
+| minContextSlot | number  | No       | Minimum slot the request can be evaluated at                                |
 
-### Parameters
+### Memcmp Filter
 
-#### Required Parameters
+| Field    | Type   | Required | Description                                       |
+| -------- | ------ | -------- | ------------------------------------------------- |
+| offset   | number | Yes      | Byte offset into the account data to compare from |
+| bytes    | string | Yes      | Data to match, base58 or base64 encoded           |
+| encoding | string | No       | Encoding of the bytes field: base58 or base64     |
 
-* **`string`** (required): The Pubkey of the program, provided as a base-58 encoded string.
-
-#### Optional Parameters
-
-* **`object`** (optional): A configuration object containing:
-  * **commitment** (`string`, optional): Defines the level of finality for the query.
-  * **minContextSlot** (`number`, optional): The minimum slot at which the request can be evaluated.
-  * **withContext** (`bool`, optional): Wraps the result in an RpcResponse JSON object.
-  * **encoding** (`string`, optional): Specifies the encoding format for the returned account data.
-    * Default: `json`
-    * Supported values: `jsonParsed`, `base58`, `base64`, `base64+zstd`.
-  * **dataSlice** (`object`, optional): Specifies a portion of account data to return.
-    * `length` (`usize`): Number of bytes to return.
-    * `offset` (`usize`): Byte offset from which to start reading.
-  * **filters** (`array`, optional): Allows filtering results using up to 4 filter objects. The resultant accounts must meet all filter criteria.
-
-### Result
-
-By default, the response contains an array of JSON objects. If the `withContext` flag is set, the array is wrapped in an `RpcResponse` JSON object.
-
-Each result object contains:
-
-* `pubkey` (`string`): The account Pubkey, base-58 encoded.
-* `account` (`object`):
-  * `lamports` (`u64`): Number of lamports assigned to this account.
-  * `owner` (`string`): Base-58 encoded Pubkey of the program that owns this account.
-  * `data` (`[string, encoding]|object`): Account data, either as encoded binary data or JSON format.
-  * `executable` (`bool`): Indicates if the account contains a program.
-  * `rentEpoch` (`u64`): The epoch at which this account will next owe rent.
-  * `space` (`u64`): The data size of the account.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
     "method": "getProgramAccounts",
-    "params": [
-      "4Nd1mBQtrMJVYVfKf2PJy9NZUZdTAsp7D4xWLs4gDB4T",
-      {
-        "filters": [
-          {
-            "dataSize": 17
-          },
-          {
-            "memcmp": {
-              "offset": 4,
-              "bytes": "3Mc6vR"
-            }
-          }
-        ]
-      }
-    ]
+    "params": ["TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", {"encoding": "jsonParsed", "filters": [{"dataSize": 165}, {"memcmp": {"offset": 0, "bytes": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"}}]}],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns an array of **accounts owned by the specified program Pubkey**.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": [
-    {
-      "account": {
-        "data": "2R9jLfiAQ9bgdcw6h8s44439",
-        "executable": false,
-        "lamports": 15298080,
-        "owner": "4Nd1mBQtrMJVYVfKf2PJy9NZUZdTAsp7D4xWLs4gDB4T",
-        "rentEpoch": 28,
-        "space": 42
-      },
-      "pubkey": "CxELquR1gPP8wHe33gZ4QxqGB3sZ9RSwsJ2KshVewkFY"
-    }
-  ],
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getProgramAccounts error scenarios:
-
-* Invalid Pubkey: If the provided key is incorrectly formatted.
-* Network errors: Connectivity issues with the Solana JSON-RPC API endpoints.
-* Malformed request: Incorrectly structured JSON requests.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32602,
-    "message": "Invalid Pubkey format"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getProgramAccounts** method is useful for:
-
-* **dApp developers**: Fetching all accounts managed by a specific program;
-* **Blockchain explorers**: Displaying program-related account data efficiently;
-* **Validators and node operators**: Monitoring program accounts in real time.
-
-### Code getProgramAccounts Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection, PublicKey } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getProgramAccounts",
-  params: [
-    "4Nd1mBQtrMJVYVfKf2PJy9NZUZdTAsp7D4xWLs4gDB4T",
-    {
-      filters: [
-        { dataSize: 17 },
-        {
-          memcmp: {
-            offset: 4,
-            bytes: "3Mc6vR"
-          }
-        }
-      ],
-      encoding: "base64"
-    }
-  ]
-};
-
-const fetchProgramAccounts = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && Array.isArray(response.data.result)) {
-      const accounts = response.data.result;
-      if (accounts.length > 0) {
-        accounts.forEach((account, index) => {
-          console.log(`Account ${index + 1}:`);
-          console.log(`  Pubkey: ${account.pubkey}`);
-          console.log(`  Lamports: ${account.account.lamports}`);
-          console.log(`  Owner: ${account.account.owner}`);
-          console.log(`  Executable: ${account.account.executable}`);
-          console.log(`  Data (base64): ${account.account.data}`);
-          console.log(`  Rent Epoch: ${account.account.rentEpoch}`);
-        });
-      } else {
-        console.log("No program accounts found for the specified filters.");
-      }
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getProgramAccounts error:", error.response?.data || error.message);
+const accounts = await connection.getParsedProgramAccounts(
+  new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'),
+  {
+    filters: [
+      { dataSize: 165 },
+      { memcmp: { offset: 0, bytes: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' } }
+    ]
   }
-};
+);
 
-fetchProgramAccounts();
-
+console.log(accounts.length);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getProgramAccounts',
+        'params': ["TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", {"encoding": "jsonParsed", "filters": [{"dataSize": 165}, {"memcmp": {"offset": 0, "bytes": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"}}]}],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getProgramAccounts",
+            "params": ["TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", {"encoding": "jsonParsed", "filters": [{"dataSize": 165}, {"memcmp": {"offset": 0, "bytes": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"}}]}],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **getProgramAccounts** into Solana’s Core API, developers can efficiently track program-owned accounts, retrieve transaction and block details, and optimize decentralized applications. The JSON-RPC request structure allows streamlined account queries, making it an essential tool for Solana-based services.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": [
+        {
+            "account": {
+                "data": [
+                    "",
+                    "base64"
+                ],
+                "executable": false,
+                "lamports": 2039280,
+                "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+                "rentEpoch": 18446744073709551615,
+                "space": 165
+            },
+            "pubkey": "3emsAVdmGKERbHjmGfQ6oZ1e35dkf5z6TmFYcCQnpB2M"
+        }
+    ]
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                                                        |
+| --------- | ------ | ---------------------------------------------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                                                  |
+| id        | string | Request identifier matching the request                                            |
+| result    | array  | Array of account objects owned by the program, each with pubkey and account fields |
+
+### Result Entry
+
+| Field   | Type   | Description                                                                 |
+| ------- | ------ | --------------------------------------------------------------------------- |
+| pubkey  | string | Base58 Pubkey of the account                                                |
+| account | object | Account object with lamports, owner, data, executable, rentEpoch, and space |
+
+## Use Cases
+
+* **Token Holder Indexes**: Enumerate every SPL Token account for a given mint
+* **Anchor Discriminators**: Filter PDAs by the 8-byte account discriminator at offset 0
+* **Order Book Crawls**: List open orders accounts owned by a DEX program
+* **Stake Analysis**: Query stake accounts delegated to a specific vote account
+* **Protocol Dashboards**: Rebuild protocol state without an off-chain indexer
+
+## Error Handling
+
+| Error Code | Message                                   | Description                                                          |
+| ---------- | ----------------------------------------- | -------------------------------------------------------------------- |
+| -32602     | Invalid params                            | More than 4 filters, malformed memcmp bytes, or unsupported encoding |
+| -32603     | Internal error                            | Scan exceeded the node's account scan limits                         |
+| -32016     | Minimum context slot has not been reached | The node has not yet processed minContextSlot                        |
+| -32005     | Node is unhealthy                         | The node has fallen behind the cluster tip                           |

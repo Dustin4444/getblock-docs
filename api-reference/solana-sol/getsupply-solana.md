@@ -1,168 +1,161 @@
 ---
 description: >-
-  The getSupply JSON-RPC method retrieves information about the current supply
-  of Solana (SOL), including total, circulating, and non-circulating supplies.
+  Example code for the getSupply JSON-RPC method. Complete guide on how to use
+  the getSupply JSON-RPC method in the GetBlock Web3 documentation.
 ---
 
-# getSupply – Solana
+# getSupply - Solana
 
-{% hint style="success" %}
-The **getSupply** RPC Solana method provides details on the current supply distribution in the Solana blockchain.
-{% endhint %}
+This method returns total, circulating, and non-circulating SOL supply in lamports. The list of non-circulating accounts can be omitted to reduce response size.
 
-It supports an optional parameters object for customizing the request, such as excluding non-circulating account details for performance optimization.
+## Parameters
 
-This method is useful for developers building **dashboards**, **analytics tools**, and **financial service**s that rely on accurate blockchain supply data via Solana's Core API.
+| Parameter | Type   | Required | Description                                                     |
+| --------- | ------ | -------- | --------------------------------------------------------------- |
+| config    | object | No       | Configuration object controlling commitment and account listing |
 
-### Supported Networks
+### Config Object
 
-This method is available on the following API endpoints:
+| Field                             | Type    | Required | Description                                                                 |
+| --------------------------------- | ------- | -------- | --------------------------------------------------------------------------- |
+| commitment                        | string  | No       | Commitment level: processed, confirmed, or finalized. Defaults to finalized |
+| excludeNonCirculatingAccountsList | boolean | No       | Omit the array of non-circulating account addresses from the response       |
 
-* Mainnet
-
-### Parameters
-
-#### Optional Parameters
-
-* **`object`** (optional): A configuration object containing:
-  * **commitment** (`string`, optional): Defines the level of finality for the request.
-  * **excludeNonCirculatingAccountsList** (`bool`, optional): If set to true, excludes the list of non-circulating accounts from the response.
-
-### Result
-
-The response returns an RpcResponse object containing:
-
-* **`context`** (`object`): Contextual information about the slot.
-  * `slot` (`u64`): The slot number when the supply data was retrieved.
-* **`value`** (`object`):
-  * `total` (`u64`): Total supply of SOL in lamports.
-  * `circulating` (`u64`): Circulating supply in lamports.
-  * `nonCirculating` (`u64`): Non-circulating supply in lamports.
-  * `nonCirculatingAccounts` (`array`): An array of account addresses holding non-circulating supply.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "getSupply"
+    "method": "getSupply",
+    "params": [{"commitment": "finalized", "excludeNonCirculatingAccountsList": true}],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns the current supply information.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": {
-    "context": {
-      "slot": 1114
-    },
-    "value": {
-      "circulating": 16000,
-      "nonCirculating": 1000000,
-      "nonCirculatingAccounts": [
-        "FEy8pTbP5fEoqMV1GdTz83byuA8EKByqYat1PKDgVAq5",
-        "9huDUZfxoJ7wGMTffUE7vh1xePqef7gyrLJu9NApncqA",
-        "3mi1GmwEE3zo2jmfDuzvjSX9ovRXsDUKHvsntpkhuLJ9",
-        "BYxEJTDerkaRWBem3XgnVcdhppktBXa2HbkHPKj2Ui4Z"
-      ],
-      "total": 1016000
-    }
-  },
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getSupply error scenarios:
-
-* Invalid parameters: If the request contains malformed or incorrect parameters.
-* Network errors: Connectivity issues with the Solana JSON-RPC API endpoints.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32602,
-    "message": "Invalid parameter format"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getSupply** method is useful for:
-
-* **Validators and node operators**: Monitoring total and circulating supply;
-* **Wallet applications**: Displaying supply metrics to users;
-* **Web3 analytics tools:** Analyzing supply trends and distributions;
-* **Blockchain explorers**: Displaying real-time supply statistics.
-
-### Code getSupply Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'finalized');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getSupply"
-};
+const { value } = await connection.getSupply({
+  excludeNonCirculatingAccountsList: true
+});
 
-const fetchSupplyInfo = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result?.value) {
-      const supply = response.data.result.value;
-      console.log("Supply Information:");
-      console.log(`  Total Supply: ${supply.total}`);
-      console.log(`  Circulating Supply: ${supply.circulating}`);
-      console.log(`  Non-Circulating Supply: ${supply.nonCirculating}`);
-      console.log(`  Non-Circulating Accounts: ${supply.nonCirculatingAccounts.join(', ') || 'N/A'}`);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getSupply error:", error.response?.data || error.message);
-  }
-};
-
-fetchSupplyInfo();
-
+console.log(value.circulating, value.total);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getSupply',
+        'params': [{"commitment": "finalized", "excludeNonCirculatingAccountsList": true}],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getSupply",
+            "params": [{"commitment": "finalized", "excludeNonCirculatingAccountsList": true}],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **getSupply** into Solana’s Core API, developers can track blockchain supply metrics, analyze transaction activity, and monitor circulating and non-circulating supply dynamics. This JSON-RPC method is essential for applications that need accurate supply information for financial reporting and analytics.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": {
+        "context": {
+            "slot": 397234561
+        },
+        "value": {
+            "circulating": 542837291043872913,
+            "nonCirculating": 18402937182937,
+            "nonCirculatingAccounts": [],
+            "total": 542855693981055850
+        }
+    }
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                                            |
+| --------- | ------ | ---------------------------------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                                      |
+| id        | string | Request identifier matching the request                                |
+| result    | object | RPC response object where value holds the supply breakdown in lamports |
+
+### Value Object
+
+| Field                  | Type   | Description                                                   |
+| ---------------------- | ------ | ------------------------------------------------------------- |
+| total                  | number | Total SOL supply in lamports                                  |
+| circulating            | number | Circulating supply in lamports                                |
+| nonCirculating         | number | Non-circulating supply in lamports                            |
+| nonCirculatingAccounts | array  | Addresses holding non-circulating supply, empty when excluded |
+
+## Use Cases
+
+* **Market Cap**: Multiply circulating supply by SOL price for market capitalization
+* **Staking Ratio**: Compare total active stake against circulating supply
+* **Vesting Analysis**: Track how non-circulating balances unlock over time
+* **Network Reports**: Publish verified supply figures rather than third-party estimates
+
+## Error Handling
+
+| Error Code | Message           | Description                                        |
+| ---------- | ----------------- | -------------------------------------------------- |
+| -32602     | Invalid params    | Unrecognized commitment level in the config object |
+| -32603     | Internal error    | Node failed to scan non-circulating accounts       |
+| -32005     | Node is unhealthy | The node has fallen behind the cluster tip         |

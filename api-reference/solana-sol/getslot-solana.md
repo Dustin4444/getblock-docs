@@ -1,140 +1,141 @@
 ---
 description: >-
-  The getSlot JSON-RPC method retrieves the latest slot that has reached the
-  given or default commitment level in the Solana blockchain.
+  Example code for the getSlot JSON-RPC method. Complete guide on how to use the
+  getSlot JSON-RPC method in the GetBlock Web3 documentation.
 ---
 
-# getSlot – Solana
+# getSlot - Solana
 
-{% hint style="info" %}
-The **getSlot** RPC Solana method allows developers to retrieve the most recent slot number that has been confirmed based on the specified commitment level.
-{% endhint %}
+This method returns the highest slot the node has reached at the requested commitment level. Slots increment on a fixed schedule whether or not a block is produced.
 
-Slots represent points in time within Solana’s block production mechanism, making this method essential for **real-time block and transaction monitoring** in Solana’s Core API.
+## Parameters
 
-The method also supports an optional parameters object to refine results based on the commitment level and minimum evaluation slot.
+| Parameter | Type   | Required | Description                                 |
+| --------- | ------ | -------- | ------------------------------------------- |
+| config    | object | No       | Configuration object controlling commitment |
 
-### Supported Networks
+### Config Object
 
-This method is available on the following API endpoints:
+| Field          | Type   | Required | Description                                                                 |
+| -------------- | ------ | -------- | --------------------------------------------------------------------------- |
+| commitment     | string | No       | Commitment level: processed, confirmed, or finalized. Defaults to finalized |
+| minContextSlot | number | No       | Minimum slot the request can be evaluated at                                |
 
-* Mainnet
-
-### Parameters
-
-#### Optional Parameters
-
-* **`object`** (optional): A configuration object containing:
-  * **commitment** (`string`, optional): Defines the level of finality for the query.
-  * **minContextSlot** (`number`, optional): The minimum slot at which the request can be evaluated.
-
-### Result
-
-The response returns a `u64` value, representing **the current slot number**.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "getSlot"
+    "method": "getSlot",
+    "params": [{"commitment": "finalized"}],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns the latest slot number.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": 1234,
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getSlot error scenarios:
-
-* Invalid parameters: If an incorrect or malformed parameter is provided.
-* Network errors: Connectivity issues with the Solana JSON-RPC API endpoints.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32602,
-    "message": "Invalid parameter format"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana getSlot method is useful for:
-
-* **Validators and node operators**: Tracking the latest slot to ensure synchronization;
-* **Blockchain explorers**: Displaying real-time network slot data;
-* **dApp developers**: Monitoring slot progression to optimize transaction timing.
-
-### Code getSlot Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'finalized');
 
+const slot = await connection.getSlot();
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getSlot"
-};
-
-
-const fetchCurrentSlot = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result !== undefined) {
-      console.log("Current Slot:", response.data.result);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getSlot error:", error.response?.data || error.message);
-  }
-};
-
-fetchCurrentSlot();
+console.log(slot);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getSlot',
+        'params': [{"commitment": "finalized"}],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getSlot",
+            "params": [{"commitment": "finalized"}],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **getSlot** into Solana’s Core API, developers can efficiently track block progress, monitor transaction confirmation times, and ensure real-time request handling. This JSON-RPC method is essential for building responsive blockchain applications and infrastructure services.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": 397234561
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                      |
+| --------- | ------ | ------------------------------------------------ |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                |
+| id        | string | Request identifier matching the request          |
+| result    | number | Highest slot reached at the requested commitment |
+
+## Use Cases
+
+* **Sync Checks**: Compare slots across providers to detect a lagging endpoint
+* **Polling Anchors**: Use the current slot as a cursor for incremental ingestion
+* **Commitment Gaps**: Measure the distance between processed and finalized slots
+* **Timing Estimates**: Convert slot deltas to elapsed time at roughly 400 ms per slot
+
+## Error Handling
+
+| Error Code | Message                                   | Description                                        |
+| ---------- | ----------------------------------------- | -------------------------------------------------- |
+| -32602     | Invalid params                            | Unrecognized commitment level in the config object |
+| -32016     | Minimum context slot has not been reached | The node has not yet processed minContextSlot      |
+| -32603     | Internal error                            | Node failed to read the requested cluster state    |
+| -32005     | Node is unhealthy                         | The node has fallen behind the cluster tip         |

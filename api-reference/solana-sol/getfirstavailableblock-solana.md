@@ -1,141 +1,131 @@
 ---
 description: >-
-  The getFirstAvailableBlock method retrieves the earliest available block in
-  the Solana blockchain. This block represents the oldest historical data that
-  can be accessed via the node.
+  Example code for the getFirstAvailableBlock JSON-RPC method. Complete guide on
+  how to use the getFirstAvailableBlock JSON-RPC method in the GetBlock Web3
+  documentation.
 ---
 
 # getFirstAvailableBlock - Solana
 
-{% hint style="success" %}
-The getFirstAvailableBlock method in Solana provides the first available block from the blockchain, allowing developers to retrieve the earliest block that can be queried.
-{% endhint %}
+This method returns the lowest confirmed block slot that has not been purged from the node's ledger. It defines the earliest point historical queries can reach on that node.
 
-The getFirstAvailableBlock method provides information about the earliest available block in the Solana blockchain. It is used for data synchronization and analysis, allowing applications to start processing from the first accessible block. This method is part of Solana's Core API and ensures the proper operation of services that rely on historical blockchain data.
+## Parameters
 
-### Supported Networks
-
-Access this method via Solana API Endpoints:
-
-* Mainnet
-
-### Parameters
-
-{% hint style="info" %}
-No parameters are required for this method.
-{% endhint %}
+This method does not accept any parameters.
 
 ## Request
 
-#### Endpoint URL:
-
-```
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### Example Request (cURL):
-
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
     "method": "getFirstAvailableBlock",
-    "params": []
+    "params": [],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-The response contains the block number of the first available block.
-
-#### Example Response:
-
-```json
-{
-    "id": "getblock.io",
-    "jsonrpc": "2.0",
-    "result": 122257143
-}
-```
-
-#### Response Parameters:
-
-* id: A unique identifier for the request, matching the ID sent in the request body.
-* jsonrpc: Specifies the use of JSON-RPC version 2.0.
-* result: The block number of the first available block in the blockchain.
-
-### Use Cases
-
-The getFirstAvailableBlock method is valuable in a range of applications, including:
-
-* Blockchain synchronization: Ensuring that your application starts from the earliest block available.
-* Transaction monitoring: Useful in blockchain explorers or analytics tools that need to start querying blocks from the earliest point.
-* API integration: Developers can use this method to ensure data integrity and consistency by retrieving the first available block and tracking the blockchain from there.
-
-#### Error Handling
-
-Errors with the getFirstAvailableBlock method may occur in the following scenarios:
-
-* The API key is missing, expired, or invalid.
-* An issue with the endpoint or network causes the request to fail.
-
-Example Error Response:
-
-```json
-{
-    "jsonrpc": "2.0",
-    "error": {
-        "code": -32007,
-        "message": "No available blocks"
-    },
-    "id": "getblock.io"
-}
-```
-
-### Code getFirstAvailableBlock Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-    jsonrpc: "2.0",
-    id: 1, 
-    method: "getFirstAvailableBlock",
-    params: []
-};
+const firstSlot = await connection.getFirstAvailableBlock();
 
-const fetchFirstAvailableBlock = async () => {
-    try {
-        const response = await axios.post(url, payload, { headers });
-
-        if (response.status === 200 && response.data.result !== undefined) {
-            const firstAvailableBlock = response.data.result;
-            console.log("First Available Block:", firstAvailableBlock);
-        } else {
-            console.error("Unexpected response:", response.data);
-        }
-    } catch (error) {
-        console.error("getFirstAvailableBlock error:", error.response?.data || error.message);
-    }
-};
-
-fetchFirstAvailableBlock();
-
+console.log(firstSlot);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getFirstAvailableBlock',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getFirstAvailableBlock",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-The Web3 getFirstAvailableBlock method is a useful tool for Web3 applications that need to query data starting from the first available block. By utilizing this method, developers can ensure their applications handle block data consistently and without gaps, making it essential for projects that require precise synchronization with Solana’s blockchain.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": 386201344
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                            |
+| --------- | ------ | ------------------------------------------------------ |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                      |
+| id        | string | Request identifier matching the request                |
+| result    | number | Lowest confirmed block slot still retained by the node |
+
+## Use Cases
+
+* **History Bounds**: Check whether a target slot is inside the node's retained range
+* **Archive Routing**: Route older queries to an archive endpoint when the slot falls below this value
+* **Backfill Planning**: Set the floor for a historical ingestion job
+* **Error Prevention**: Avoid slot-missing errors by validating range inputs up front
+
+## Error Handling
+
+| Error Code | Message           | Description                                                 |
+| ---------- | ----------------- | ----------------------------------------------------------- |
+| -32603     | Internal error    | Node failed to read the lowest cleanup slot from blockstore |
+| -32005     | Node is unhealthy | The node has fallen behind the cluster tip                  |

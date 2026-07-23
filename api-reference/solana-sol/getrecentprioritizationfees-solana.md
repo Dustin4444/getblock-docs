@@ -1,177 +1,151 @@
 ---
 description: >-
-  The getRecentPrioritizationFees JSON-RPC method retrieves a list of
-  prioritization fees from recent blocks.
+  Example code for the getRecentPrioritizationFees JSON-RPC method. Complete
+  guide on how to use the getRecentPrioritizationFees JSON-RPC method in the
+  GetBlock Web3 documentation.
 ---
 
-# getRecentPrioritizationFees – Solana
+# getRecentPrioritizationFees - Solana
 
-{% hint style="success" %}
-The **getRecentPrioritizationFees** RPC Solana method provides insight into the dynamic fee market within the Solana blockchain.
-{% endhint %}
+This method returns a list of prioritization fees observed in recent slots, optionally scoped to transactions that lock a given set of accounts. Prioritization fees are paid per compute unit on top of the base fee.
 
-The getRecentPrioritizationFees method retrieves **recent prioritization fees** paid by transactions in the Solana blockchain. It provides insight into the dynamic fee market, helping developers **estimate the cost of prioritizing transactions** for faster processing. This method is useful for optimizing transaction fees and improving the efficiency of fee-based strategies in Solana applications.
+## Parameters
 
-### Supported Networks
+| Parameter | Type  | Required | Description                                                           |
+| --------- | ----- | -------- | --------------------------------------------------------------------- |
+| addresses | array | No       | Array of up to 128 base58-encoded account Pubkeys to scope the sample |
 
-This method is available on the following API endpoints:
-
-* Mainnet
-
-### Parameters
-
-#### Optional Parameters
-
-* **`array`** (optional): An array of up to 128 account addresses, provided as base-58 encoded strings.
-  * If provided, the response reflects the fee required for a transaction locking all specified accounts as writable.
-
-### Result
-
-The response returns an array of `RpcPrioritizationFee` objects, each containing:
-
-* `slot` (`u64`): The slot in which the prioritization fee was observed.
-* `prioritizationFee` (`u64`): The per-compute-unit fee paid by at least one successfully landed transaction, measured in micro-lamports (0.000001 lamports).
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
     "method": "getRecentPrioritizationFees",
-    "params": [
-      ["CxELquR1gPP8wHe33gZ4QxqGB3sZ9RSwsJ2KshVewkFY"]
-    ]
+    "params": [["JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"]],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns an `array` of **recent prioritization fees** for the specified accounts (or general network fees if no accounts are provided).
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": [
-    {
-      "slot": 348125,
-      "prioritizationFee": 0
-    },
-    {
-      "slot": 348126,
-      "prioritizationFee": 1000
-    },
-    {
-      "slot": 348127,
-      "prioritizationFee": 500
-    },
-    {
-      "slot": 348128,
-      "prioritizationFee": 0
-    },
-    {
-      "slot": 348129,
-      "prioritizationFee": 1234
-    }
-  ],
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getRecentPrioritizationFees error scenarios:
-
-* Invalid account address: If an incorrectly formatted or non-existent account is provided.
-* Network errors: Connectivity issues with the Solana JSON-RPC API endpoints.
-* Malformed request: Incorrectly structured JSON requests.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32602,
-    "message": "Invalid account address format"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getRecentPrioritizationFees** method is useful for:
-
-* **dApp developers**: Estimating transaction prioritization fees for faster execution;
-* **Web3 analytics tools**: Tracking fee trends over recent blocks;
-* **Blockchain explorers**: Displaying historical prioritization fee data;
-* **Validators and node operators**: Monitoring network fee dynamics and congestion levels.
-
-### Code getRecentPrioritizationFees Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection, PublicKey } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/";
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getRecentPrioritizationFees",
-  params: [
-    ["CxELquR1gPP8wHe33gZ4QxqGB3sZ9RSwsJ2KshVewkFY"]
-  ]
-};
+const fees = await connection.getRecentPrioritizationFees({
+  lockedWritableAccounts: [new PublicKey('JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4')]
+});
 
-const fetchRecentPrioritizationFees = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && Array.isArray(response.data.result)) {
-      const fees = response.data.result;
-      if (fees.length > 0) {
-        fees.forEach((fee, index) => {
-          console.log(`Fee ${index + 1}:`);
-          console.log(`  Slot: ${fee.slot}`);
-          console.log(`  Prioritization Fee: ${fee.prioritizationFee}`);
-        });
-      } else {
-        console.log("No prioritization fees found.");
-      }
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getRecentPrioritizationFees error:", error.response?.data || error.message);
-  }
-};
-
-fetchRecentPrioritizationFees();
-java
+console.log(fees.slice(0, 5));
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getRecentPrioritizationFees',
+        'params': [["JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"]],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getRecentPrioritizationFees",
+            "params": [["JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"]],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **getRecentPrioritizationFees** into Solana’s Core API, developers can optimize transaction execution strategies by analyzing recent prioritization transaction fees. The JSON-RPC request provides valuable insights into the dynamic fee structure, helping dApps, validators, and infrastructure services efficiently navigate Solana’s network conditions.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": [
+        {
+            "slot": 397234560,
+            "prioritizationFee": 0
+        },
+        {
+            "slot": 397234561,
+            "prioritizationFee": 12500
+        }
+    ]
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                  |
+| --------- | ------ | -------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")            |
+| id        | string | Request identifier matching the request      |
+| result    | array  | Array of per-slot prioritization fee samples |
+
+### Sample Entry
+
+| Field             | Type   | Description                                              |
+| ----------------- | ------ | -------------------------------------------------------- |
+| slot              | number | Slot the fee sample was taken from                       |
+| prioritizationFee | number | Fee in micro-lamports per compute unit paid in that slot |
+
+## Use Cases
+
+* **Dynamic Fee Bidding**: Set a compute unit price from recent percentiles instead of a fixed value
+* **Congestion Detection**: Identify hot accounts where writes are being contested
+* **Swap Routing**: Price prioritization into quotes before submitting to a DEX program
+* **Cost Dashboards**: Chart fee pressure per program over recent slots
+
+## Error Handling
+
+| Error Code | Message        | Description                                            |
+| ---------- | -------------- | ------------------------------------------------------ |
+| -32602     | Invalid params | More than 128 addresses supplied or a malformed Pubkey |
+| -32603     | Internal error | Node failed to read the prioritization fee cache       |

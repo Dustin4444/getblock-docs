@@ -8,7 +8,7 @@ description: >-
 
 Bots are commonly used on Solana to snipe new tokens and trade on DEXes. In this example, we’ll build a Python bot that:
 
-* Detects newly minted SPL tokens quickly (via [pump.fun](https://getblock.io/marketplace/projects/pump-fun/) or a similar program)&#x20;
+* Detects newly minted SPL tokens quickly (via [pump.fun](https://getblock.io/marketplace/projects/pump-fun/) or a similar program)
 * Extracts the mint address and related accounts
 * Atomically swaps SOL → token using a swap aggregator (Jupiter) while applying priority fees and defensive checks
 
@@ -37,11 +37,11 @@ Always test on devnet (or a local validator) before using mainnet.
 
 #### **Getting an RPC access token**
 
-To call Solana nodes through GetBlock, you need an RPC endpoint with an access token. To get a token:&#x20;
+To call Solana nodes through GetBlock, you need an RPC endpoint with an access token. To get a token:
 
-1. Create an account on GetBlock.io&#x20;
-2. Create a Solana endpoint from your dashboard&#x20;
-3. Copy the generated access token/endpoint&#x20;
+1. Create an account on GetBlock.io
+2. Create a Solana endpoint from your dashboard
+3. Copy the generated access token/endpoint
 
 The access token is embedded in the endpoint URL. See examples below or visit our [access-token docs](../../../getting-started/authentication-with-access-tokens.md) for details.
 
@@ -52,7 +52,7 @@ The access token is embedded in the endpoint URL. See examples below or visit ou
 
 Use environment variables or a secrets manager for these strings (do not hardcode them in source).
 
-#### Plans and rate limits&#x20;
+#### Plans and rate limits
 
 GetBlock provides tiered [plans](../../../getting-started/plans-and-limits/) with documented requests and CU limits. Choose a plan that fits your bot’s expected RPS and compute usage. For production, use a paid plan or dedicated node to avoid shared-node rate limits.
 
@@ -80,12 +80,12 @@ export BOT_KEYFILE="/path/to/encrypted/key.json"   # or use a signer service / H
 
 ***
 
-### Step 2: Connect to GetBlock RPC&#x20;
+### Step 2: Connect to GetBlock RPC
 
 Establish low-latency RPC and subscription streams to detect new mints in real time. Use async clients to avoid blocking. We show an async watcher that reconnects, resubscribes, deduplicates, and pushes work to a buy worker.
 
 {% hint style="success" %}
-Use [`logsSubscribe`](../../../api-reference/solana-sol/logssubscribe-solana.md) with the `mentions` filter on a target program ID. It’s faster and uses less bandwidth than subscribing to full blocks or transactions. For full transaction payloads you can also use [`blockSubscribe`](../../../api-reference/solana-sol/blocksubscribe-solana.md)/fetch [`getTransaction`](../../../api-reference/solana-sol/gettransaction-solana.md) for details. `logsSubscribe` is appropriate to detect the create instruction as quickly as possible.
+Use [`logsSubscribe`](/broken/pages/DAKBEPzp4DxqpYo9uy5j) with the `mentions` filter on a target program ID. It’s faster and uses less bandwidth than subscribing to full blocks or transactions. For full transaction payloads you can also use [`blockSubscribe`](/broken/pages/CQGYjQj6dAjQ3VDUjTDZ)/fetch [`getTransaction`](/broken/pages/Uq52KBzXkGJCxir4qAiU) for details. `logsSubscribe` is appropriate to detect the create instruction as quickly as possible.
 {% endhint %}
 
 _**Sketch** (adapt imports and helpers to your library versions):_
@@ -148,7 +148,7 @@ async def watch_logs():
 **Notes**:
 
 * Use a persistent `seen_signatures` store (Redis) in production to avoid duplicate buys across restarts.
-* Use `blockSubscribe` + `getTransaction(..., encoding='jsonParsed')` as fallback to get structured instruction/account info if logs are not enough. `get_parsed_transaction` equivalent is available in clients (or call HTTP RPC directly).&#x20;
+* Use `blockSubscribe` + `getTransaction(..., encoding='jsonParsed')` as fallback to get structured instruction/account info if logs are not enough. `get_parsed_transaction` equivalent is available in clients (or call HTTP RPC directly).
 
 ***
 
@@ -156,9 +156,9 @@ async def watch_logs():
 
 Fetch the full transaction (jsonParsed) and inspect instructions and innerInstructions to locate the Create/InitializeMint flow:
 
-1. Get the full transaction using the signature: `await client.get_transaction(sig, encoding="jsonParsed")` (or `get_transaction` / `getTransaction` depending on the client).&#x20;
+1. Get the full transaction using the signature: `await client.get_transaction(sig, encoding="jsonParsed")` (or `get_transaction` / `getTransaction` depending on the client).
 2. Inspect `meta.innerInstructions` and `transaction.message.instructions` for the `Create` or `InitializeMint` instruction and the new mint pubkey.
-3. If logs include `Program data: <base64>`, decode the base64 and parse according to that program’s schema. Example:&#x20;
+3. If logs include `Program data: <base64>`, decode the base64 and parse according to that program’s schema. Example:
 
 ```python
 resp = await client.get_transaction(sig, encoding="json")
@@ -166,7 +166,7 @@ tx = resp.value
 # inspect tx.transaction.message.instructions or tx.meta.logMessages
 ```
 
-4. If logs don't include the mint, use `get_signatures_for_address` on the program or watch [`accountSubscribe`](../../../api-reference/solana-sol/accountsubscribe-solana.md) for newly-created accounts (less direct).
+4. If logs don't include the mint, use `get_signatures_for_address` on the program or watch [`accountSubscribe`](/broken/pages/XumVsD3uXHfxBHr5VRF7) for newly-created accounts (less direct).
 
 {% hint style="info" %}
 **Important**: Detect the SPL mint pubkey (the token mint account). For many token-creation flows the mint is an account created by the **`SystemProgram::CreateAccount`** followed by **`spl_token::initialize_mint`**. Look for **`initializeMint`** or **`InitializeMint`** in parsed instructions.
@@ -206,7 +206,7 @@ Jupiter returns prebuilt swap instructions and multi-DEX routes, which are harde
 
 Construct a versioned transaction with priority fees to maximize execution chance. Key points:
 
-* Use [`getLatestBlockhash`](../../../api-reference/solana-sol/sol_getlatestblockhash.md) (they replaced/deprecated old `get_recent_blockhash`) and create a **versioned transaction** where possible to support address lookup tables and versioned messages.
+* Use [`getLatestBlockhash`](/broken/pages/wDZOfgHiHiXPUJlhYD1y) (they replaced/deprecated old `get_recent_blockhash`) and create a **versioned transaction** where possible to support address lookup tables and versioned messages.
 * Add ComputeBudget instructions (set compute limit + set compute unit price) **as the first instructions** in the message to request priority fees. Use `solders` compute\_budget helpers to create these instructions.
 
 _**Example**_:
@@ -231,19 +231,19 @@ tx = VersionedTransaction(message_v0, [payer_signer])
 
 ```
 
-Call [`simulateTransaction`](../../../api-reference/solana-sol/simulatetransaction-solana.md) (or `client.simulate_transaction`) to check likely failure and compute unit consumption before actually sending. If simulation shows insufficient compute or other failures, adjust compute budget / swap route / slippage and retry.
+Call [`simulateTransaction`](/broken/pages/XiJSKF9XevuX9v30pHqa) (or `client.simulate_transaction`) to check likely failure and compute unit consumption before actually sending. If simulation shows insufficient compute or other failures, adjust compute budget / swap route / slippage and retry.
 
 ***
 
 ### Step 6: Sign, submit, confirm, and retry
 
-Sign the transaction, submit, and confirm the outcome:&#x20;
+Sign the transaction, submit, and confirm the outcome:
 
 * Use secure signing: For dev, use encrypted local keyfiles. In production, use a signing service.
 * Submit via RPC with a versioned transaction string or `send_raw_transaction`.
-* Use `getLatestBlockhash()` for `last_valid_block_height` and blockhash.&#x20;
+* Use `getLatestBlockhash()` for `last_valid_block_height` and blockhash.
 * If a blockhash is too old, rebuild with a fresh blockhash and resend.
-* Use `simulate` then `send_raw_transaction`, then `confirm_transaction` or monitor via websocket [`getSignatureStatuses`](../../../api-reference/solana-sol/getsignaturestatuses-solana.md).
+* Use `simulate` then `send_raw_transaction`, then `confirm_transaction` or monitor via websocket [`getSignatureStatuses`](/broken/pages/TcfxjYDTjw19o5i7EHz2).
 * Add retry/rebroadcast logic and limit total retries to avoid excessive fees.
 
 ***

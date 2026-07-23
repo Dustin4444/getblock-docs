@@ -1,150 +1,144 @@
 ---
 description: >-
-  The getStakeMinimumDelegation JSON-RPC method returns the stake minimum
-  delegation required in lamports.
+  Example code for the getStakeMinimumDelegation JSON-RPC method. Complete guide
+  on how to use the getStakeMinimumDelegation JSON-RPC method in the GetBlock
+  Web3 documentation.
 ---
 
-# getStakeMinimumDelegation – Solana
+# getStakeMinimumDelegation - Solana
 
-{% hint style="success" %}
-The **getStakeMinimumDelegation** RPC Solana method provides the minimum stake amount necessary to delegate stake to a validator.
-{% endhint %}
+This method returns the minimum stake delegation the cluster currently enforces, in lamports. Delegations below this threshold are rejected by the stake program.
 
-This value is denominated in lamports, Solana's smallest currency unit. The method supports an optional parameters object to specify commitment levels for data accuracy.
+## Parameters
 
-The Core API uses this method to help **validators**, **dApps**, and **wallet applications** manage stake operations effectively.
+| Parameter | Type   | Required | Description                                 |
+| --------- | ------ | -------- | ------------------------------------------- |
+| config    | object | No       | Configuration object controlling commitment |
 
-### Supported Networks
+### Config Object
 
-This method is available on the following API endpoints:
+| Field      | Type   | Required | Description                                                                 |
+| ---------- | ------ | -------- | --------------------------------------------------------------------------- |
+| commitment | string | No       | Commitment level: processed, confirmed, or finalized. Defaults to finalized |
 
-* Mainnet
-
-### Parameters
-
-#### Optional Parameters
-
-* **`object`** (optional): A configuration object containing:
-  * **commitment** (`string`, optional): Defines the level of finality for the request.
-
-### Result
-
-The response returns an RpcResponse object containing:
-
-* **`context`** (`object`): Provides contextual information about the slot in which the value was retrieved.
-  * `slot` (`u64`): The slot number of the data.
-* **`value`** (`u64`): The stake minimum delegation amount in lamports.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "getStakeMinimumDelegation"
+    "method": "getStakeMinimumDelegation",
+    "params": [{"commitment": "finalized"}],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns the minimum stake delegation value.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": {
-    "context": {
-      "slot": 501
-    },
-    "value": 1000000000
-  },
-  "id": 1
-}
-```
-
-In this response, 1,000,000,000 lamports (equivalent to 1 SOL) is the minimum stake delegation.
-
-### Error Handling
-
-Common getStakeMinimumDelegation error scenarios:
-
-* Invalid parameters: If the request contains malformed parameters.
-* Network errors: Connectivity issues with the Solana JSON-RPC API endpoints.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32602,
-    "message": "Invalid parameter format"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getStakeMinimumDelegation** method is useful for:
-
-* **Validators and node operators**: Understanding the minimum stake required for delegation;
-* **Wallet applications**: Displaying the minimum stake requirement to users;
-* **Web3 analytics tools**: Analyzing staking activity and requirements.
-
-### Code getStakeMinimumDelegation Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'finalized');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getStakeMinimumDelegation"
-};
+const { value } = await connection.getStakeMinimumDelegation();
 
-const fetchStakeMinimumDelegation = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result?.value !== undefined) {
-      const minDelegation = response.data.result.value;
-      console.log("Minimum Stake Delegation (lamports):", minDelegation);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getStakeMinimumDelegation error:", error.response?.data || error.message);
-  }
-};
-
-fetchStakeMinimumDelegation();
-
+console.log(value);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getStakeMinimumDelegation',
+        'params': [{"commitment": "finalized"}],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getStakeMinimumDelegation",
+            "params": [{"commitment": "finalized"}],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **getStakeMinimumDelegation** into Solana’s Core API, developers can manage staking operations, query the blockchain for current transaction requirements, and provide stake-related information to users efficiently. This JSON-RPC method ensures accurate and up-to-date insights into stake requirements for validators and delegators.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": {
+        "context": {
+            "slot": 397234561
+        },
+        "value": 1000000000
+    }
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                                           |
+| --------- | ------ | --------------------------------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                                     |
+| id        | string | Request identifier matching the request                               |
+| result    | object | RPC response object where value is the minimum delegation in lamports |
+
+## Use Cases
+
+* **Stake UI Validation**: Block delegation attempts below the enforced minimum
+* **Split Planning**: Confirm both halves clear the minimum before splitting a stake account
+* **Liquid Staking**: Size validator allocations in a stake pool against the threshold
+* **Error Prevention**: Avoid InsufficientDelegation failures before signing
+
+## Error Handling
+
+| Error Code | Message        | Description                                         |
+| ---------- | -------------- | --------------------------------------------------- |
+| -32602     | Invalid params | Unrecognized commitment level in the config object  |
+| -32603     | Internal error | Node failed to read the stake program feature state |

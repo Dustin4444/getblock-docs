@@ -1,178 +1,161 @@
 ---
 description: >-
-  The getInflationReward JSON-RPC method retrieves staking rewards (inflation
-  rewards) for a list of addresses during a specified epoch.
+  Example code for the getInflationReward JSON-RPC method. Complete guide on how
+  to use getInflationReward JSON-RPC in GetBlock Web3 documentation.
 ---
 
-# getInflationReward – Solana
+# getInflationReward - Solana
 
-{% hint style="success" %}
-The **getInflationReward** RPC Solana method provides reward distribution details for validators and stakers, including reward amount, effective slot, post-reward balance, and commission percentage (if applicable).
-{% endhint %}
+This method returns the inflation reward credited to a list of addresses for a given epoch. Addresses that received no reward return null.
 
-The getInflationReward method retrieves **inflation rewards earned by one or more validator accounts for a given epoch**. It provides insights into staking rewards, helping delegators and validators track earnings and assess the impact of inflation-based incentives on the Solana network.
+## Parameters
 
-### Supported Networks
+| Parameter | Type   | Required | Description                                           |
+| --------- | ------ | -------- | ----------------------------------------------------- |
+| addresses | array  | Yes      | Array of base58-encoded addresses to query            |
+| config    | object | No       | Configuration object controlling epoch and commitment |
 
-This method is accessible through Solana API endpoints:
+### Config Object
 
-* Mainnet
+| Field          | Type   | Required | Description                                                                 |
+| -------------- | ------ | -------- | --------------------------------------------------------------------------- |
+| commitment     | string | No       | Commitment level: processed, confirmed, or finalized. Defaults to finalized |
+| epoch          | number | No       | Epoch to query rewards for. Defaults to the previous epoch                  |
+| minContextSlot | number | No       | Minimum slot the request can be evaluated at                                |
 
-### Parameters
-
-#### Optional Parameters
-
-* **addresses** (`array`): A list of addresses as base-58 encoded strings.
-* **commitment** (`string`): Defines the finality level of the response.
-* **epoch** (`u64`): The epoch for which the reward is being queried (defaults to the previous epoch if omitted).
-* **minContextSlot** (`number`): Ensures the request is evaluated at or after the specified slot.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
     "method": "getInflationReward",
-    "params": [
-      [
-        "6dmNQ5jwLeLk5REvio1JcMshcbvkYMwy26sJ8pbkvStu",
-        "BGsqMegLpV6n6Ve146sSX2dTjUMj3M92HnU8BbNRMhF2"
-      ],
-      { "epoch": 2 }
-    ]
+    "params": [["3ZT31jkAGhUaw8jsy4Q3Q3fSN6r5eYkr4wD1TThTZ4bT"], {"epoch": 860}],
+    "id": "getblock.io"
 }'
-
 ```
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful getInflationReward example response returns an array containing staking reward details.
-
-#### Example Response
-
-The result field is an array with elements corresponding (in order) to the list of addresses passed in the request.
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": [
-    {
-      "amount": 2500,
-      "effectiveSlot": 224,
-      "epoch": 2,
-      "postBalance": 499999442500
-    },
-    null
-  ],
-  "id": 1
-}
-```
-
-#### **In this response:**
-
-* `amount` (`u64`): The number of lamports rewarded during that epoch.
-* `effectiveSlot`(`u64`): The slot at which the reward was calculated.
-* `epoch`(`u64`): The epoch for which the reward was issued.
-* `postBalance`(`u64`): The account’s balance (in lamports) immediately after the reward was applied.
-* `null`: The second address did not receive any reward for the requested epoch.
-
-### Error Handling
-
-Common getInflationReward error scenarios:
-
-* Invalid address format: If an incorrect base-58 encoded address is provided.
-* Epoch data unavailable: If the requested epoch has no recorded rewards.
-* Network issues: API connectivity failures or request timeouts.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32000,
-    "message": "Reward data unavailable for the given epoch"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getInflationReward** method is essential for:
-
-* **Stakers and validators**: Tracking earned staking rewards per epoch;
-* **Blockchain explorers**: Displaying staking reward history;
-* **Web3 applications**: Providing insights into validator performance;
-* **Analytics platforms**: Aggregating staking data for economic modeling.
-
-### Code getInflationReward Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection, PublicKey } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getInflationReward",
-  params: [
-    [
-      "6dmNQ5jwLeLk5REvio1JcMshcbvkYMwy26sJ8pbkvStu",
-      "BGsqMegLpV6n6Ve146sSX2dTjUMj3M92HnU8BbNRMhF2"
-    ],
-    { "epoch": 2 }
-  ]
-};
+const rewards = await connection.getInflationReward(
+  [new PublicKey('3ZT31jkAGhUaw8jsy4Q3Q3fSN6r5eYkr4wD1TThTZ4bT')],
+  860
+);
 
-
-const fetchInflationReward = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result) {
-      console.log("Inflation Reward:", response.data.result);
-      response.data.result.forEach((reward, index) => {
-        console.log(`Account ${index + 1}:`);
-        console.log(`  Epoch: ${reward.epoch}`);
-        console.log(`  Effective Slot: ${reward.effectiveSlot}`);
-        console.log(`  Amount: ${reward.amount}`);
-        console.log(`  Post Balance: ${reward.postBalance}`);
-        console.log(`  Commission: ${reward.commission ?? "N/A"}`);
-      });
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getInflationReward error:", error.response?.data || error.message);
-  }
-};
-
-fetchInflationReward();
-
+console.log(rewards[0]);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getInflationReward',
+        'params': [["3ZT31jkAGhUaw8jsy4Q3Q3fSN6r5eYkr4wD1TThTZ4bT"], {"epoch": 860}],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getInflationReward",
+            "params": [["3ZT31jkAGhUaw8jsy4Q3Q3fSN6r5eYkr4wD1TThTZ4bT"], {"epoch": 860}],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-Integrate the Web3 **getInflationReward** API with Solana’s Core API to track staking rewards dynamically. By leveraging JSON-RPC parameters and endpoints, developers can efficiently monitor staking performance, validator commissions, and epoch-based reward distributions.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": [
+        {
+            "amount": 1893472,
+            "commission": 5,
+            "effectiveSlot": 397234461,
+            "epoch": 860,
+            "postBalance": 502893472
+        }
+    ]
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                                                     |
+| --------- | ------ | ------------------------------------------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                                               |
+| id        | string | Request identifier matching the request                                         |
+| result    | array  | Array of reward objects or null entries, in the order of the supplied addresses |
+
+### Reward Entry
+
+| Field         | Type   | Description                                  |
+| ------------- | ------ | -------------------------------------------- |
+| epoch         | number | Epoch the reward was credited for            |
+| effectiveSlot | number | Slot at which the reward became effective    |
+| amount        | number | Reward amount in lamports                    |
+| postBalance   | number | Account balance in lamports after the reward |
+| commission    | number | null                                         |
+
+## Use Cases
+
+* **Staking Statements**: Report per-epoch rewards to delegators in a staking dashboard
+* **Realized APY**: Divide reward amount by stake to compute actual yield per epoch
+* **Commission Audits**: Verify a validator applied the commission it advertises
+* **Tax Exports**: Produce epoch-by-epoch reward records for accounting
+
+## Error Handling
+
+| Error Code | Message                                             | Description                                                  |
+| ---------- | --------------------------------------------------- | ------------------------------------------------------------ |
+| -32602     | Invalid params                                      | Epoch is in the future or an address is malformed            |
+| -32011     | Transaction history is not available from this node | The node does not retain reward data for the requested epoch |
+| -32603     | Internal error                                      | Node failed to read the epoch rewards partition              |

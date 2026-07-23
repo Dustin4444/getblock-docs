@@ -1,177 +1,163 @@
 ---
 description: >-
-  The getTokenAccountBalance JSON-RPC method retrieves the token balance of a
-  specified SPL Token account.
+  Example code for the getTokenAccountBalance JSON-RPC method. Complete guide on
+  how to use the getTokenAccountBalance JSON-RPC method in the GetBlock Web3
+  documentation.
 ---
 
-# getTokenAccountBalance – Solana
+# getTokenAccountBalance - Solana
 
-{% hint style="info" %}
-The **getTokenAccountBalance** RPC Solana method provides the balance of an SPL Token account using a given Pubkey.
-{% endhint %}
+This method returns the token balance of an SPL Token account. Balances are returned as a raw integer string alongside the mint's decimal precision.
 
-The response includes the raw balance, the number of decimal places, and formatted balances. This method is particularly useful in **dApps**, **wallets**, and **financial applications** using the Solana Core API.
+## Parameters
 
-### Supported Networks
+| Parameter | Type   | Required | Description                                    |
+| --------- | ------ | -------- | ---------------------------------------------- |
+| pubkey    | string | Yes      | Base58-encoded Pubkey of the SPL Token account |
+| config    | object | No       | Configuration object controlling commitment    |
 
-This method is available on the following API endpoints:
+### Config Object
 
-* Mainnet
+| Field      | Type   | Required | Description                                                                 |
+| ---------- | ------ | -------- | --------------------------------------------------------------------------- |
+| commitment | string | No       | Commitment level: processed, confirmed, or finalized. Defaults to finalized |
 
-### Parameters
-
-#### Required Parameters
-
-* **`string`** (required): The Pubkey of the Token account to query, provided as a base-58 encoded string.
-
-#### Optional Parameters
-
-* **`object`** (optional): A configuration object containing:
-  * **commitment** (`string`, optional): Defines the level of finality for the request.
-
-### Result
-
-The response returns an RpcResponse object containing:
-
-* **`context`** (`object`): Contextual information about the slot.
-  * `slot` (`u64`): The slot number when the balance was retrieved.
-* **`value`** (`object`):
-  * `amount` (`string`): The raw balance without decimals (string representation of u64).
-  * `decimals` (`u8`): The number of base 10 digits to the right of the decimal point.
-  * `uiAmount` (`number`|`null`): The balance with decimals applied. (Deprecated)
-  * `uiAmountString` (`string`): The balance formatted as a string with decimals applied.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
     "method": "getTokenAccountBalance",
-    "params": [
-      "7fUAJdStEuGbc3sM84cKRL6yYaaSstyLSU4ve5oovLS7"
-    ]
+    "params": ["3emsAVdmGKERbHjmGfQ6oZ1e35dkf5z6TmFYcCQnpB2M", {"commitment": "confirmed"}],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns the token balance of the specified account.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": {
-    "context": {
-      "slot": 1114
-    },
-    "value": {
-      "amount": "9864",
-      "decimals": 2,
-      "uiAmount": 98.64,
-      "uiAmountString": "98.64"
-    }
-  },
-  "id": 1
-}
-```
-
-In this response:
-
-* The raw balance is 9864.
-* With 2 decimal places, the formatted balance is 98.64.
-
-### Error Handling
-
-Common getTokenAccountBalance error scenarios:
-
-* Invalid Pubkey: If the provided Pubkey is incorrectly formatted.
-* Network errors: Connectivity issues with the Solana JSON-RPC API endpoints.
-* Non-existent token account: If the provided Pubkey does not correspond to a valid SPL Token account.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32602,
-    "message": "Invalid Token Account Pubkey"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana getTokenAccountBalance method is useful for:
-
-* **Wallet applications**: Displaying users' token balances;
-* **Web3 analytics tools**: Monitoring token balances across accounts;
-* **DeFi applications**: Calculating token holdings for smart contracts;
-* **Blockchain explorers**: Displaying account balances.
-
-### Code getTokenAccountBalance Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection, PublicKey } = require('@solana/web3.js');
 
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const { value } = await connection.getTokenAccountBalance(
+  new PublicKey('3emsAVdmGKERbHjmGfQ6oZ1e35dkf5z6TmFYcCQnpB2M')
+);
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getTokenAccountBalance",
-  params: [
-    "7fUAJdStEuGbc3sM84cKRL6yYaaSstyLSU4ve5oovLS7"
-  ]
-};
-
-const fetchTokenAccountBalance = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result?.value) {
-      const balance = response.data.result.value;
-      console.log("Token Account Balance:");
-      console.log(`  Amount: ${balance.amount}`);
-      console.log(`  Decimals: ${balance.decimals}`);
-      console.log(`  UI Amount: ${balance.uiAmount}`);
-      console.log(`  UI Amount String: ${balance.uiAmountString}`);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getTokenAccountBalance error:", error.response?.data || error.message);
-  }
-};
-
-fetchTokenAccountBalance();
-
+console.log(value.uiAmountString);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getTokenAccountBalance',
+        'params': ["3emsAVdmGKERbHjmGfQ6oZ1e35dkf5z6TmFYcCQnpB2M", {"commitment": "confirmed"}],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getTokenAccountBalance",
+            "params": ["3emsAVdmGKERbHjmGfQ6oZ1e35dkf5z6TmFYcCQnpB2M", {"commitment": "confirmed"}],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **getTokenAccountBalance** into Solana’s Core API, developers can easily query token balances, track account activity, and analyze transaction flows. This JSON-RPC method is essential for applications requiring accurate and up-to-date token balance information.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": {
+        "context": {
+            "apiVersion": "2.3.6",
+            "slot": 397234561
+        },
+        "value": {
+            "amount": "1250000000",
+            "decimals": 6,
+            "uiAmount": 1250.0,
+            "uiAmountString": "1250"
+        }
+    }
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                                                  |
+| --------- | ------ | ---------------------------------------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                                            |
+| id        | string | Request identifier matching the request                                      |
+| result    | object | RPC response object where value holds the token amount and decimal precision |
+
+### Value Object
+
+| Field          | Type         | Description                                                   |
+| -------------- | ------------ | ------------------------------------------------------------- |
+| amount         | string       | Raw token amount as a string, without decimal adjustment      |
+| decimals       | number       | Decimal precision defined on the mint                         |
+| uiAmount       | number\|null | Amount adjusted for decimals, subject to float precision loss |
+| uiAmountString | string       | Amount adjusted for decimals, as a string                     |
+
+## Use Cases
+
+* **Wallet Balances**: Display USDC or USDT balances in a wallet interface
+* **Swap Preflight**: Confirm sufficient token balance before building a swap
+* **Vault Accounting**: Read protocol vault holdings for TVL calculations
+* **Airdrop Checks**: Verify a recipient received an expected token amount
+
+## Error Handling
+
+| Error Code | Message           | Description                                    |
+| ---------- | ----------------- | ---------------------------------------------- |
+| -32602     | Invalid params    | Pubkey is not an initialized SPL Token account |
+| -32603     | Internal error    | Node failed to parse the token account layout  |
+| -32005     | Node is unhealthy | The node has fallen behind the cluster tip     |

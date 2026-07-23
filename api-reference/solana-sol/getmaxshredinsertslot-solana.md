@@ -1,137 +1,131 @@
 ---
 description: >-
-  The getMaxShredInsertSlot JSON-RPC method retrieves the maximum slot observed
-  after shred insertion in the Solana network.
+  Example code for the getMaxShredInsertSlot JSON-RPC method. Complete guide on
+  how to use the getMaxShredInsertSlot JSON-RPC method in the GetBlock Web3
+  documentation.
 ---
 
-# getMaxShredInsertSlot – Solana
+# getMaxShredInsertSlot - Solana
 
-{% hint style="success" %}
-The **getMaxShredInsertSlot** RPC Solana method provides insight into the highest slot number observed after shred insert.
-{% endhint %}
+This method returns the highest slot for which the node has written shreds into its blockstore. It advances after the retransmit stage completes for a slot.
 
-This method is particularly useful for **tracking data propagation and block finalization** within the network.
+## Parameters
 
-Unlike other block or transaction retrieval methods, this RPC focuses on the point at which **shreds** **(block data fragments) are fully inserted**. Developers use this method to assess slot finalization efficiency, optimize node configurations, and troubleshoot data insertion issues in Core API implementations.
+This method does not accept any parameters.
 
-### Supported Networks
-
-This method is available on the following API endpoints:
-
-* Mainnet
-
-### Parameters
-
-{% hint style="info" %}
-The getMaxShredInsertSlot request does not require any parameters.
-{% endhint %}
-
-### Result
-
-The response returns a single `u64` value, representing **the maximum slot seen after shred insertion**.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "getMaxShredInsertSlot"
+    "method": "getMaxShredInsertSlot",
+    "params": [],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns the highest slot number observed after shred insertion.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": 1234,
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getMaxShredInsertSlot error scenarios:
-
-* Network errors: Connectivity issues with the Solana JSON-RPC API endpoints.
-* Invalid request format: Sending a malformed JSON request.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32602,
-    "message": "Invalid request format"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getMaxShredInsertSlot** method is useful for:
-
-* **Validators and nodes**: Monitoring the shred insert process for block finalization efficiency;
-* **Web3 analytics tools**: Tracking real-time data insertion trends;
-* **Blockchain infrastructure**: Understanding shred propagation trends to optimize network performance.
-
-### Code getMaxShredInsertSlot Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getMaxShredInsertSlot"
-};
+const { result } = await connection._rpcRequest('getMaxShredInsertSlot', []);
 
-const fetchMaxShredInsertSlot = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result !== undefined) {
-      console.log("Max Shred Insert Slot:", response.data.result);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getMaxShredInsertSlot error:", error.response?.data || error.message);
-  }
-};
-
-fetchMaxShredInsertSlot();
-
+console.log(result);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getMaxShredInsertSlot',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getMaxShredInsertSlot",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **getMaxShredInsertSlot** into Solana’s Core API, developers can track shred insertion status, monitor block finalization, and improve transaction data flow. The JSON-RPC request structure allows seamless retrieval of slot insertion data, ensuring efficient blockchain operations for dApps, validators, and infrastructure providers.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": 397234561
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                                  |
+| --------- | ------ | ------------------------------------------------------------ |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                            |
+| id        | string | Request identifier matching the request                      |
+| result    | number | Highest slot with shreds inserted into the node's blockstore |
+
+## Use Cases
+
+* **Write Path Health**: Detect blockstore write stalls separately from network ingestion
+* **Disk Diagnostics**: Correlate insert lag with storage throughput problems
+* **Indexer Readiness**: Confirm a slot is durably stored before requesting getBlock
+* **Node Comparison**: Benchmark ingestion pipelines across hardware configurations
+
+## Error Handling
+
+| Error Code | Message           | Description                                     |
+| ---------- | ----------------- | ----------------------------------------------- |
+| -32603     | Internal error    | Node failed to read the requested cluster state |
+| -32005     | Node is unhealthy | The node has fallen behind the cluster tip      |

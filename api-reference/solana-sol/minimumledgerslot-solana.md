@@ -1,142 +1,131 @@
 ---
 description: >-
-  The minimumLedgerSlot JSON-RPC method retrieves the lowest slot that a Solana
-  node has information about in its ledger.
+  Example code for the minimumLedgerSlot JSON-RPC method. Complete guide on how
+  to use the minimumLedgerSlot JSON-RPC method in the GetBlock Web3
+  documentation.
 ---
 
-# minimumLedgerSlot – Solana
+# minimumLedgerSlot - Solana
 
-{% hint style="success" %}
-The **minimumLedgerSlot** RPC Solana method is used in Web3 minimumLedgerSlot applications to determine the starting point of available ledger data.
-{% endhint %}
+This method returns the lowest slot still present in the node's local ledger. The value increases over time as the node purges older slots.
 
-This is essential for tasks that require historical transaction data.
+## Parameters
 
-### Supported Networks
+This method does not accept any parameters.
 
-This method is available on the following API endpoints:
-
-* Mainnet
-
-### Parameters
-
-{% hint style="info" %}
-This method does not require any parameters.
-{% endhint %}
-
-### Result
-
-The response returns a u64 integer indicating the minimum ledger slot that the Solana node retains in its ledger.
-
-#### Result Format
-
-* `u64`: The lowest slot number in the ledger.
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "minimumLedgerSlot"
+    "method": "minimumLedgerSlot",
+    "params": [],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful request returns the minimum ledger slot.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": 1234,
-  "id": 1
-}
-```
-
-In this response:
-
-* `result`: The minimum ledger slot is 1234.
-
-### Error Handling
-
-Common minimumLedgerSlot error scenarios:
-
-* **Network issues:** Connectivity problems with the Solana JSON-RPC API endpoints.
-* **Invalid request format**: Incorrect JSON structure.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32600,
-    "message": "Invalid request"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana minimumLedgerSlot method is useful for:
-
-* **Historical data retrieval**: Determining the earliest available slot;
-* **Blockchain synchronization**: Aligning data queries with available ledger history;
-* **Analytics tools**: Calculating ledger size and data retention periods.
-
-### Code minimumLedgerSlot Example – Web3 Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/";
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "minimumLedgerSlot"
-};
+const minSlot = await connection.getFirstAvailableBlock();
 
-const fetchMinimumLedgerSlot = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result !== undefined) {
-      console.log("Minimum Ledger Slot:", response.data.result);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("minimumLedgerSlot error:", error.response?.data || error.message);
-  }
-};
-
-fetchMinimumLedgerSlot();
+console.log(minSlot);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'minimumLedgerSlot',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "minimumLedgerSlot",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-By integrating Web3 **minimumLedgerSlot** into Solana’s Core API, developers can accurately track ledger history, analyze block availability, and ensure compatibility with blockchain applications that depend on historical data.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": 386201344
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                     |
+| --------- | ------ | ----------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")               |
+| id        | string | Request identifier matching the request         |
+| result    | number | Lowest slot retained in the node's local ledger |
+
+## Use Cases
+
+* **Retention Checks**: Confirm a node still holds the slot range an application depends on
+* **Purge Monitoring**: Track how quickly ledger cleanup advances on a dedicated node
+* **Query Routing**: Send requests below this slot to an archival endpoint
+* **Disk Planning**: Correlate retained slot depth with node storage capacity
+
+## Error Handling
+
+| Error Code | Message           | Description                                 |
+| ---------- | ----------------- | ------------------------------------------- |
+| -32603     | Internal error    | Node failed to read the ledger cleanup slot |
+| -32005     | Node is unhealthy | The node has fallen behind the cluster tip  |

@@ -1,148 +1,154 @@
 ---
 description: >-
-  The getInflationGovernor JSON-RPC method retrieves the current inflation
-  governor settings of the Solana blockchain.
+  Example code for the getInflationGovernor JSON-RPC method. Complete guide on
+  how to use getInflationGovernor JSON-RPC in GetBlock Web3 documentation.
 ---
 
-# getInflationGovernor – Solana
+# getInflationGovernor - Solana
 
-{% hint style="success" %}
-The **getInflationGovernor** RPC Solana method returns details about the blockchain’s inflation governance, including initial and terminal inflation rates, tapering rates, and the percentage allocated to the foundation.
-{% endhint %}
+This method returns the inflation parameters governing SOL issuance, including the initial and terminal rates and the annual taper. These values are set by cluster genesis configuration.
 
-The getInflationGovernor method retrieves the **inflation governance parameters** of the Solana network. It provides details on **inflation scheduling**, including initial and terminal rates, annual reductions, and staking reward distribution, allowing developers and validators to understand the network’s long-term economic model.
+## Parameters
 
-### Supported Networks
+| Parameter | Type   | Required | Description                                 |
+| --------- | ------ | -------- | ------------------------------------------- |
+| config    | object | No       | Configuration object controlling commitment |
 
-This method is accessible through Solana API endpoints:
+### Config Object
 
-* Mainnet
+| Field      | Type   | Required | Description                                                                 |
+| ---------- | ------ | -------- | --------------------------------------------------------------------------- |
+| commitment | string | No       | Commitment level: processed, confirmed, or finalized. Defaults to finalized |
 
-### Parameters
-
-#### Optional Parameters
-
-* **`object` (optional)** wit&#x68;**:**
-  * **commitment** (`string`): Specifies the finality level of the response (`finalized`, `confirmed`, `processed`).
-
-### Request Example
-
-#### API Endpoints
-
-```json
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "getInflationGovernor"
+    "method": "getInflationGovernor",
+    "params": [{"commitment": "finalized"}],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful getInflationGovernor example response returns the **inflation governance parameters**.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": {
-    "foundation": 0.05,
-    "foundationTerm": 7,
-    "initial": 0.15,
-    "taper": 0.15,
-    "terminal": 0.015
-  },
-  "id": 1
-}
-```
-
-#### Response fields:
-
-* `foundation` (`f64`): The fraction of total inflation allocated to the Solana Foundation, expressed as a decimal (e.g.,`0.05`= 5%).
-* `foundationTerm` (`u64`): The duration (in years) over which the foundation portion is allocated.
-* `initial` (`f64`): The initial inflation rate at the start of the inflation schedule (e.g., `0.15` = initial 15% inflation rate).
-* `taper` (`f64`): The rate at which inflation decreases each year until it reaches the terminal rate, expressed as a decimal (e.g., `0.15`).
-* `terminal` (`f64`): The final, long-term inflation rate after all annual tapering, expressed as a decimal (e.g., `0.015` means a final inflation rate of 1.5%).
-
-### Error Handling
-
-Common getInflationGovernor error scenarios:
-
-* Network connectivity issues: The request fails due to API unavailability.
-* Invalid request format: If the request parameters are incorrectly structured.
-* Node synchronization issues: If the node is not fully synced, it may return outdated inflation values.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32000,
-    "message": "Inflation data unavailable"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana **getInflationGovernor** method is essential for:
-
-* **Validators**: Understanding how inflation affects staking rewards:
-* **Blockchain explorers**: Displaying real-time inflation parameters;
-* **Web3 applications**: Adjusting economic models based on inflation governance;
-* **Analytics platforms**: Monitoring inflation trends and economic sustainability.
-
-### Code Example – Web3 getInflationGovernor Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'finalized');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getInflationGovernor"
-};
+const governor = await connection.getInflationGovernor();
 
-const fetchInflationGovernor = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result) {
-      console.log("Inflation Governor:", response.data.result);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getInflationGovernor error:", error.response?.data || error.message);
-  }
-};
-
-fetchInflationGovernor();
-
+console.log(governor);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getInflationGovernor',
+        'params': [{"commitment": "finalized"}],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getInflationGovernor",
+            "params": [{"commitment": "finalized"}],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-Integrate the **getInflationGovernor** API with Solana’s Core API to retrieve inflation governance data dynamically. By leveraging JSON-RPC parameters and endpoints, developers can ensure accurate tracking of inflation adjustments, staking rewards, and overall network economics.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": {
+        "foundation": 0.0,
+        "foundationTerm": 0.0,
+        "initial": 0.08,
+        "taper": 0.15,
+        "terminal": 0.015
+    }
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                                |
+| --------- | ------ | ---------------------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                          |
+| id        | string | Request identifier matching the request                    |
+| result    | object | Object holding the cluster's inflation governor parameters |
+
+### Result Object
+
+| Field          | Type   | Description                                              |
+| -------------- | ------ | -------------------------------------------------------- |
+| initial        | number | Initial annual inflation rate at genesis                 |
+| terminal       | number | Long-run annual inflation rate the schedule converges to |
+| taper          | number | Annual rate at which inflation decreases toward terminal |
+| foundation     | number | Share of total inflation allocated to the foundation     |
+| foundationTerm | number | Duration in years of the foundation allocation           |
+
+## Use Cases
+
+* **Yield Modelling**: Project staking returns across future epochs from the taper schedule
+* **Tokenomics Research**: Document issuance policy in protocol or investor reporting
+* **Dilution Estimates**: Model supply growth against a fixed holding position
+* **Cluster Comparison**: Confirm Devnet and Mainnet share the same genesis parameters
+
+## Error Handling
+
+| Error Code | Message        | Description                                              |
+| ---------- | -------------- | -------------------------------------------------------- |
+| -32602     | Invalid params | Unrecognized commitment level in the config object       |
+| -32603     | Internal error | Node failed to read the inflation governor from the bank |

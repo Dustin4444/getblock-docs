@@ -1,150 +1,154 @@
 ---
 description: >-
-  The getClusterNodes JSON-RPC method retrieves information about all nodes
-  participating in the Solana cluster.
+  Example code for the getClusterNodes JSON-RPC method. Complete guide on how to
+  use the getClusterNodes JSON-RPC method in the GetBlock Web3 documentation.
 ---
 
-# getClusterNodes – Solana
+# getClusterNodes - Solana
 
-{% hint style="success" %}
-The getClusterNodes RPC Solana method returns an array of JSON objects containing details about each active node in the cluster.
-{% endhint %}
+This method returns information about all nodes the queried validator has discovered through gossip, including their network endpoints and software versions.
 
-The returned data includes the node’s public key, network addresses, software version, feature set, and shred version. This information is crucial for developers, validators, and network analysts to assess node distribution, connectivity, and operational details.
+## Parameters
 
-### Supported Networks
+This method does not accept any parameters.
 
-This method is accessible through Solana API endpoints:
-
-* Mainnet
-
-### Parameters
-
-{% hint style="info" %}
-This method does not require any parameters.
-{% endhint %}
-
-### Request Example
-
-#### API Endpoints
-
-```
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "getClusterNodes"
+    "method": "getClusterNodes",
+    "params": [],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful getClusterNodes example response returns an array of objects detailing each node in the cluster.
-
-The response includes:
-
-* pubkey (string): Base-58 encoded node public key.
-* gossip (string|null): Gossip network address of the node.
-* tpu (string|null): TPU network address of the node.
-* rpc (string|null): JSON-RPC network address (if the node has an active RPC service).
-* version (string|null): Software version running on the node.
-* featureSet (u32|null): Unique identifier for the node's feature set.
-* shredVersion (u16|null): Shred version configured for the node.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": [
-    {
-      "gossip": "10.239.6.48:8001",
-      "pubkey": "9QzsJf7LPLj8GkXbYT3LFDKqsj2hHG7TA3xinJHu8epQ",
-      "rpc": "10.239.6.48:8899",
-      "tpu": "10.239.6.48:8856",
-      "version": "1.0.0 c375ce1f"
-    }
-  ],
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getClusterNodes error scenarios:
-
-* Network connectivity issues: The request fails due to Solana RPC unavailability.
-* Invalid request format: If the request is improperly structured.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32000,
-    "message": "Cluster data unavailable"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana getClusterNodes method is essential for:
-
-* Network monitoring: Observing node connectivity and distribution.
-* Validator tracking: Checking node software versions and infrastructure.
-* Web3 applications: Ensuring proper RPC availability for dApps.
-* Infrastructure analysis: Gathering metadata on the cluster’s performance and configuration.
-
-### Code Example – Web3 getClusterNodes Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getClusterNodes"
-};
+const nodes = await connection.getClusterNodes();
 
-const fetchClusterNodes = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result) {
-      console.log("Cluster Nodes:", response.data.result);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getClusterNodes error:", error.response?.data || error.message);
-  }
-};
-
-fetchClusterNodes();
-
+console.log(nodes.length, nodes[0].version);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getClusterNodes',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getClusterNodes",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-Integrate the getClusterNodes API with Solana’s Core API to dynamically retrieve real-time network data. By leveraging JSON-RPC parameters and endpoints, developers can gain deep insights into cluster activity, ensuring robust infrastructure for blockchain applications and validator operations.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": [
+        {
+            "featureSet": 3271946008,
+            "gossip": "145.40.94.130:8001",
+            "pubkey": "dv1ZAGvdsz5hHLwWXsVnM94hWf1pjbKVau1QVkaMJ92",
+            "pubsub": null,
+            "rpc": null,
+            "shredVersion": 50093,
+            "tpu": "145.40.94.130:8004",
+            "tpuQuic": "145.40.94.130:8009",
+            "version": "2.3.6"
+        }
+    ]
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                     |
+| --------- | ------ | ----------------------------------------------- |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")               |
+| id        | string | Request identifier matching the request         |
+| result    | array  | Array of node objects discovered through gossip |
+
+### Node Entry
+
+| Field        | Type   | Description                          |
+| ------------ | ------ | ------------------------------------ |
+| pubkey       | string | Node identity Pubkey, base58 encoded |
+| gossip       | string | null                                 |
+| tpu          | string | null                                 |
+| rpc          | string | null                                 |
+| version      | string | null                                 |
+| featureSet   | number | null                                 |
+| shredVersion | number | null                                 |
+
+## Use Cases
+
+* **Version Census**: Measure adoption of a validator client release across the cluster
+* **Leader Targeting**: Resolve TPU addresses to forward transactions directly to leaders
+* **Fork Detection**: Compare shred versions to spot nodes on a divergent cluster
+* **Topology Mapping**: Chart validator distribution across hosting providers and regions
+
+## Error Handling
+
+| Error Code | Message           | Description                                     |
+| ---------- | ----------------- | ----------------------------------------------- |
+| -32603     | Internal error    | Node failed to read the requested cluster state |
+| -32005     | Node is unhealthy | The node has fallen behind the cluster tip      |

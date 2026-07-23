@@ -1,138 +1,147 @@
 ---
 description: >-
-  The getEpochSchedule JSON-RPC method retrieves the epoch schedule information
-  from the Solana cluster's genesis configuration.
+  Example code for the getEpochSchedule JSON-RPC method. Complete guide on how
+  to use the getEpochSchedule JSON-RPC method in the GetBlock Web3
+  documentation.
 ---
 
-# getEpochSchedule – Solana
+# getEpochSchedule - Solana
 
-{% hint style="success" %}
-The getEpochSchedule RPC Solana method provides essential details about the structure of epochs in the Solana network.
-{% endhint %}
+This method returns the epoch schedule parameters configured at cluster genesis, including epoch length and the warmup behavior applied to early epochs.
 
-It helps developers and validators understand the number of slots per epoch, leader schedule offsets, and how epochs evolve over time.
+## Parameters
 
-### Supported Networks
+This method does not accept any parameters.
 
-This method is accessible through Solana API endpoints:
-
-* Mainnet
-
-### Parameters
-
-{% hint style="info" %}
-This method does not require any parameters.
-{% endhint %}
-
-### Request Example
-
-#### API Endpoints
-
-```
-https://go.getblock.io/<ACCESS-TOKEN>/
-```
-
-#### cURL Example
+## Request
 
 {% tabs %}
-{% tab title="curl" %}
-```json
-curl --location "https://go.getblock.io/<ACCESS-TOKEN>/" -XPOST \
---header "Content-Type: application/json" \
---data '{
+{% tab title="cURL" %}
+{% code overflow="wrap" %}
+```bash
+curl --location --request POST 'https://go.getblock.io/<ACCESS-TOKEN>/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "getEpochSchedule"
+    "method": "getEpochSchedule",
+    "params": [],
+    "id": "getblock.io"
 }'
 ```
+{% endcode %}
 {% endtab %}
-{% endtabs %}
 
-### Response
-
-A successful getEpochSchedule example response provides information about epoch structure and scheduling.
-
-#### Example Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "result": {
-    "firstNormalEpoch": 8,
-    "firstNormalSlot": 8160,
-    "leaderScheduleSlotOffset": 8192,
-    "slotsPerEpoch": 8192,
-    "warmup": true
-  },
-  "id": 1
-}
-```
-
-### Error Handling
-
-Common getEpochSchedule error scenarios:
-
-* Network issues: Request fails due to Solana API unavailability.
-* Invalid response format: Unexpected JSON structure returned.
-
-#### Example Error Response
-
-```json
-{
-  "jsonrpc": "2.0",
-  "error": {
-    "code": -32000,
-    "message": "Epoch schedule data unavailable"
-  },
-  "id": 1
-}
-```
-
-### Use Cases
-
-The Solana getEpochSchedule method is essential for:
-
-* Validators: Determining leader schedules and epoch transitions.
-* Blockchain explorers: Displaying epoch duration and slot calculations.
-* Web3 applications: Adjusting staking and governance models based on epoch structure.
-* Analytics platforms: Understanding epoch-based network trends.
-
-### Code Example – Web3 getEpochSchedule Integration
-
-{% tabs %}
-{% tab title="JavaScript" %}
+{% tab title="@solana/web3.js" %}
+{% code title="example.js" %}
 ```javascript
-const axios = require('axios');
+const { Connection } = require('@solana/web3.js');
 
-const url = "https://go.getblock.io/<ACCESS-TOKEN>/"; 
-const headers = { "Content-Type": "application/json" };
+const connection = new Connection('https://go.getblock.io/<ACCESS-TOKEN>/', 'confirmed');
 
-const payload = {
-  jsonrpc: "2.0",
-  id: 1,
-  method: "getEpochSchedule"
-};
+const schedule = await connection.getEpochSchedule();
 
-const fetchEpochSchedule = async () => {
-  try {
-    const response = await axios.post(url, payload, { headers });
-
-    if (response.status === 200 && response.data.result) {
-      console.log("Epoch Schedule:", response.data.result);
-    } else {
-      console.error("Unexpected response:", response.data);
-    }
-  } catch (error) {
-    console.error("getEpochSchedule error:", error.response?.data || error.message);
-  }
-};
-
-fetchEpochSchedule();
-
+console.log(schedule.slotsPerEpoch, schedule.firstNormalEpoch);
 ```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Request" %}
+{% code title="example.py" %}
+```python
+import requests
+
+response = requests.post(
+    'https://go.getblock.io/<ACCESS-TOKEN>/',
+    headers={'Content-Type': 'application/json'},
+    json={
+        'jsonrpc': '2.0',
+        'method': 'getEpochSchedule',
+        'params': [],
+        'id': 'getblock.io'
+    }
+)
+
+print(response.json()['result'])
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Rust" %}
+{% code title="example.rs" %}
+```rust
+use reqwest::Client;
+use serde_json::{json, Value};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
+
+    let response = client
+        .post("https://go.getblock.io/<ACCESS-TOKEN>/")
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "jsonrpc": "2.0",
+            "method": "getEpochSchedule",
+            "params": [],
+            "id": "getblock.io"
+        }))
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+    println!("Result: {}", response["result"]);
+    Ok(())
+}
+```
+{% endcode %}
 {% endtab %}
 {% endtabs %}
 
-### Integration with Web3
+## Response
 
-Integrate the getEpochSchedule API with Solana’s Core API to retrieve real-time epoch structure details. By leveraging JSON-RPC parameters and endpoints, developers can track epoch progression, slot distribution, and leader schedule offsets, ensuring smooth blockchain operations.
+```json
+{
+    "jsonrpc": "2.0",
+    "id": "getblock.io",
+    "result": {
+        "firstNormalEpoch": 14,
+        "firstNormalSlot": 524256,
+        "leaderScheduleSlotOffset": 432000,
+        "slotsPerEpoch": 432000,
+        "warmup": true
+    }
+}
+```
+
+## Response Parameters
+
+| Parameter | Type   | Description                                            |
+| --------- | ------ | ------------------------------------------------------ |
+| jsonrpc   | string | JSON-RPC protocol version ("2.0")                      |
+| id        | string | Request identifier matching the request                |
+| result    | object | Object holding the cluster's epoch schedule parameters |
+
+### Result Object
+
+| Field                    | Type    | Description                                                             |
+| ------------------------ | ------- | ----------------------------------------------------------------------- |
+| slotsPerEpoch            | number  | Maximum number of slots in each epoch                                   |
+| leaderScheduleSlotOffset | number  | Slots before an epoch starts at which its leader schedule is calculated |
+| warmup                   | boolean | Whether epochs started short and grew toward slotsPerEpoch              |
+| firstNormalEpoch         | number  | First epoch with the full slotsPerEpoch length                          |
+| firstNormalSlot          | number  | Slot at which firstNormalEpoch begins                                   |
+
+## Use Cases
+
+* **Slot to Epoch Math**: Convert an arbitrary slot to its epoch without extra requests
+* **Schedule Prefetch**: Time leader schedule fetches using leaderScheduleSlotOffset
+* **Historical Analysis**: Handle warmup epochs correctly when indexing early ledger data
+* **Test Validators**: Detect shortened epoch settings on a local validator
+
+## Error Handling
+
+| Error Code | Message           | Description                                     |
+| ---------- | ----------------- | ----------------------------------------------- |
+| -32603     | Internal error    | Node failed to read the requested cluster state |
+| -32005     | Node is unhealthy | The node has fallen behind the cluster tip      |
